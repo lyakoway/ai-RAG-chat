@@ -1,0 +1,96 @@
+/* ============================================================
+   Design tokens + base styles
+   Light/dark theme via [data-theme] on <html>.
+   ============================================================ */
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', Menlo, monospace;
+
+  /* radii / shadows / motion */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-full: 999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.14);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* brand accent */
+  --accent: #6366f1;
+  --accent-2: #8b5cf6;
+  --accent-grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #d946ef 100%);
+}
+
+/* ---------- Light theme (default) ---------- */
+:root,
+:root[data-theme='light'] {
+  --bg: #f6f7fb;
+  --bg-elev: #ffffff;
+  --bg-soft: #eef0f6;
+  --panel: rgba(255, 255, 255, 0.72);
+  --border: #e4e7ef;
+  --border-strong: #d3d8e6;
+  --text: #14161f;
+  --text-soft: #4b5063;
+  --text-muted: #868ca0;
+  --bubble-ai: #ffffff;
+  --ring: rgba(99, 102, 241, 0.25);
+  color-scheme: light;
+}
+
+/* ---------- Dark theme ---------- */
+:root[data-theme='dark'] {
+  --bg: #0b0d14;
+  --bg-elev: #12141d;
+  --bg-soft: #171a26;
+  --panel: rgba(20, 23, 34, 0.72);
+  --border: #232739;
+  --border-strong: #313650;
+  --text: #eef0f7;
+  --text-soft: #b3b8cc;
+  --text-muted: #737a92;
+  --bubble-ai: #171a26;
+  --ring: rgba(139, 92, 246, 0.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+button:disabled { cursor: not-allowed; opacity: 0.5; }
+
+input, textarea, select { font-family: inherit; color: inherit; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); background-clip: content-box; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
