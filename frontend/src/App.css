@@ -1,0 +1,299 @@
+/* ================= Layout shell ================= */
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr auto;
+  /* Cap the single row at viewport height so inner overflow:auto panes
+     get a bounded height and actually scroll (instead of being clipped). */
+  grid-template-rows: minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Grid items default to min-height:auto and refuse to shrink below their
+   content — reset so their scrollable children work. */
+.sidebar,
+.main,
+.docs-panel {
+  min-height: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg);
+}
+
+/* ================= Sidebar ================= */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+}
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--accent-grad);
+  box-shadow: var(--shadow-md);
+}
+.brand-title { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.brand-sub { font-size: 12px; color: var(--text-muted); }
+
+.btn-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  border-radius: var(--r-md);
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  background: var(--accent-grad);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s var(--ease), box-shadow 0.2s;
+}
+.btn-new:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* Filters block inside the drawer — hidden on desktop (they live in the top bar). */
+.sidebar-filters {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-filters-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 0 2px 2px;
+}
+.sidebar-filters .dropdown { width: 100%; }
+.sidebar-filters .dropdown-trigger { width: 100%; justify-content: flex-start; }
+.sidebar-filters .dropdown-value { margin-right: auto; }
+.sidebar-filters .dropdown-menu { width: 100%; min-width: 0; }
+
+.conv-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -4px; padding: 0 4px; }
+.conv-empty { color: var(--text-muted); font-size: 13px; padding: 8px; line-height: 1.5; }
+.conv-group { margin-bottom: 14px; }
+.conv-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 4px 8px;
+}
+.conv-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--text-soft);
+  transition: background 0.15s;
+}
+.conv-item:hover { background: var(--bg-soft); }
+.conv-item.active { background: var(--bg-soft); color: var(--text); }
+.conv-item.active .conv-icon { color: var(--accent); }
+.conv-icon { flex-shrink: 0; color: var(--text-muted); }
+.conv-title {
+  flex: 1;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.conv-del {
+  opacity: 0;
+  color: var(--text-muted);
+  transition: opacity 0.15s, color 0.15s;
+  padding: 2px;
+  border-radius: 6px;
+}
+.conv-item:hover .conv-del { opacity: 1; }
+.conv-del:hover { color: #ef4444; }
+
+.sidebar-footer { border-top: 1px solid var(--border); padding-top: 12px; }
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--r-sm);
+  color: var(--text-soft);
+  font-size: 13.5px;
+  transition: background 0.15s;
+}
+.theme-toggle:hover { background: var(--bg-soft); }
+
+/* ================= Top bar ================= */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  z-index: 5;
+}
+.topbar-left { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
+
+.docs-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.docs-toggle:hover { border-color: var(--border-strong); }
+.docs-toggle.active { color: var(--accent); border-color: var(--accent); }
+.docs-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--r-full);
+  background: var(--accent-grad);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ================= Dropdown ================= */
+.dropdown { position: relative; }
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.dropdown-trigger:hover { border-color: var(--border-strong); }
+.dropdown-label { color: var(--text-muted); }
+.dropdown-value { font-weight: 600; }
+.dropdown-caret { color: var(--text-muted); transition: transform 0.2s; }
+.dropdown-caret.up { transform: rotate(180deg); }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 240px;
+  padding: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  animation: fadeUp 0.16s var(--ease);
+}
+.dropdown-menu.right { left: auto; right: 0; }
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  transition: background 0.12s;
+}
+.dropdown-option:hover:not(:disabled) { background: var(--bg-soft); }
+.dropdown-option.active { background: var(--bg-soft); }
+.dropdown-option-main { display: flex; flex-direction: column; gap: 1px; }
+.dropdown-option-label { font-size: 13.5px; font-weight: 500; }
+.dropdown-option-hint { font-size: 11.5px; color: var(--text-muted); }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-on { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15); }
+.dot-off { background: var(--text-muted); }
+
+/* Hamburger — desktop hides it (sidebar is always docked). */
+.menu-btn {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text-soft);
+  place-items: center;
+}
+.menu-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+/* Backdrop behind mobile drawers. */
+.drawer-backdrop { display: none; }
+
+/* ================= Responsive (≤1100px): drawers ================= */
+@media (max-width: 1100px) {
+  .app { grid-template-columns: 1fr; } /* main takes full width */
+
+  .menu-btn { display: inline-grid; }
+
+  /* Header collapses to [☰ menu] .......... [Документы].
+     Model/category selectors move into the drawer. */
+  .topbar-left { display: none; }
+  .sidebar-filters { display: flex; }
+
+  /* Sidebar becomes a left slide-in drawer. */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(280px, 82vw);
+    z-index: 130;
+    transform: translateX(-100%);
+    transition: transform 0.28s var(--ease);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    background: rgba(6, 8, 14, 0.5);
+    backdrop-filter: blur(2px);
+    animation: fadeUp 0.2s var(--ease);
+  }
+}
+
+@media (max-width: 620px) {
+  .topbar { padding: 10px 14px; }
+  .docs-toggle { padding: 8px 12px; }
+}
