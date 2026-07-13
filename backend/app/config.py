@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
+    # Number of layers to offload to GPU for Ollama. Leave None to let Ollama
+    # decide. Set to 0 to force CPU (needed e.g. on macOS 13, where the GPU/Metal
+    # build crashes with GGML_ASSERT).
+    ollama_num_gpu: int | None = None
 
     def ensure_dirs(self) -> None:
         self.upload_dir.mkdir(parents=True, exist_ok=True)
