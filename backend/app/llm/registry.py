@@ -38,7 +38,9 @@ _SPECS: list[ModelSpec] = [
               "Сбалансированная модель Anthropic", AnthropicProvider),
     ModelSpec("anthropic:claude-opus-4-8", "anthropic", "claude-opus-4-8", "Claude Opus 4.8",
               "Самая мощная модель Anthropic", AnthropicProvider),
-    ModelSpec("ollama:llama3.1", "ollama", "llama3.1", "Llama 3.1 (local)",
+    ModelSpec("ollama:llama3.2:3b", "ollama", "llama3.2:3b", "Llama 3.2 3B (local)",
+              "Локальная модель через Ollama (быстрая)", OllamaProvider),
+    ModelSpec("ollama:llama3.1", "ollama", "llama3.1", "Llama 3.1 8B (local)",
               "Локальная модель через Ollama", OllamaProvider),
     ModelSpec("ollama:mistral", "ollama", "mistral", "Mistral (local)",
               "Локальная модель через Ollama", OllamaProvider),
@@ -53,16 +55,18 @@ def _build(spec: ModelSpec) -> LLMProvider:
 
 def list_models() -> list[dict]:
     out = []
-    # Cache availability per provider to avoid repeated network probes.
+    # Availability depends on the specific model for Ollama (is it pulled?),
+    # but only on the provider for key-based ones (OpenAI/Anthropic/mock).
     avail_cache: dict[str, bool] = {}
     for spec in _SPECS:
-        if spec.provider not in avail_cache:
-            avail_cache[spec.provider] = _build(spec).available()
+        key = spec.id if spec.provider == "ollama" else spec.provider
+        if key not in avail_cache:
+            avail_cache[key] = _build(spec).available()
         out.append({
             "id": spec.id,
             "provider": spec.provider,
             "label": spec.label,
-            "available": avail_cache[spec.provider],
+            "available": avail_cache[key],
             "description": spec.description,
         })
     return out

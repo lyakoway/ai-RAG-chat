@@ -112,9 +112,14 @@ class OllamaProvider:
         self.model = model
 
     def available(self) -> bool:
+        """Reachable AND this specific model has been pulled."""
         try:
             r = httpx.get(f"{settings.ollama_base_url}/api/tags", timeout=1.0)
-            return r.status_code == 200
+            if r.status_code != 200:
+                return False
+            names = {m.get("name", "") for m in r.json().get("models", [])}
+            # Ollama tags include an explicit ":latest"; match with or without it.
+            return self.model in names or f"{self.model}:latest" in names
         except Exception:
             return False
 
@@ -127,6 +132,8 @@ class OllamaProvider:
             "messages": [{"role": "system", "content": system}]
             + [{"role": m.role, "content": m.content} for m in messages],
         }
+        if settings.ollama_num_gpu is not None:
+            payload["options"] = {"num_gpu": settings.ollama_num_gpu}
         async with httpx.AsyncClient(timeout=None) as client:
             async with client.stream(
                 "POST", f"{settings.ollama_base_url}/api/chat", json=payload
