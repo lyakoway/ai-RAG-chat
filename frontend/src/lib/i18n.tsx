@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { initialPref } from './prefs'
 
 export type Lang = 'ru' | 'en'
+
+const LANGS: readonly Lang[] = ['ru', 'en']
 
 /** Flat translation dictionary. `{var}` placeholders are filled by t(key, vars). */
 const dict = {
@@ -130,9 +133,7 @@ interface I18nValue {
 const I18nContext = createContext<I18nValue | null>(null)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(
-    () => (localStorage.getItem('lang') as Lang) || 'ru',
-  )
+  const [lang, setLang] = useState<Lang>(() => initialPref('lang', LANGS, 'ru'))
 
   useEffect(() => {
     localStorage.setItem('lang', lang)
