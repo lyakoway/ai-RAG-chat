@@ -18,7 +18,10 @@
   justify-content: space-between;
   padding: 16px 18px;
   border-bottom: 1px solid var(--border);
+  animation: enterUp 0.4s var(--ease) both;
+  animation-delay: 0.08s;
 }
+.docs-upload { animation: enterUp 0.4s var(--ease) both; animation-delay: 0.14s; }
 .docs-head h2 {
   display: flex;
   align-items: center;
@@ -94,6 +97,7 @@
   border: 1px solid var(--border);
   background: var(--bg);
   transition: border-color 0.15s;
+  animation: fadeUp 0.35s var(--ease) both;
 }
 .doc-item:hover { border-color: var(--border-strong); }
 .doc-ext {
