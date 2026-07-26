@@ -17,8 +17,17 @@
   margin: 0 auto;
   padding: 12vh 24px 40px;
   text-align: center;
-  animation: fadeUp 0.4s var(--ease);
 }
+/* Staggered entrance of the welcome block. */
+.welcome-logo { animation: popIn 0.6s var(--ease) both; animation-delay: 0.05s; }
+.welcome-title { animation: enterUp 0.5s var(--ease) both; animation-delay: 0.16s; }
+.welcome-sub { animation: enterUp 0.5s var(--ease) both; animation-delay: 0.24s; }
+.welcome-note { animation: enterUp 0.5s var(--ease) both; animation-delay: 0.32s; }
+.suggestion { animation: enterUp 0.5s var(--ease) both; }
+.suggestion:nth-child(1) { animation-delay: 0.4s; }
+.suggestion:nth-child(2) { animation-delay: 0.48s; }
+.suggestion:nth-child(3) { animation-delay: 0.56s; }
+
 .welcome-logo {
   width: 68px;
   height: 68px;
@@ -260,6 +269,8 @@
   max-width: 828px;
   width: 100%;
   margin: 0 auto;
+  animation: enterUp 0.5s var(--ease) both;
+  animation-delay: 0.15s;
 }
 .composer-box {
   display: flex;
