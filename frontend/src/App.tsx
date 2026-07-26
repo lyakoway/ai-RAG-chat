@@ -10,21 +10,28 @@ import { DocumentViewer } from './components/DocumentViewer'
 import { useChat } from './hooks/useChat'
 import { useI18n } from './lib/i18n'
 import { api } from './lib/api'
+import { initialPref, stripPrefParams } from './lib/prefs'
 import type { Conversation, DocumentItem, ModelInfo, Source } from './lib/types'
 
 type Theme = 'light' | 'dark'
+const THEMES: readonly Theme[] = ['light', 'dark']
 
 export default function App() {
   const { lang } = useI18n()
 
   // ---- Theme ----
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem('theme') as Theme) || 'dark',
-  )
+  // Initial value may come from ?theme= in the URL (see lib/prefs).
+  const [theme, setTheme] = useState<Theme>(() => initialPref('theme', THEMES, 'dark'))
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('theme', theme)
   }, [theme])
+
+  // URL params (?lang=&theme=) set the initial state once, then are stripped
+  // so the user's own toggles stay authoritative on later reloads.
+  useEffect(() => {
+    stripPrefParams(['lang', 'theme'])
+  }, [])
 
   // ---- Models ----
   const [models, setModels] = useState<ModelInfo[]>([])
