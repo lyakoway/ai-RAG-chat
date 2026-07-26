@@ -147,19 +147,30 @@
 .conv-item:hover .conv-del { opacity: 1; }
 .conv-del:hover { color: #ef4444; }
 
-.sidebar-footer { border-top: 1px solid var(--border); padding-top: 12px; }
+.sidebar-footer {
+  display: flex;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
 .theme-toggle {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
   padding: 10px;
   border-radius: var(--r-sm);
   color: var(--text-soft);
-  font-size: 13.5px;
-  transition: background 0.15s;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s, color 0.15s;
 }
-.theme-toggle:hover { background: var(--bg-soft); }
+.theme-toggle:hover { background: var(--bg-soft); color: var(--text); }
+.theme-toggle svg { flex-shrink: 0; }
 
 /* ================= Top bar ================= */
 .topbar {

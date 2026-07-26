@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { IconChevron, IconDoc, IconExternal } from '../lib/icons'
+import { useI18n } from '../lib/i18n'
 import type { Source } from '../lib/types'
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function SourceList({ sources, open, onToggle, activeIndex, onOpenSource }: Props) {
+  const { t } = useI18n()
   const cardRefs = useRef<(HTMLLIElement | null)[]>([])
   const [flash, setFlash] = useState<number | null>(null)
 
@@ -32,7 +34,7 @@ export function SourceList({ sources, open, onToggle, activeIndex, onOpenSource 
     <div className="sources">
       <button className="sources-header" onClick={onToggle}>
         <IconDoc width={15} height={15} />
-        <span>Источники · {sources.length}</span>
+        <span>{t('sources', { count: sources.length })}</span>
         <IconChevron width={15} height={15} className={`sources-caret ${open ? 'up' : ''}`} />
       </button>
 
@@ -51,13 +53,15 @@ export function SourceList({ sources, open, onToggle, activeIndex, onOpenSource 
                 <button
                   className="source-name"
                   onClick={() => onOpenSource(s)}
-                  title="Открыть источник"
+                  title={t('openSource')}
                 >
                   {s.filename}
                   <IconExternal width={13} height={13} />
                 </button>
                 <span className="source-meta">
-                  {s.page != null && <span className="source-page">стр. {s.page}</span>}
+                  {s.page != null && (
+                    <span className="source-page">{t('page', { n: s.page })}</span>
+                  )}
                   {s.score != null && (
                     <span className="source-score">{Math.round(s.score * 100)}%</span>
                   )}

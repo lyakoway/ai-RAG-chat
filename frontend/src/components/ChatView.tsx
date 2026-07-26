@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 import { IconLayers, IconSpark } from '../lib/icons'
+import { useI18n } from '../lib/i18n'
 import type { ChatMessage, Source } from '../lib/types'
 
 interface Props {
@@ -13,12 +14,6 @@ interface Props {
   onOpenSource: (source: Source) => void
 }
 
-const SUGGESTIONS = [
-  'Кратко перескажи ключевые положения документа',
-  'Какие сроки и условия упоминаются?',
-  'Найди цифры и суммы в таблицах',
-]
-
 export function ChatView({
   messages,
   isStreaming,
@@ -27,6 +22,8 @@ export function ChatView({
   hasDocuments,
   onOpenSource,
 }: Props) {
+  const { t } = useI18n()
+  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3')]
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -41,21 +38,18 @@ export function ChatView({
         {empty ? (
           <div className="welcome">
             <div className="welcome-logo"><IconSpark width={30} height={30} /></div>
-            <h1 className="welcome-title">Чат с вашими документами</h1>
-            <p className="welcome-sub">
-              Загрузите PDF, Word или Excel и задавайте вопросы — ответы приходят со ссылками
-              на страницы-источники.
-            </p>
+            <h1 className="welcome-title">{t('welcomeTitle')}</h1>
+            <p className="welcome-sub">{t('welcomeSub')}</p>
 
             {!hasDocuments && (
               <div className="welcome-note">
                 <IconLayers width={16} height={16} />
-                Пока нет готовых документов. Откройте панель «Документы» справа и загрузите файлы.
+                {t('welcomeNote')}
               </div>
             )}
 
             <div className="suggestions">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   className="suggestion"

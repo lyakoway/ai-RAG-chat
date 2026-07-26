@@ -1,5 +1,6 @@
 import { Filters } from './Filters'
 import { IconDoc, IconMenu } from '../lib/icons'
+import { useI18n } from '../lib/i18n'
 import type { ModelInfo } from '../lib/types'
 
 interface Props {
@@ -27,9 +28,10 @@ export function TopBar({
   readyDocs,
   onMenu,
 }: Props) {
+  const { t } = useI18n()
   return (
     <header className="topbar">
-      <button className="menu-btn" onClick={onMenu} title="Меню и настройки">
+      <button className="menu-btn" onClick={onMenu} title={t('menuTitle')}>
         <IconMenu width={18} height={18} />
       </button>
 
@@ -48,10 +50,10 @@ export function TopBar({
       <button
         className={`docs-toggle ${docsOpen ? 'active' : ''}`}
         onClick={onToggleDocs}
-        title="Панель документов"
+        title={t('documents')}
       >
         <IconDoc width={16} height={16} />
-        Документы
+        {t('documents')}
         <span className="docs-count">{readyDocs}</span>
       </button>
     </header>

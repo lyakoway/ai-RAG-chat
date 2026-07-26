@@ -54,7 +54,9 @@ export function streamChat(
       }
     } catch (err) {
       if (controller.signal.aborted) return // user cancelled — not an error
-      handlers.onError?.(err instanceof Error ? err.message : 'Ошибка соединения')
+      const fallback =
+        localStorage.getItem('lang') === 'en' ? 'Connection error' : 'Ошибка соединения'
+      handlers.onError?.(err instanceof Error ? err.message : fallback)
     }
   })()
 
