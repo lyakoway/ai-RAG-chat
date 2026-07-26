@@ -41,6 +41,7 @@ class ChatRequest(BaseModel):
     category: str | None = None                 # filter retrieval by category
     document_ids: list[str] | None = None        # or restrict to specific docs
     top_k: int | None = None
+    lang: str = "ru"                             # UI language: "ru" | "en"
 
 
 # ---------- Conversations ----------

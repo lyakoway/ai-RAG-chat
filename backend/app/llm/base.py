@@ -25,7 +25,7 @@ class LLMProvider(Protocol):
         ...
 
     async def stream(
-        self, system: str, messages: list[ChatMessage]
+        self, system: str, messages: list[ChatMessage], lang: str = "ru"
     ) -> AsyncIterator[str]:
-        """Yield response text chunks."""
+        """Yield response text chunks. `lang` is the UI language ("ru"|"en")."""
         ...

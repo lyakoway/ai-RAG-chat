@@ -8,12 +8,15 @@ import { ChatView } from './components/ChatView'
 import { DocumentsPanel } from './components/DocumentsPanel'
 import { DocumentViewer } from './components/DocumentViewer'
 import { useChat } from './hooks/useChat'
+import { useI18n } from './lib/i18n'
 import { api } from './lib/api'
 import type { Conversation, DocumentItem, ModelInfo, Source } from './lib/types'
 
 type Theme = 'light' | 'dark'
 
 export default function App() {
+  const { lang } = useI18n()
+
   // ---- Theme ----
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem('theme') as Theme) || 'dark',
@@ -110,8 +113,9 @@ export default function App() {
   )
 
   const handleSend = useCallback(
-    (text: string) => send(text, { model, category: category === 'All' ? null : category }),
-    [send, model, category],
+    (text: string) =>
+      send(text, { model, category: category === 'All' ? null : category, lang }),
+    [send, model, category, lang],
   )
 
   return (

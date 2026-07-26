@@ -28,27 +28,44 @@ class MockProvider:
     def available(self) -> bool:
         return True
 
-    async def stream(self, system: str, messages: list[ChatMessage]) -> AsyncIterator[str]:
+    async def stream(
+        self, system: str, messages: list[ChatMessage], lang: str = "ru"
+    ) -> AsyncIterator[str]:
         question = messages[-1].content if messages else ""
         # Pull the context block the RAG pipeline injected into `system`.
         context = ""
         if "CONTEXT:" in system:
             context = system.split("CONTEXT:", 1)[1].strip()
 
-        if context:
-            first = context.splitlines()[0] if context.splitlines() else ""
-            reply = (
-                f"На основе загруженных документов по вашему вопросу «{question}»:\n\n"
-                f"{first[:600]}\n\n"
-                "Подробности приведены в источниках ниже. "
-                "(Демо-режим: подключите OpenAI/Anthropic/Ollama для реальных ответов.)"
-            )
+        first = context.splitlines()[0] if context.splitlines() else ""
+        if lang == "en":
+            if context:
+                reply = (
+                    f"Based on your uploaded documents, regarding “{question}”:\n\n"
+                    f"{first[:600]}\n\n"
+                    "See the sources below for details. "
+                    "(Demo mode: connect OpenAI/Anthropic/Ollama for real answers.)"
+                )
+            else:
+                reply = (
+                    f"You asked: “{question}”. I couldn't find relevant fragments in the "
+                    "uploaded documents. Upload documents or refine your question.\n\n"
+                    "(Demo mode, no external model.)"
+                )
         else:
-            reply = (
-                f"Вы спросили: «{question}». Я не нашёл релевантных фрагментов в "
-                "загруженных документах. Загрузите документы или уточните вопрос.\n\n"
-                "(Демо-режим без внешней модели.)"
-            )
+            if context:
+                reply = (
+                    f"На основе загруженных документов по вашему вопросу «{question}»:\n\n"
+                    f"{first[:600]}\n\n"
+                    "Подробности приведены в источниках ниже. "
+                    "(Демо-режим: подключите OpenAI/Anthropic/Ollama для реальных ответов.)"
+                )
+            else:
+                reply = (
+                    f"Вы спросили: «{question}». Я не нашёл релевантных фрагментов в "
+                    "загруженных документах. Загрузите документы или уточните вопрос.\n\n"
+                    "(Демо-режим без внешней модели.)"
+                )
 
         for token in _tokenize(reply):
             await asyncio.sleep(0.012)
@@ -64,7 +81,9 @@ class OpenAIProvider:
     def available(self) -> bool:
         return bool(settings.openai_api_key)
 
-    async def stream(self, system: str, messages: list[ChatMessage]) -> AsyncIterator[str]:
+    async def stream(
+        self, system: str, messages: list[ChatMessage], lang: str = "ru"
+    ) -> AsyncIterator[str]:
         from openai import AsyncOpenAI
 
         client = AsyncOpenAI(api_key=settings.openai_api_key)
@@ -89,7 +108,9 @@ class AnthropicProvider:
     def available(self) -> bool:
         return bool(settings.anthropic_api_key)
 
-    async def stream(self, system: str, messages: list[ChatMessage]) -> AsyncIterator[str]:
+    async def stream(
+        self, system: str, messages: list[ChatMessage], lang: str = "ru"
+    ) -> AsyncIterator[str]:
         from anthropic import AsyncAnthropic
 
         client = AsyncAnthropic(api_key=settings.anthropic_api_key)
@@ -123,7 +144,9 @@ class OllamaProvider:
         except Exception:
             return False
 
-    async def stream(self, system: str, messages: list[ChatMessage]) -> AsyncIterator[str]:
+    async def stream(
+        self, system: str, messages: list[ChatMessage], lang: str = "ru"
+    ) -> AsyncIterator[str]:
         import json
 
         payload = {

@@ -63,7 +63,7 @@ async def chat(req: ChatRequest, db: Session = Depends(get_db)):
         document_ids=req.document_ids,
     )
     sources = rag.to_sources(hits)
-    system = rag.build_system_prompt(hits)
+    system = rag.build_system_prompt(hits, req.lang)
     provider = get_provider(req.model)
     conv_id = conv.id
 
@@ -74,7 +74,7 @@ async def chat(req: ChatRequest, db: Session = Depends(get_db)):
         })
         buffer: list[str] = []
         try:
-            async for delta in provider.stream(system, history):
+            async for delta in provider.stream(system, history, req.lang):
                 buffer.append(delta)
                 yield _sse("token", {"delta": delta})
         except Exception as exc:  # noqa: BLE001

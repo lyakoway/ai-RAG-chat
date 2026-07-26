@@ -9,6 +9,7 @@ interface SendOptions {
   model: string
   category?: string | null
   documentIds?: string[] | null
+  lang?: string
 }
 
 interface UseChatArgs {
@@ -64,6 +65,7 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
           model: opts.model,
           category: opts.category,
           document_ids: opts.documentIds,
+          lang: opts.lang,
         },
         {
           onSources: (cid: string, sources: Source[]) => {

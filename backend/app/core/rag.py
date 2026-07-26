@@ -7,16 +7,29 @@ from app.schemas.dto import Source
 
 settings = get_settings()
 
-SYSTEM_PROMPT = """Ты — ассистент, отвечающий на вопросы СТРОГО по предоставленным \
+SYSTEM_PROMPT_RU = """Ты — ассистент, отвечающий на вопросы СТРОГО по предоставленным \
 документам. Правила:
 - Используй только информацию из блока CONTEXT ниже.
 - Если ответа в контексте нет — честно скажи, что не нашёл информации.
-- Отвечай на языке вопроса, кратко и по делу.
+- Отвечай ПО-РУССКИ, кратко и по делу.
 - Ссылайся на источники в формате [1], [2] по номерам фрагментов из контекста.
 
 CONTEXT:
 {context}
 """
+
+SYSTEM_PROMPT_EN = """You are an assistant answering questions STRICTLY from the \
+provided documents. Rules:
+- Use only the information in the CONTEXT block below.
+- If the answer isn't in the context, say honestly that you couldn't find it.
+- Answer IN ENGLISH, concise and to the point.
+- Cite sources as [1], [2] by the fragment numbers from the context.
+
+CONTEXT:
+{context}
+"""
+
+SYSTEM_PROMPTS = {"ru": SYSTEM_PROMPT_RU, "en": SYSTEM_PROMPT_EN}
 
 
 def retrieve(
@@ -43,9 +56,11 @@ def build_context(hits: list[dict]) -> str:
     return "\n\n---\n\n".join(blocks)
 
 
-def build_system_prompt(hits: list[dict]) -> str:
-    context = build_context(hits) if hits else "(нет релевантных фрагментов)"
-    return SYSTEM_PROMPT.format(context=context)
+def build_system_prompt(hits: list[dict], lang: str = "ru") -> str:
+    empty = "(нет релевантных фрагментов)" if lang == "ru" else "(no relevant fragments)"
+    context = build_context(hits) if hits else empty
+    template = SYSTEM_PROMPTS.get(lang, SYSTEM_PROMPT_RU)
+    return template.format(context=context)
 
 
 def to_sources(hits: list[dict]) -> list[Source]:
