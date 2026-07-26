@@ -6,6 +6,7 @@ export interface ChatStreamRequest {
   model: string
   category?: string | null
   document_ids?: string[] | null
+  lang?: string
 }
 
 export interface ChatStreamHandlers {
