@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { IconSpark } from '../lib/icons'
 import { injectCitations } from '../lib/citations'
 import { SourceList } from './SourceList'
+import { useI18n } from '../lib/i18n'
 import type { ChatMessage, Source } from '../lib/types'
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function MessageBubble({ message, onOpenSource }: Props) {
+  const { t } = useI18n()
   const isUser = message.role === 'user'
   const showCursor = message.streaming && !message.content
   const sources = message.sources ?? []
@@ -28,7 +30,7 @@ export function MessageBubble({ message, onOpenSource }: Props) {
 
   // Markdown renderers that make citation markers ([1]) clickable.
   const withCites = (children: ReactNode) =>
-    injectCitations(children, sources.length, goToCitation)
+    injectCitations(children, sources.length, goToCitation, (n) => t('sourceN', { n }))
   const mdComponents = {
     p: (p: ComponentProps<'p'>) => <p>{withCites(p.children)}</p>,
     li: (p: ComponentProps<'li'>) => <li>{withCites(p.children)}</li>,

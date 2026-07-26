@@ -11,6 +11,7 @@ export function injectCitations(
   children: ReactNode,
   count: number,
   onCite: (index: number) => void,
+  titleFor: (n: number) => string,
 ): ReactNode {
   return Children.map(children, (child) => {
     if (typeof child === 'string') {
@@ -26,7 +27,7 @@ export function injectCitations(
                 type="button"
                 className="cite-ref"
                 onClick={() => onCite(n - 1)}
-                title={`Источник ${n}`}
+                title={titleFor(n)}
               >
                 {n}
               </button>
@@ -39,7 +40,11 @@ export function injectCitations(
     if (isValidElement(child)) {
       const el = child as ReactElement<{ children?: ReactNode }>
       if (el.props?.children) {
-        return cloneElement(el, undefined, injectCitations(el.props.children, count, onCite))
+        return cloneElement(
+          el,
+          undefined,
+          injectCitations(el.props.children, count, onCite, titleFor),
+        )
       }
     }
     return child

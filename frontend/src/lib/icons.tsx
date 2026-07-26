@@ -55,3 +55,6 @@ export const IconSpark = (p: SVGProps<SVGSVGElement>) => (
 export const IconMenu = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M4 6h16M4 12h16M4 18h16" /></svg>
 )
+export const IconGlobe = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" /></svg>
+)

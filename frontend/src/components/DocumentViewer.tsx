@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { api } from '../lib/api'
 import { IconExternal } from '../lib/icons'
+import { useI18n } from '../lib/i18n'
 import type { Source } from '../lib/types'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function DocumentViewer({ source, onClose }: Props) {
+  const { t } = useI18n()
   useEffect(() => {
     if (!source) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -30,13 +32,15 @@ export function DocumentViewer({ source, onClose }: Props) {
         <div className="viewer-head">
           <div className="viewer-title">
             <strong>{source.filename}</strong>
-            {source.page != null && <span className="viewer-page">стр. {source.page}</span>}
+            {source.page != null && (
+              <span className="viewer-page">{t('page', { n: source.page })}</span>
+            )}
           </div>
           <div className="viewer-actions">
             <a className="viewer-open" href={fileUrl} target="_blank" rel="noreferrer">
-              <IconExternal width={15} height={15} /> В новой вкладке
+              <IconExternal width={15} height={15} /> {t('viewerNewTab')}
             </a>
-            <button className="viewer-close" onClick={onClose} title="Закрыть (Esc)">✕</button>
+            <button className="viewer-close" onClick={onClose} title={t('viewerClose')}>✕</button>
           </div>
         </div>
 
@@ -46,14 +50,12 @@ export function DocumentViewer({ source, onClose }: Props) {
           ) : (
             <div className="viewer-fallback">
               <p>
-                Предпросмотр в браузере доступен только для PDF.
-                {source.page != null && (
-                  <> Цитата взята из фрагмента <b>стр. {source.page}</b>.</>
-                )}
+                {t('viewerPdfOnly')}
+                {source.page != null && <> {t('viewerFromPage', { n: source.page })}</>}
               </p>
               <blockquote className="viewer-snippet">{source.snippet}</blockquote>
               <a className="viewer-download" href={fileUrl} target="_blank" rel="noreferrer">
-                Скачать / открыть файл
+                {t('viewerDownload')}
               </a>
             </div>
           )}

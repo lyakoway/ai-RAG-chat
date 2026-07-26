@@ -1,5 +1,6 @@
-import { IconChat, IconMoon, IconPlus, IconSpark, IconSun, IconTrash } from '../lib/icons'
+import { IconChat, IconGlobe, IconMoon, IconPlus, IconSpark, IconSun, IconTrash } from '../lib/icons'
 import { Filters } from './Filters'
+import { useI18n, type TKey } from '../lib/i18n'
 import type { Conversation, ModelInfo } from '../lib/types'
 
 interface Props {
@@ -20,12 +21,18 @@ interface Props {
   onCategoryChange: (c: string) => void
 }
 
+const GROUP_KEYS: Record<string, TKey> = {
+  today: 'groupToday',
+  week: 'groupWeek',
+  earlier: 'groupEarlier',
+}
+
 function groupByDate(items: Conversation[]) {
   const groups: Record<string, Conversation[]> = {}
   const now = Date.now()
   for (const c of items) {
     const days = (now - new Date(c.updated_at).getTime()) / 86400000
-    const key = days < 1 ? 'Сегодня' : days < 7 ? 'Последние 7 дней' : 'Ранее'
+    const key = days < 1 ? 'today' : days < 7 ? 'week' : 'earlier'
     ;(groups[key] ??= []).push(c)
   }
   return groups
@@ -47,8 +54,9 @@ export function Sidebar({
   category,
   onCategoryChange,
 }: Props) {
+  const { t, toggleLang } = useI18n()
   const groups = groupByDate(conversations)
-  const order = ['Сегодня', 'Последние 7 дней', 'Ранее']
+  const order = ['today', 'week', 'earlier']
 
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`}>
@@ -56,16 +64,16 @@ export function Sidebar({
         <div className="brand-logo"><IconSpark width={20} height={20} /></div>
         <div>
           <div className="brand-title">RAG Chat</div>
-          <div className="brand-sub">Поиск по документам</div>
+          <div className="brand-sub">{t('brandSub')}</div>
         </div>
       </div>
 
       <button className="btn-new" onClick={onNew}>
-        <IconPlus /> Новый чат
+        <IconPlus /> {t('newChat')}
       </button>
 
       <div className="sidebar-filters">
-        <span className="sidebar-filters-label">Настройки поиска</span>
+        <span className="sidebar-filters-label">{t('searchSettings')}</span>
         <Filters
           models={models}
           model={model}
@@ -77,13 +85,11 @@ export function Sidebar({
       </div>
 
       <nav className="conv-list">
-        {conversations.length === 0 && (
-          <p className="conv-empty">История пуста. Задайте первый вопрос.</p>
-        )}
+        {conversations.length === 0 && <p className="conv-empty">{t('historyEmpty')}</p>}
         {order.map((key) =>
           groups[key]?.length ? (
             <div key={key} className="conv-group">
-              <div className="conv-group-label">{key}</div>
+              <div className="conv-group-label">{t(GROUP_KEYS[key])}</div>
               {groups[key].map((c) => (
                 <div
                   key={c.id}
@@ -94,7 +100,7 @@ export function Sidebar({
                   <span className="conv-title">{c.title}</span>
                   <button
                     className="conv-del"
-                    title="Удалить диалог"
+                    title={t('deleteConversation')}
                     onClick={(e) => {
                       e.stopPropagation()
                       onDelete(c.id)
@@ -112,7 +118,11 @@ export function Sidebar({
       <div className="sidebar-footer">
         <button className="theme-toggle" onClick={onToggleTheme}>
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
-          {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+          {theme === 'dark' ? t('themeLight') : t('themeDark')}
+        </button>
+        <button className="theme-toggle" onClick={toggleLang}>
+          <IconGlobe />
+          {t('langSwitch')}
         </button>
       </div>
     </aside>

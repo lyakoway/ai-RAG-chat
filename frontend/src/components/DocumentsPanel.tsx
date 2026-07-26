@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { IconDoc, IconTrash, IconUpload } from '../lib/icons'
 import { api } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 import type { DocumentItem } from '../lib/types'
 
 interface Props {
@@ -22,6 +23,7 @@ function fileExt(name: string) {
 }
 
 export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, onClose }: Props) {
+  const { t } = useI18n()
   const [category, setCategory] = useState('General')
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -38,7 +40,7 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
       }
       onUploaded()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Ошибка загрузки')
+      setError(e instanceof Error ? e.message : t('uploadError'))
     } finally {
       setUploading(false)
     }
@@ -54,18 +56,18 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
   return (
     <aside className="docs-panel">
       <div className="docs-head">
-        <h2><IconDoc width={18} height={18} /> Документы</h2>
-        <button className="docs-close" onClick={onClose} title="Скрыть панель">✕</button>
+        <h2><IconDoc width={18} height={18} /> {t('documents')}</h2>
+        <button className="docs-close" onClick={onClose} title={t('hidePanel')}>✕</button>
       </div>
 
       <div className="docs-upload">
-        <label className="docs-cat-label">Категория</label>
+        <label className="docs-cat-label">{t('category')}</label>
         <input
           className="docs-cat-input"
           list="categories"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          placeholder="Например: HR, Финансы, Договоры"
+          placeholder={t('categoryPlaceholder')}
         />
         <datalist id="categories">
           {knownCategories.map((c) => (
@@ -89,9 +91,9 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
         >
           <IconUpload width={22} height={22} />
           <span className="dropzone-title">
-            {uploading ? 'Загрузка…' : 'Перетащите файлы или нажмите'}
+            {uploading ? t('dropzoneUploading') : t('dropzoneIdle')}
           </span>
-          <span className="dropzone-sub">PDF · Word · Excel · можно несколько сразу</span>
+          <span className="dropzone-sub">{t('dropzoneSub')}</span>
           <input
             ref={inputRef}
             type="file"
@@ -108,7 +110,7 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
       </div>
 
       <div className="docs-list">
-        {documents.length === 0 && <p className="docs-empty">Документы ещё не загружены.</p>}
+        {documents.length === 0 && <p className="docs-empty">{t('docsEmpty')}</p>}
         {documents.map((d) => (
           <div key={d.id} className="doc-item">
             <div className={`doc-ext ext-${fileExt(d.filename).toLowerCase()}`}>
@@ -120,21 +122,21 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
                 <span className="doc-badge">{d.category}</span>
                 <span>{formatSize(d.size_bytes)}</span>
                 {d.status === 'ready' && (
-                  <span>{d.page_count} стр · {d.chunk_count} фрагм.</span>
+                  <span>{t('docStats', { pages: d.page_count, chunks: d.chunk_count })}</span>
                 )}
               </div>
               {d.status === 'processing' && (
                 <div className="doc-status processing">
-                  <span className="spinner" /> Индексация…
+                  <span className="spinner" /> {t('indexing')}
                 </div>
               )}
               {d.status === 'error' && (
                 <div className="doc-status error" title={d.error ?? ''}>
-                  Ошибка: {d.error}
+                  {t('errorPrefix')}: {d.error}
                 </div>
               )}
             </div>
-            <button className="doc-del" onClick={() => remove(d.id)} title="Удалить">
+            <button className="doc-del" onClick={() => remove(d.id)} title={t('deleteDoc')}>
               <IconTrash width={16} height={16} />
             </button>
           </div>

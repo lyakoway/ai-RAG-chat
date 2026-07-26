@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { IconSend, IconStop } from '../lib/icons'
+import { useI18n } from '../lib/i18n'
 
 interface Props {
   onSend: (text: string) => void
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function Composer({ onSend, onStop, isStreaming }: Props) {
+  const { t } = useI18n()
   const [text, setText] = useState('')
   const ref = useRef<HTMLTextAreaElement>(null)
 
@@ -34,7 +36,7 @@ export function Composer({ onSend, onStop, isStreaming }: Props) {
         <textarea
           ref={ref}
           className="composer-input"
-          placeholder="Спросите что-нибудь о ваших документах…"
+          placeholder={t('composerPlaceholder')}
           rows={1}
           value={text}
           onChange={(e) => {
@@ -49,7 +51,7 @@ export function Composer({ onSend, onStop, isStreaming }: Props) {
           }}
         />
         {isStreaming ? (
-          <button className="composer-btn stop" onClick={onStop} title="Остановить">
+          <button className="composer-btn stop" onClick={onStop} title={t('stop')}>
             <IconStop />
           </button>
         ) : (
@@ -57,15 +59,13 @@ export function Composer({ onSend, onStop, isStreaming }: Props) {
             className="composer-btn send"
             onClick={submit}
             disabled={!text.trim()}
-            title="Отправить (Enter)"
+            title={t('sendHint')}
           >
             <IconSend />
           </button>
         )}
       </div>
-      <p className="composer-hint">
-        Enter — отправить · Shift+Enter — новая строка. Ответы основаны на загруженных документах.
-      </p>
+      <p className="composer-hint">{t('composerHint')}</p>
     </div>
   )
 }
