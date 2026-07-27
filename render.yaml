@@ -8,14 +8,11 @@ services:
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    # Диск нужен для ChromaDB / загрузок / SQLite → требуется платный план.
-    # Хочешь бесплатно (данные эфемерны): plan: free и удали блок disk ниже.
-    plan: starter
+    # Бесплатный тариф: без persistent-диска, поэтому данные (ChromaDB,
+    # загрузки, SQLite) эфемерны и стираются при рестарте/редеплое.
+    # Нужна персистентность → plan: starter + блок disk (mountPath /app/data).
+    plan: free
     healthCheckPath: /api/health
-    disk:
-      name: data
-      mountPath: /app/data
-      sizeGB: 1
     envVars:
       # Ключи задаются в дашборде Render (sync: false — не хранятся в git).
       # Без них приложение работает в демо-режиме (mock) + локальные эмбеддинги.
