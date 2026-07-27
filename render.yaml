@@ -1,16 +1,17 @@
-# Render Blueprint — деплой AI RAG Chat двумя сервисами.
+# Render Blueprint — деплой AI RAG Chat одним сервисом.
+# Бэкенд (FastAPI) отдаёт и API, и собранный фронтенд с одного домена,
+# поэтому на free-тарифе не нужна межсервисная сеть и нет проблем с CORS.
 # Инструкция: Render Dashboard → New → Blueprint → выбрать этот репозиторий.
-# Render прочитает этот файл и создаст оба сервиса автоматически.
 services:
-  # ---------- Бэкенд (FastAPI + ChromaDB) ----------
   - type: web
     name: ai-rag-chat-backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
-    # Бесплатный тариф: без persistent-диска, поэтому данные (ChromaDB,
-    # загрузки, SQLite) эфемерны и стираются при рестарте/редеплое.
-    # Нужна персистентность → plan: starter + блок disk (mountPath /app/data).
+    # Комбинированный образ из корня репозитория (фронт + бэкенд).
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    # Бесплатный тариф: без persistent-диска → данные (ChromaDB, загрузки,
+    # SQLite) эфемерны и стираются при рестарте/редеплое. Нужна
+    # персистентность → plan: starter + блок disk (mountPath /app/data).
     plan: free
     healthCheckPath: /api/health
     envVars:
@@ -20,20 +21,3 @@ services:
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
-
-  # ---------- Фронтенд (React + nginx, проксирует /api на бэкенд) ----------
-  - type: web
-    name: ai-rag-chat-frontend
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    plan: free
-    envVars:
-      # Внутренний адрес бэкенда (host:port) — Render подставит автоматически.
-      - key: BACKEND_HOSTPORT
-        fromService:
-          type: web
-          name: ai-rag-chat-backend
-          property: hostport
-      - key: NGINX_ENVSUBST_FILTER
-        value: BACKEND_HOSTPORT
