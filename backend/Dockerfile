@@ -15,4 +15,5 @@ COPY app ./app
 VOLUME ["/app/data"]
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so ${PORT} (set by hosts like Render) is honored; 8000 locally.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}

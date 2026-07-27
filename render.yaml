@@ -1,0 +1,42 @@
+# Render Blueprint — деплой AI RAG Chat двумя сервисами.
+# Инструкция: Render Dashboard → New → Blueprint → выбрать этот репозиторий.
+# Render прочитает этот файл и создаст оба сервиса автоматически.
+services:
+  # ---------- Бэкенд (FastAPI + ChromaDB) ----------
+  - type: web
+    name: ai-rag-chat-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    # Диск нужен для ChromaDB / загрузок / SQLite → требуется платный план.
+    # Хочешь бесплатно (данные эфемерны): plan: free и удали блок disk ниже.
+    plan: starter
+    healthCheckPath: /api/health
+    disk:
+      name: data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      # Ключи задаются в дашборде Render (sync: false — не хранятся в git).
+      # Без них приложение работает в демо-режиме (mock) + локальные эмбеддинги.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  # ---------- Фронтенд (React + nginx, проксирует /api на бэкенд) ----------
+  - type: web
+    name: ai-rag-chat-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      # Внутренний адрес бэкенда (host:port) — Render подставит автоматически.
+      - key: BACKEND_HOSTPORT
+        fromService:
+          type: web
+          name: ai-rag-chat-backend
+          property: hostport
+      - key: NGINX_ENVSUBST_FILTER
+        value: BACKEND_HOSTPORT

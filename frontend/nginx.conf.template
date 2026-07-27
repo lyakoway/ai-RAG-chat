@@ -10,8 +10,11 @@ server {
     }
 
     # Proxy API to the backend service. SSE needs buffering off.
+    # ${BACKEND_HOSTPORT} is rendered at container start by the nginx
+    # entrypoint (envsubst): "backend:8000" via docker-compose, or the
+    # backend service's internal host:port when deployed on Render.
     location /api/ {
-        proxy_pass http://backend:8000;
+        proxy_pass http://${BACKEND_HOSTPORT};
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
