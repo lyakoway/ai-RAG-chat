@@ -23,7 +23,8 @@ COPY backend/requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY backend/app ./app
-COPY --from=frontend /fe/dist ./static   # FastAPI serves this at "/"
+# FastAPI serves this at "/" (COPY forbids inline comments on the same line).
+COPY --from=frontend /fe/dist ./static
 
 # Persistent data (uploads, chroma, sqlite). Ephemeral without a mounted disk.
 VOLUME ["/app/data"]
