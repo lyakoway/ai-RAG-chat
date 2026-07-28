@@ -1,3 +1,14 @@
+<!-- Метаданные для Hugging Face Spaces (Docker SDK). На GitHub — просто заголовок. -->
+---
+title: AI RAG Chat
+emoji: 📚
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # AI RAG Chat — чат с внутренними документами
 
 Портфолио-проект: чат-ассистент с **Retrieval-Augmented Generation** по вашим
