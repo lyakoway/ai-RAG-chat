@@ -1,4 +1,3 @@
-<!-- Метаданные для Hugging Face Spaces (Docker SDK). На GitHub — просто заголовок. -->
 ---
 title: AI RAG Chat
 emoji: 📚
