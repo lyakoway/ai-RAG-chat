@@ -74,19 +74,23 @@ class MockProvider:
 
 class OpenAIProvider:
     provider = "openai"
+    base_url: str | None = None  # None → официальный эндпоинт OpenAI
 
     def __init__(self, model: str = "gpt-4o-mini") -> None:
         self.model = model
 
+    def _api_key(self) -> str | None:
+        return settings.openai_api_key
+
     def available(self) -> bool:
-        return bool(settings.openai_api_key)
+        return bool(self._api_key())
 
     async def stream(
         self, system: str, messages: list[ChatMessage], lang: str = "ru"
     ) -> AsyncIterator[str]:
         from openai import AsyncOpenAI
 
-        client = AsyncOpenAI(api_key=settings.openai_api_key)
+        client = AsyncOpenAI(api_key=self._api_key(), base_url=self.base_url)
         payload = [{"role": "system", "content": system}] + [
             {"role": m.role, "content": m.content} for m in messages
         ]
@@ -97,6 +101,19 @@ class OpenAIProvider:
             delta = chunk.choices[0].delta.content
             if delta:
                 yield delta
+
+
+class ZaiProvider(OpenAIProvider):
+    """Z.ai (Zhipu GLM) через OpenAI-совместимый эндпоинт — работает без VPN."""
+
+    provider = "zai"
+    base_url = "https://api.z.ai/api/paas/v4"
+
+    def __init__(self, model: str = "glm-4.6") -> None:
+        self.model = model
+
+    def _api_key(self) -> str | None:
+        return settings.zai_api_key
 
 
 class AnthropicProvider:
