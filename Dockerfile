@@ -28,7 +28,8 @@ COPY --from=frontend /fe/dist ./static
 
 # Persistent data (uploads, chroma, sqlite). Ephemeral without a mounted disk.
 VOLUME ["/app/data"]
-EXPOSE 8000
+# 7860 — порт по умолчанию для Hugging Face Spaces (совпадает с app_port в README).
+EXPOSE 7860
 
-# Shell form so ${PORT} (set by Render) is honored; 8000 locally.
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Shell form so ${PORT} (set by the host) is honored; 7860 by default.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}
