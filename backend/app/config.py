@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     # --- LLM provider keys (optional) ---
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
+    # Z.ai (Zhipu GLM) — OpenAI-совместимый эндпоинт, доступен без VPN.
+    zai_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
     # Number of layers to offload to GPU for Ollama. Leave None to let Ollama
     # decide. Set to 0 to force CPU (needed e.g. on macOS 13, where the GPU/Metal
