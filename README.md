@@ -8,16 +8,25 @@ app_port: 7860
 pinned: false
 ---
 
-# AI RAG Chat — чат с внутренними документами
+# 📚 AI RAG Chat — чат с внутренними документами
 
-Портфолио-проект: чат-ассистент с **Retrieval-Augmented Generation** по вашим
-документам (PDF, Word, Excel). Отвечает **только по загруженным файлам** и
-показывает **источники со ссылками на страницы**.
+> Чат-ассистент с **Retrieval-Augmented Generation** по вашим документам
+> (PDF, Word, Excel). Отвечает **только по загруженным файлам** и показывает
+> **источники со ссылками на страницы**.
 
-![stack](https://img.shields.io/badge/backend-FastAPI-009688) ![stack](https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61dafb) ![stack](https://img.shields.io/badge/vector-ChromaDB-5c2d91)
+### 🔗 Живое демо → **https://lyakoway-rag-chat.hf.space**
 
-<!-- Скриншот: сохраните изображение интерфейса в docs/screenshot.png -->
-![Скриншот интерфейса](docs/screenshot.png)
+[![Demo](https://img.shields.io/badge/demo-🤗%20Hugging%20Face%20Spaces-ff9d00)](https://lyakoway-rag-chat.hf.space)
+![backend](https://img.shields.io/badge/backend-FastAPI-009688)
+![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61dafb)
+![vector](https://img.shields.io/badge/vector-ChromaDB-5c2d91)
+![license](https://img.shields.io/badge/license-MIT-black)
+
+<sub>Демо на бесплатном тарифе может «засыпать» — первый заход после простоя
+поднимается ~50 сек.</sub>
+
+<!-- Скриншот интерфейса: положите файл в docs/screenshot.png и раскомментируйте строку ниже. -->
+<!-- ![Скриншот интерфейса](docs/screenshot.png) -->
 
 ## Возможности
 
@@ -29,8 +38,8 @@ pinned: false
   на **странице цитаты** (для Office-файлов — скачивание/предпросмотр сниппета)
 - 💬 **История диалогов** — все чаты сохраняются, к ним можно вернуться
 - 🏷️ **Фильтрация по категориям** — ограничьте поиск нужной категорией (HR, Финансы, …)
-- 🤖 **Выбор модели** — OpenAI (GPT), Anthropic (Claude), локальная (Ollama) или
-  офлайн демо-режим без ключей
+- 🤖 **Выбор модели** — Z.ai (GLM, есть **бесплатная**), OpenAI (GPT),
+  Anthropic (Claude), локальная (Ollama) или офлайн демо-режим без ключей
 - ⚡ **Стриминг ответов** — токены приходят в реальном времени (SSE)
 - 🎨 **Аккуратный UI** — светлая/тёмная тема, адаптивная вёрстка
 
@@ -53,8 +62,8 @@ pinned: false
                                                │  ├────────────────────┤  │
                                                │  │ RAG pipeline       │  │
                                                │  ├────────────────────┤  │
-                                               │  │ LLM providers      │──┼─▶ OpenAI / Anthropic
-                                               │  │ (mock/gpt/claude/  │  │   / Ollama
+                                               │  │ LLM providers      │──┼─▶ Z.ai (GLM) / OpenAI
+                                               │  │ (mock/gpt/claude/  │  │   Anthropic / Ollama
                                                │  │  ollama)           │  │
                                                │  └────────────────────┘  │
                                                │  История → SQLite         │
@@ -135,12 +144,17 @@ cd backend && .venv/bin/python scripts/make_samples.py
 | Провайдер | Как включить |
 |-----------|--------------|
 | **Demo (offline)** | работает всегда, без настройки |
+| **Z.ai (GLM)** | `ZAI_API_KEY=...` в `backend/.env`; ключ — на [z.ai/model-api](https://z.ai/model-api). Модель `glm-4.5-flash` **бесплатная** |
 | **OpenAI (GPT)** | `OPENAI_API_KEY=sk-...` в `backend/.env` |
 | **Anthropic (Claude)** | `ANTHROPIC_API_KEY=sk-ant-...` в `backend/.env` |
 | **Ollama (локально)** | установите [Ollama](https://ollama.com), `ollama pull llama3.2:3b` (см. ниже) |
 
 Недоступные модели помечены в выпадающем списке серой точкой (нет ключа / модель
 не скачана / сервер не запущен).
+
+> **Z.ai** — OpenAI-совместимый эндпоинт (`https://api.z.ai/api/paas/v4`),
+> доступен без VPN. Провайдер поддерживает настраиваемый `base_url`, поэтому
+> так же можно подключить любой OpenAI-совместимый шлюз.
 
 ### Локальные модели через Ollama
 
@@ -178,12 +192,25 @@ OLLAMA_NUM_GPU=0      # форсировать CPU (обход Metal-бага н
 > нет готового бинарника, brew собирает из исходников (долго). Проще скачать
 > готовый бинарник с ollama.com и запускать CLI напрямую.
 
+## 🚀 Деплой
+
+Живая версия развёрнута на **Hugging Face Spaces** (Docker) — один контейнер, в
+котором **FastAPI отдаёт и API, и собранный фронтенд** с одного домена (без CORS
+и межсервисной сети). Сборку описывает корневой [`Dockerfile`](Dockerfile):
+многостадийный образ — сначала `vite build`, затем Python-бэкенд, который
+раздаёт статику из `/app/static`.
+
+- Метаданные Space (SDK, порт `7860`) — в YAML-блоке в начале этого README.
+- Ключи задаются как **секреты Space** (`ZAI_API_KEY` и т.п.), в код не попадают.
+- Для локального запуска двумя сервисами есть [`docker-compose.yml`](docker-compose.yml)
+  (nginx проксирует `/api` на бэкенд) — см. [Через Docker](#через-docker).
+
 ## Стек
 
 - **Backend:** FastAPI, SQLAlchemy (SQLite), ChromaDB, fastembed, pypdf,
   python-docx, openpyxl, tiktoken
 - **Frontend:** React 19, TypeScript, Vite, react-markdown
-- **LLM:** OpenAI / Anthropic / Ollama / mock
+- **LLM:** Z.ai (GLM) / OpenAI / Anthropic / Ollama / mock (настраиваемый `base_url`)
 
 ## Примечания
 
