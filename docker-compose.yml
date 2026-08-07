@@ -15,7 +15,11 @@ services:
       - "host.docker.internal:host-gateway"   # доступ к локальному Ollama
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_YANDEX_METRIKA_ID: ${VITE_YANDEX_METRIKA_ID:-}
+        VITE_GA4_MEASUREMENT_ID: ${VITE_GA4_MEASUREMENT_ID:-}
     depends_on:
       - backend
     ports:

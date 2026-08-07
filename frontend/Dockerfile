@@ -4,6 +4,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# Vite вшивает VITE_* на этапе сборки (как NEXT_PUBLIC_* в lyako-way).
+ARG VITE_YANDEX_METRIKA_ID=
+ARG VITE_GA4_MEASUREMENT_ID=
+ENV VITE_YANDEX_METRIKA_ID=$VITE_YANDEX_METRIKA_ID \
+    VITE_GA4_MEASUREMENT_ID=$VITE_GA4_MEASUREMENT_ID
 RUN npm run build
 
 # --- Serve stage (nginx serves static build + proxies /api) ---
