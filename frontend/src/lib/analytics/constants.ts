@@ -8,7 +8,6 @@ export const AnalyticsEvent = {
   CHAT_MESSAGE_SEND: 'chat_message_send',
   CHAT_NEW: 'chat_new',
   DOCUMENT_UPLOAD: 'document_upload',
-  DOCUMENT_OPEN: 'document_open',
   DOCUMENT_DELETE: 'document_delete',
   CATEGORY_FILTER: 'category_filter',
   MODEL_CHANGE: 'model_change',

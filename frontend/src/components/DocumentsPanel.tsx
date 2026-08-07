@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { IconDoc, IconTrash, IconUpload } from '../lib/icons'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import type { DocumentItem } from '../lib/types'
@@ -33,11 +34,17 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
   const upload = async (files: FileList | File[]) => {
     setError(null)
     setUploading(true)
+    const list = Array.from(files)
+    const cat = category.trim() || 'General'
     try {
       // Sequential upload keeps the UI status readable; supports many files at once.
-      for (const file of Array.from(files)) {
-        await api.uploadDocument(file, category.trim() || 'General')
+      for (const file of list) {
+        await api.uploadDocument(file, cat)
       }
+      trackEvent(AnalyticsEvent.DOCUMENT_UPLOAD, {
+        category: cat,
+        count: list.length,
+      })
       onUploaded()
     } catch (e) {
       setError(e instanceof Error ? e.message : t('uploadError'))
@@ -46,8 +53,9 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
     }
   }
 
-  const remove = async (id: string) => {
+  const remove = async (id: string, filename: string) => {
     await api.deleteDocument(id)
+    trackEvent(AnalyticsEvent.DOCUMENT_DELETE, { filename })
     onDeleted()
   }
 
@@ -136,7 +144,11 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
                 </div>
               )}
             </div>
-            <button className="doc-del" onClick={() => remove(d.id)} title={t('deleteDoc')}>
+            <button
+              className="doc-del"
+              onClick={() => remove(d.id, d.filename)}
+              title={t('deleteDoc')}
+            >
               <IconTrash width={16} height={16} />
             </button>
           </div>

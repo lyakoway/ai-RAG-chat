@@ -1,4 +1,5 @@
 import { IconChat, IconGlobe, IconMoon, IconPlus, IconSpark, IconSun, IconTrash } from '../lib/icons'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { Filters } from './Filters'
 import { useI18n, type TKey } from '../lib/i18n'
 import type { Conversation, ModelInfo } from '../lib/types'
@@ -120,7 +121,13 @@ export function Sidebar({
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
           {theme === 'dark' ? t('themeLight') : t('themeDark')}
         </button>
-        <button className="theme-toggle" onClick={toggleLang}>
+        <button
+          className="theme-toggle"
+          onClick={() => {
+            trackEvent(AnalyticsEvent.LANGUAGE_TOGGLE)
+            toggleLang()
+          }}
+        >
           <IconGlobe />
           {t('langSwitch')}
         </button>
