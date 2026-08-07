@@ -21,3 +21,8 @@ services:
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Аналитика (Vite вшивает на build; задайте ID счётчиков в дашборде).
+      - key: VITE_YANDEX_METRIKA_ID
+        sync: false
+      - key: VITE_GA4_MEASUREMENT_ID
+        sync: false
