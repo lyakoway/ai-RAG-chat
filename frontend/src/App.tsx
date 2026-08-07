@@ -8,6 +8,7 @@ import { ChatView } from './components/ChatView'
 import { DocumentsPanel } from './components/DocumentsPanel'
 import { DocumentViewer } from './components/DocumentViewer'
 import { useChat } from './hooks/useChat'
+import { AnalyticsEvent, trackEvent } from './lib/analytics'
 import { useI18n } from './lib/i18n'
 import { api } from './lib/api'
 import { initialPref, stripPrefParams } from './lib/prefs'
@@ -93,11 +94,16 @@ export default function App() {
     [documents],
   )
 
-  const newChat = useCallback(() => {
+  const resetChat = useCallback(() => {
     setConversationId(null)
     reset([])
     setSidebarOpen(false)
   }, [reset])
+
+  const newChat = useCallback(() => {
+    trackEvent(AnalyticsEvent.CHAT_NEW)
+    resetChat()
+  }, [resetChat])
 
   const openConversation = useCallback(
     async (id: string) => {
@@ -113,17 +119,46 @@ export default function App() {
   const deleteConversation = useCallback(
     async (id: string) => {
       await api.deleteConversation(id)
-      if (id === conversationId) newChat()
+      if (id === conversationId) resetChat()
       refreshConversations()
     },
-    [conversationId, newChat, refreshConversations],
+    [conversationId, resetChat, refreshConversations],
   )
 
   const handleSend = useCallback(
-    (text: string) =>
-      send(text, { model, category: category === 'All' ? null : category, lang }),
+    (text: string) => {
+      trackEvent(AnalyticsEvent.CHAT_MESSAGE_SEND, {
+        model,
+        category: category === 'All' ? 'all' : category,
+      })
+      send(text, { model, category: category === 'All' ? null : category, lang })
+    },
     [send, model, category, lang],
   )
+
+  const handleModelChange = useCallback((id: string) => {
+    trackEvent(AnalyticsEvent.MODEL_CHANGE, { model: id })
+    setModel(id)
+  }, [])
+
+  const handleCategoryChange = useCallback((c: string) => {
+    trackEvent(AnalyticsEvent.CATEGORY_FILTER, { category: c })
+    setCategory(c)
+  }, [])
+
+  const handleToggleTheme = useCallback(() => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    trackEvent(AnalyticsEvent.THEME_TOGGLE, { theme: next })
+    setTheme(next)
+  }, [theme])
+
+  const handleOpenSource = useCallback((source: Source) => {
+    trackEvent(AnalyticsEvent.SOURCE_CLICK, {
+      filename: source.filename,
+      ...(source.page != null ? { page: source.page } : {}),
+    })
+    setViewerSource(source)
+  }, [])
 
   return (
     <div className="app">
@@ -135,23 +170,23 @@ export default function App() {
         onOpen={openConversation}
         onDelete={deleteConversation}
         theme={theme}
-        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onToggleTheme={handleToggleTheme}
         models={models}
         model={model}
-        onModelChange={setModel}
+        onModelChange={handleModelChange}
         categories={categories}
         category={category}
-        onCategoryChange={setCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
       <main className="main">
         <TopBar
           models={models}
           model={model}
-          onModelChange={setModel}
+          onModelChange={handleModelChange}
           categories={categories}
           category={category}
-          onCategoryChange={setCategory}
+          onCategoryChange={handleCategoryChange}
           docsOpen={docsOpen}
           onToggleDocs={() => setDocsOpen((v) => !v)}
           readyDocs={readyDocs}
@@ -163,7 +198,7 @@ export default function App() {
           onSend={handleSend}
           onStop={stop}
           hasDocuments={readyDocs > 0}
-          onOpenSource={setViewerSource}
+          onOpenSource={handleOpenSource}
         />
       </main>
 
