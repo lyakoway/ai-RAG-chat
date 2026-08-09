@@ -59,7 +59,9 @@ const dict = {
 
     viewerNewTab: 'В новой вкладке',
     viewerClose: 'Закрыть (Esc)',
-    viewerPdfOnly: 'Предпросмотр в браузере доступен только для PDF.',
+    viewerPreviewUnsupported: 'Предпросмотр в браузере доступен для PDF и DOCX.',
+    viewerDocxLoading: 'Загрузка документа…',
+    viewerDocxError: 'Не удалось показать DOCX. Скачайте файл или откройте в новой вкладке.',
     viewerFromPage: 'Цитата взята из фрагмента стр. {n}.',
     viewerDownload: 'Скачать / открыть файл',
   },
@@ -115,7 +117,9 @@ const dict = {
 
     viewerNewTab: 'Open in new tab',
     viewerClose: 'Close (Esc)',
-    viewerPdfOnly: 'In-browser preview is available for PDF only.',
+    viewerPreviewUnsupported: 'In-browser preview is available for PDF and DOCX.',
+    viewerDocxLoading: 'Loading document…',
+    viewerDocxError: 'Could not preview this DOCX. Download it or open in a new tab.',
     viewerFromPage: 'Citation taken from a fragment on p. {n}.',
     viewerDownload: 'Download / open file',
   },
