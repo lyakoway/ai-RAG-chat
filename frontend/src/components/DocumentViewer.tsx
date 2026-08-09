@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { IconExternal } from '../lib/icons'
 import { useI18n } from '../lib/i18n'
@@ -7,6 +7,65 @@ import type { Source } from '../lib/types'
 interface Props {
   source: Source | null
   onClose: () => void
+}
+
+function fileExt(filename: string) {
+  return filename.split('.').pop()?.toLowerCase() ?? ''
+}
+
+function DocxPreview({ fileUrl }: { fileUrl: string }) {
+  const { t } = useI18n()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    let cancelled = false
+    setStatus('loading')
+    el.innerHTML = ''
+
+    ;(async () => {
+      try {
+        const [{ renderAsync }, res] = await Promise.all([
+          import('docx-preview'),
+          fetch(fileUrl),
+        ])
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const buffer = await res.arrayBuffer()
+        if (cancelled) return
+        await renderAsync(buffer, el, undefined, {
+          className: 'docx',
+          inWrapper: true,
+          ignoreWidth: false,
+          ignoreHeight: false,
+          breakPages: true,
+          renderHeaders: true,
+          renderFooters: true,
+        })
+        if (!cancelled) setStatus('ready')
+      } catch {
+        if (!cancelled) setStatus('error')
+      }
+    })()
+
+    return () => {
+      cancelled = true
+      el.innerHTML = ''
+    }
+  }, [fileUrl])
+
+  return (
+    <div className="viewer-docx-wrap">
+      {status === 'loading' && <p className="viewer-docx-status">{t('viewerDocxLoading')}</p>}
+      {status === 'error' && <p className="viewer-docx-status">{t('viewerDocxError')}</p>}
+      <div
+        ref={containerRef}
+        className={`viewer-docx ${status === 'ready' ? 'ready' : ''}`}
+      />
+    </div>
+  )
 }
 
 export function DocumentViewer({ source, onClose }: Props) {
@@ -20,8 +79,9 @@ export function DocumentViewer({ source, onClose }: Props) {
 
   if (!source) return null
 
-  const ext = source.filename.split('.').pop()?.toLowerCase() ?? ''
+  const ext = fileExt(source.filename)
   const isPdf = ext === 'pdf'
+  const isDocx = ext === 'docx'
   const fileUrl = api.documentFileUrl(source.document_id)
   // PDF.js/native viewer honours #page= to jump straight to the cited page.
   const pdfUrl = source.page ? `${fileUrl}#page=${source.page}&view=FitH` : fileUrl
@@ -47,10 +107,12 @@ export function DocumentViewer({ source, onClose }: Props) {
         <div className="viewer-body">
           {isPdf ? (
             <iframe className="viewer-frame" src={pdfUrl} title={source.filename} />
+          ) : isDocx ? (
+            <DocxPreview fileUrl={fileUrl} />
           ) : (
             <div className="viewer-fallback">
               <p>
-                {t('viewerPdfOnly')}
+                {t('viewerPreviewUnsupported')}
                 {source.page != null && <> {t('viewerFromPage', { n: source.page })}</>}
               </p>
               <blockquote className="viewer-snippet">{source.snippet}</blockquote>
