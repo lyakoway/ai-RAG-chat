@@ -2,6 +2,7 @@ import { useState, type ComponentProps, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { IconSpark } from '../lib/icons'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { injectCitations } from '../lib/citations'
 import { SourceList } from './SourceList'
 import { useI18n } from '../lib/i18n'
@@ -22,10 +23,25 @@ export function MessageBubble({ message, onOpenSource }: Props) {
   const [activeSource, setActiveSource] = useState<number | null>(null)
 
   const goToCitation = (index: number) => {
+    const source = sources[index]
+    trackEvent(AnalyticsEvent.SOURCE_CITATION_CLICK, {
+      index: index + 1,
+      ...(source?.filename ? { filename: source.filename } : {}),
+      ...(source?.page != null ? { page: source.page } : {}),
+    })
     setSourcesOpen(true)
     // Re-trigger scroll even if the same index is clicked twice.
     setActiveSource(null)
     requestAnimationFrame(() => setActiveSource(index))
+  }
+
+  const handleSourcesToggle = () => {
+    const next = !sourcesOpen
+    trackEvent(AnalyticsEvent.SOURCES_TOGGLE, {
+      open: next,
+      count: sources.length,
+    })
+    setSourcesOpen(next)
   }
 
   // Markdown renderers that make citation markers ([1]) clickable.
@@ -67,7 +83,7 @@ export function MessageBubble({ message, onOpenSource }: Props) {
           <SourceList
             sources={sources}
             open={sourcesOpen}
-            onToggle={() => setSourcesOpen((v) => !v)}
+            onToggle={handleSourcesToggle}
             activeIndex={activeSource}
             onOpenSource={onOpenSource}
           />
