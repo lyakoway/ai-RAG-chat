@@ -13,7 +13,8 @@
 - `VITE_YANDEX_METRIKA_ID`
 - `VITE_GA4_MEASUREMENT_ID`
 
-Пример: `frontend/.env.example`. Локально — `frontend/.env.local`; на Hugging Face / Render — Variables на этапе сборки (или `frontend/.env.production`).
+Пример: `frontend/.env.example`. Локально — `frontend/.env.local`.  
+Прод (HF Spaces / Docker): ID в `frontend/.env.production` — Vite вшивает их при `npm run build`. Variables в Settings HF на этапе Docker-build обычно **недоступны**, поэтому без `.env.production` счётчики на демо не появятся.
 
 В Яндекс.Метрике для отчётов по целям создайте JavaScript-цели с теми же идентификаторами, что в колонке «Событие» / «Идентификатор» ниже.
 
