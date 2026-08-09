@@ -160,6 +160,14 @@ export default function App() {
     setViewerSource(source)
   }, [])
 
+  const handleToggleDocs = useCallback(() => {
+    setDocsOpen((v) => {
+      const next = !v
+      trackEvent(AnalyticsEvent.DOCS_PANEL_TOGGLE, { open: next })
+      return next
+    })
+  }, [])
+
   return (
     <div className="app">
       <Sidebar
@@ -188,7 +196,7 @@ export default function App() {
           category={category}
           onCategoryChange={handleCategoryChange}
           docsOpen={docsOpen}
-          onToggleDocs={() => setDocsOpen((v) => !v)}
+          onToggleDocs={handleToggleDocs}
           readyDocs={readyDocs}
           onMenu={() => setSidebarOpen(true)}
         />

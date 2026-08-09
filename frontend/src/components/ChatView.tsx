@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 import { IconLayers, IconSpark } from '../lib/icons'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { useI18n } from '../lib/i18n'
 import type { ChatMessage, Source } from '../lib/types'
 
@@ -49,12 +50,17 @@ export function ChatView({
             )}
 
             <div className="suggestions">
-              {suggestions.map((s) => (
+              {suggestions.map((s, i) => (
                 <button
                   key={s}
                   className="suggestion"
                   disabled={!hasDocuments}
-                  onClick={() => onSend(s)}
+                  onClick={() => {
+                    trackEvent(AnalyticsEvent.CHAT_SUGGESTION_CLICK, {
+                      index: i + 1,
+                    })
+                    onSend(s)
+                  }}
                 >
                   {s}
                 </button>
