@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { api } from '../lib/api'
 import { IconExternal } from '../lib/icons'
 import { useI18n } from '../lib/i18n'
@@ -13,6 +14,23 @@ const XLSX_PREVIEW_MAX_ROWS = 500
 
 function fileExt(filename: string) {
   return filename.split('.').pop()?.toLowerCase() ?? ''
+}
+
+function viewerMode(ext: string): 'pdf' | 'docx' | 'xlsx' | 'fallback' {
+  if (ext === 'pdf') return 'pdf'
+  if (ext === 'docx') return 'docx'
+  if (ext === 'xlsx' || ext === 'xls') return 'xlsx'
+  return 'fallback'
+}
+
+function viewerParams(source: Source) {
+  const ext = fileExt(source.filename)
+  return {
+    filename: source.filename,
+    format: ext || 'unknown',
+    mode: viewerMode(ext),
+    ...(source.page != null ? { page: source.page } : {}),
+  }
 }
 
 function DocxPreview({ fileUrl }: { fileUrl: string }) {
@@ -193,25 +211,37 @@ function XlsxPreview({ fileUrl }: { fileUrl: string }) {
 
 export function DocumentViewer({ source, onClose }: Props) {
   const { t } = useI18n()
+
+  const closeViewer = useCallback(() => {
+    if (source) {
+      trackEvent(AnalyticsEvent.VIEWER_CLOSE, viewerParams(source))
+    }
+    onClose()
+  }, [source, onClose])
+
   useEffect(() => {
     if (!source) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    trackEvent(AnalyticsEvent.VIEWER_OPEN, viewerParams(source))
+  }, [source])
+
+  useEffect(() => {
+    if (!source) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeViewer()
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [source, onClose])
+  }, [source, closeViewer])
 
   if (!source) return null
 
   const ext = fileExt(source.filename)
-  const isPdf = ext === 'pdf'
-  const isDocx = ext === 'docx'
-  const isXlsx = ext === 'xlsx' || ext === 'xls'
+  const mode = viewerMode(ext)
   const fileUrl = api.documentFileUrl(source.document_id)
   // PDF.js/native viewer honours #page= to jump straight to the cited page.
   const pdfUrl = source.page ? `${fileUrl}#page=${source.page}&view=FitH` : fileUrl
+  const params = viewerParams(source)
 
   return (
-    <div className="viewer-overlay" onClick={onClose}>
+    <div className="viewer-overlay" onClick={closeViewer}>
       <div className="viewer" onClick={(e) => e.stopPropagation()}>
         <div className="viewer-head">
           <div className="viewer-title">
@@ -221,19 +251,31 @@ export function DocumentViewer({ source, onClose }: Props) {
             )}
           </div>
           <div className="viewer-actions">
-            <a className="viewer-open" href={fileUrl} target="_blank" rel="noreferrer">
+            <a
+              className="viewer-open"
+              href={fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackEvent(AnalyticsEvent.VIEWER_NEW_TAB, params)}
+            >
               <IconExternal width={15} height={15} /> {t('viewerNewTab')}
             </a>
-            <button className="viewer-close" onClick={onClose} title={t('viewerClose')}>✕</button>
+            <button
+              className="viewer-close"
+              onClick={closeViewer}
+              title={t('viewerClose')}
+            >
+              ✕
+            </button>
           </div>
         </div>
 
         <div className="viewer-body">
-          {isPdf ? (
+          {mode === 'pdf' ? (
             <iframe className="viewer-frame" src={pdfUrl} title={source.filename} />
-          ) : isDocx ? (
+          ) : mode === 'docx' ? (
             <DocxPreview fileUrl={fileUrl} />
-          ) : isXlsx ? (
+          ) : mode === 'xlsx' ? (
             <XlsxPreview fileUrl={fileUrl} />
           ) : (
             <div className="viewer-fallback">
@@ -242,7 +284,13 @@ export function DocumentViewer({ source, onClose }: Props) {
                 {source.page != null && <> {t('viewerFromPage', { n: source.page })}</>}
               </p>
               <blockquote className="viewer-snippet">{source.snippet}</blockquote>
-              <a className="viewer-download" href={fileUrl} target="_blank" rel="noreferrer">
+              <a
+                className="viewer-download"
+                href={fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackEvent(AnalyticsEvent.VIEWER_DOWNLOAD, params)}
+              >
                 {t('viewerDownload')}
               </a>
             </div>

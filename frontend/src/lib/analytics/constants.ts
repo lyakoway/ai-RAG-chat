@@ -22,6 +22,14 @@ export const AnalyticsEvent = {
   SOURCE_CITATION_CLICK: 'source_citation_click',
   /** Раскрыть / свернуть блок «Источники» */
   SOURCES_TOGGLE: 'sources_toggle',
+  /** Модалка просмотрщика открыта */
+  VIEWER_OPEN: 'viewer_open',
+  /** «Скачать / открыть файл» (fallback) */
+  VIEWER_DOWNLOAD: 'viewer_download',
+  /** «В новой вкладке» */
+  VIEWER_NEW_TAB: 'viewer_new_tab',
+  /** Закрытие просмотрщика (✕ / Esc / оверлей) */
+  VIEWER_CLOSE: 'viewer_close',
 } as const
 
 export type AnalyticsEventName =
