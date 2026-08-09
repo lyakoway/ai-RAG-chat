@@ -390,7 +390,7 @@
   overflow: auto;
   background: var(--bg-soft);
 }
-.viewer-docx-status {
+.viewer-status {
   margin: 0;
   padding: 20px 16px 0;
   text-align: center;
@@ -417,6 +417,84 @@
   color: #111;
   box-shadow: var(--shadow-md);
   margin: 0 auto;
+}
+
+.viewer-xlsx {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-soft);
+}
+.viewer-xlsx-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+.viewer-xlsx-table {
+  border-collapse: collapse;
+  background: #fff;
+  color: #111;
+  font-size: 12.5px;
+  line-height: 1.35;
+  box-shadow: var(--shadow-sm);
+  min-width: 100%;
+}
+.viewer-xlsx-table td,
+.viewer-xlsx-table th {
+  border: 1px solid #e2e5ec;
+  padding: 5px 10px;
+  white-space: nowrap;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+.viewer-xlsx-table tr.head td {
+  font-weight: 650;
+  background: #f3f5f9;
+}
+.viewer-xlsx-table .row-num {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #f3f5f9;
+  color: #6b7280;
+  font-weight: 600;
+  text-align: right;
+  min-width: 36px;
+  border-right: 1px solid #d5d9e2;
+}
+.viewer-xlsx-note {
+  margin: 10px 4px 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.viewer-xlsx-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  overflow-x: auto;
+}
+.viewer-xlsx-tab {
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.viewer-xlsx-tab:hover { border-color: var(--border-strong); color: var(--text); }
+.viewer-xlsx-tab.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
 }
 .viewer-fallback {
   padding: 32px;

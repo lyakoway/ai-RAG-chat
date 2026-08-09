@@ -9,6 +9,8 @@ interface Props {
   onClose: () => void
 }
 
+const XLSX_PREVIEW_MAX_ROWS = 500
+
 function fileExt(filename: string) {
   return filename.split('.').pop()?.toLowerCase() ?? ''
 }
@@ -58,12 +60,133 @@ function DocxPreview({ fileUrl }: { fileUrl: string }) {
 
   return (
     <div className="viewer-docx-wrap">
-      {status === 'loading' && <p className="viewer-docx-status">{t('viewerDocxLoading')}</p>}
-      {status === 'error' && <p className="viewer-docx-status">{t('viewerDocxError')}</p>}
+      {status === 'loading' && <p className="viewer-status">{t('viewerDocxLoading')}</p>}
+      {status === 'error' && <p className="viewer-status">{t('viewerDocxError')}</p>}
       <div
         ref={containerRef}
         className={`viewer-docx ${status === 'ready' ? 'ready' : ''}`}
       />
+    </div>
+  )
+}
+
+type SheetPreview = {
+  name: string
+  rows: string[][]
+  truncated: boolean
+  totalRows: number
+}
+
+function XlsxPreview({ fileUrl }: { fileUrl: string }) {
+  const { t } = useI18n()
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [sheets, setSheets] = useState<SheetPreview[]>([])
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    setStatus('loading')
+    setSheets([])
+    setActive(0)
+
+    ;(async () => {
+      try {
+        const [XLSX, res] = await Promise.all([import('xlsx'), fetch(fileUrl)])
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const buffer = await res.arrayBuffer()
+        if (cancelled) return
+
+        const wb = XLSX.read(buffer, { type: 'array' })
+        const parsed: SheetPreview[] = wb.SheetNames.map((name) => {
+          const ws = wb.Sheets[name]
+          const all = XLSX.utils.sheet_to_json<(string | number | boolean | null)[]>(ws, {
+            header: 1,
+            defval: '',
+            raw: false,
+          })
+          const rows = all.map((row) =>
+            (Array.isArray(row) ? row : []).map((cell) =>
+              cell == null || cell === '' ? '' : String(cell),
+            ),
+          )
+          return {
+            name,
+            rows: rows.slice(0, XLSX_PREVIEW_MAX_ROWS),
+            truncated: rows.length > XLSX_PREVIEW_MAX_ROWS,
+            totalRows: rows.length,
+          }
+        })
+
+        if (!cancelled) {
+          setSheets(parsed)
+          setStatus('ready')
+        }
+      } catch {
+        if (!cancelled) setStatus('error')
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [fileUrl])
+
+  const sheet = sheets[active]
+
+  return (
+    <div className="viewer-xlsx">
+      {status === 'loading' && <p className="viewer-status">{t('viewerXlsxLoading')}</p>}
+      {status === 'error' && <p className="viewer-status">{t('viewerXlsxError')}</p>}
+
+      {status === 'ready' && sheet && (
+        <>
+          <div className="viewer-xlsx-scroll">
+            {sheet.rows.length === 0 ? (
+              <p className="viewer-status">{t('viewerXlsxEmpty')}</p>
+            ) : (
+              <table className="viewer-xlsx-table">
+                <tbody>
+                  {sheet.rows.map((row, ri) => (
+                    <tr key={ri} className={ri === 0 ? 'head' : undefined}>
+                      <th className="row-num" scope="row">
+                        {ri + 1}
+                      </th>
+                      {row.map((cell, ci) => (
+                        <td key={ci}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {sheet.truncated && (
+              <p className="viewer-xlsx-note">
+                {t('viewerXlsxTruncated', {
+                  shown: XLSX_PREVIEW_MAX_ROWS,
+                  total: sheet.totalRows,
+                })}
+              </p>
+            )}
+          </div>
+
+          {sheets.length > 1 && (
+            <div className="viewer-xlsx-tabs" role="tablist">
+              {sheets.map((s, i) => (
+                <button
+                  key={s.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === active}
+                  className={`viewer-xlsx-tab ${i === active ? 'active' : ''}`}
+                  onClick={() => setActive(i)}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
@@ -82,6 +205,7 @@ export function DocumentViewer({ source, onClose }: Props) {
   const ext = fileExt(source.filename)
   const isPdf = ext === 'pdf'
   const isDocx = ext === 'docx'
+  const isXlsx = ext === 'xlsx' || ext === 'xls'
   const fileUrl = api.documentFileUrl(source.document_id)
   // PDF.js/native viewer honours #page= to jump straight to the cited page.
   const pdfUrl = source.page ? `${fileUrl}#page=${source.page}&view=FitH` : fileUrl
@@ -109,6 +233,8 @@ export function DocumentViewer({ source, onClose }: Props) {
             <iframe className="viewer-frame" src={pdfUrl} title={source.filename} />
           ) : isDocx ? (
             <DocxPreview fileUrl={fileUrl} />
+          ) : isXlsx ? (
+            <XlsxPreview fileUrl={fileUrl} />
           ) : (
             <div className="viewer-fallback">
               <p>
