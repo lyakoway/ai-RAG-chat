@@ -97,7 +97,14 @@ def download_document(document_id: str, db: Session = Depends(get_db)):
     path = settings.upload_dir / f"{doc.id}{ext}"
     if not path.exists():
         raise HTTPException(404, "Файл отсутствует на диске")
-    return FileResponse(path, filename=doc.filename, media_type=doc.content_type)
+    # inline — иначе браузер не рендерит PDF в iframe просмотрщика
+    # (при attachment окно открывается, а холст остаётся пустым).
+    return FileResponse(
+        path,
+        filename=doc.filename,
+        media_type=doc.content_type,
+        content_disposition_type="inline",
+    )
 
 
 @router.delete("/{document_id}", status_code=204)
