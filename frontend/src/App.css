@@ -313,6 +313,14 @@
     box-shadow: var(--shadow-lg);
   }
   .sidebar.open { transform: translateX(0); }
+  .sidebar,
+  .docs-panel {
+    touch-action: pan-y;
+  }
+  .sidebar.swiping,
+  .docs-panel.swiping {
+    transition: none !important;
+  }
 
   .drawer-backdrop {
     display: block;

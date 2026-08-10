@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { IconDoc, IconTrash, IconUpload } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
+import { useSwipeDismiss } from '../hooks/useSwipeDismiss'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import type { DocumentItem } from '../lib/types'
@@ -68,9 +69,14 @@ export function DocumentsPanel({
   }
 
   const knownCategories = Array.from(new Set(['General', ...categories]))
+  const swipe = useSwipeDismiss(onClose, 'right')
 
   return (
-    <aside className="docs-panel">
+    <aside
+      className={`docs-panel ${swipe.swiping ? 'swiping' : ''}`}
+      style={swipe.style}
+      {...swipe.handlers}
+    >
       <div className="docs-head">
         <h2>
           <IconDoc width={18} height={18} />

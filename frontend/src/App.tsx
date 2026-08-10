@@ -194,6 +194,7 @@ export default function App() {
     <div className="app">
       <Sidebar
         open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         conversations={conversations}
         activeId={conversationId}
         onNew={newChat}
