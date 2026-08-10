@@ -8,6 +8,7 @@ import type { DocumentItem } from '../lib/types'
 interface Props {
   documents: DocumentItem[]
   categories: string[]
+  readyDocs: number
   onUploaded: () => void
   onDeleted: () => void
   onClose: () => void
@@ -23,7 +24,14 @@ function fileExt(name: string) {
   return name.split('.').pop()?.toUpperCase() ?? 'DOC'
 }
 
-export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, onClose }: Props) {
+export function DocumentsPanel({
+  documents,
+  categories,
+  readyDocs,
+  onUploaded,
+  onDeleted,
+  onClose,
+}: Props) {
   const { t } = useI18n()
   const [category, setCategory] = useState('General')
   const [uploading, setUploading] = useState(false)
@@ -64,7 +72,11 @@ export function DocumentsPanel({ documents, categories, onUploaded, onDeleted, o
   return (
     <aside className="docs-panel">
       <div className="docs-head">
-        <h2><IconDoc width={18} height={18} /> {t('documents')}</h2>
+        <h2>
+          <IconDoc width={18} height={18} />
+          {t('documents')}
+          <span className="docs-count">{readyDocs}</span>
+        </h2>
         <button className="docs-close" onClick={onClose} title={t('hidePanel')}>✕</button>
       </div>
 
