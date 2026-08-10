@@ -241,6 +241,7 @@ export default function App() {
         <DocumentsPanel
           documents={documents}
           categories={categories}
+          readyDocs={readyDocs}
           onUploaded={refreshDocs}
           onDeleted={refreshDocs}
           onClose={() => setDocsOpen(false)}

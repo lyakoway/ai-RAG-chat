@@ -53,15 +53,17 @@ export function TopBar({
         />
       </div>
 
-      <button
-        className={`docs-toggle ${docsOpen ? 'active' : ''}`}
-        onClick={onToggleDocs}
-        title={t('documents')}
-      >
-        <IconDoc width={16} height={16} />
-        {t('documents')}
-        <span className="docs-count">{readyDocs}</span>
-      </button>
+      {!docsOpen && (
+        <button
+          className="docs-toggle"
+          onClick={onToggleDocs}
+          title={t('documents')}
+        >
+          <IconDoc width={16} height={16} />
+          {t('documents')}
+          <span className="docs-count">{readyDocs}</span>
+        </button>
+      )}
     </header>
   )
 }
