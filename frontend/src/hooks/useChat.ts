@@ -106,6 +106,13 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
             onFinished?.()
           },
           onError: (msg) => {
+            if (mode === 'agent') {
+              trackEvent(AnalyticsEvent.AGENT_RUN_ERROR, {
+                steps: agentStepCount,
+                model: opts.model,
+                message: msg.slice(0, 120),
+              })
+            }
             patchAi({
               content: (aiMsg.content || '') + `\n\n⚠️ ${msg}`,
               streaming: false,
