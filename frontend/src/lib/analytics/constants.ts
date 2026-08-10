@@ -18,6 +18,8 @@ export const AnalyticsEvent = {
   MODE_CHANGE: 'mode_change',
   /** Успешный ответ в режиме AI Агент (после шагов tools) */
   AGENT_RUN_DONE: 'agent_run_done',
+  /** Ошибка / обрыв прогона в режиме AI Агент */
+  AGENT_RUN_ERROR: 'agent_run_error',
   THEME_TOGGLE: 'theme_toggle',
   LANGUAGE_TOGGLE: 'language_toggle',
   /** Клик по имени файла источника → открытие просмотрщика */
