@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { streamChat } from '../lib/stream'
 import type { AgentStep, ChatMessage, ChatMode, Source } from '../lib/types'
 
@@ -61,6 +62,8 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
       const patchAi = (patch: Partial<ChatMessage>) =>
         setMessages((prev) => prev.map((m) => (m.id === aiId ? { ...m, ...patch } : m)))
 
+      let agentStepCount = 0
+
       abortRef.current = streamChat(
         {
           message: text,
@@ -73,6 +76,7 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
         },
         {
           onAgentStep: (step: AgentStep) => {
+            agentStepCount += 1
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === aiId
@@ -90,6 +94,12 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
               prev.map((m) => (m.id === aiId ? { ...m, content: m.content + delta } : m)),
             ),
           onDone: (messageId) => {
+            if (mode === 'agent') {
+              trackEvent(AnalyticsEvent.AGENT_RUN_DONE, {
+                steps: agentStepCount,
+                model: opts.model,
+              })
+            }
             patchAi({ id: messageId, streaming: false })
             setStreaming(false)
             abortRef.current = null
