@@ -15,7 +15,10 @@ export const AnalyticsEvent = {
   /** Ошибка загрузки файла(ов) в панели документов */
   DOCUMENT_UPLOAD_ERROR: 'document_upload_error',
   DOCUMENT_DELETE: 'document_delete',
+  DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',
+  CONVERSATION_OPEN_ERROR: 'conversation_open_error',
+  CONVERSATION_DELETE_ERROR: 'conversation_delete_error',
   CATEGORY_FILTER: 'category_filter',
   MODEL_CHANGE: 'model_change',
   /** Переключатель «Режим: RAG Chat | AI Агент» */
@@ -32,6 +35,8 @@ export const AnalyticsEvent = {
   SOURCES_TOGGLE: 'sources_toggle',
   /** Модалка просмотрщика открыта */
   VIEWER_OPEN: 'viewer_open',
+  /** Ошибка превью в просмотрщике (DOCX / XLSX) */
+  VIEWER_ERROR: 'viewer_error',
   /** «Скачать / открыть файл» (fallback) */
   VIEWER_DOWNLOAD: 'viewer_download',
   /** «В новой вкладке» */
