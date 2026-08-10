@@ -69,9 +69,18 @@ export function DocumentsPanel({
   }
 
   const remove = async (id: string, filename: string) => {
-    await api.deleteDocument(id)
-    trackEvent(AnalyticsEvent.DOCUMENT_DELETE, { filename })
-    onDeleted()
+    try {
+      await api.deleteDocument(id)
+      trackEvent(AnalyticsEvent.DOCUMENT_DELETE, { filename })
+      onDeleted()
+    } catch (e) {
+      const message = e instanceof Error ? e.message : t('uploadError')
+      trackEvent(AnalyticsEvent.DOCUMENT_DELETE_ERROR, {
+        filename,
+        message: message.slice(0, 120),
+      })
+      setError(message)
+    }
   }
 
   const knownCategories = Array.from(new Set(['General', ...categories]))

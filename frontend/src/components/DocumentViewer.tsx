@@ -33,9 +33,17 @@ function viewerParams(source: Source) {
   }
 }
 
-function DocxPreview({ fileUrl }: { fileUrl: string }) {
+function DocxPreview({
+  fileUrl,
+  trackParams,
+}: {
+  fileUrl: string
+  trackParams: ReturnType<typeof viewerParams>
+}) {
   const { t } = useI18n()
   const containerRef = useRef<HTMLDivElement>(null)
+  const trackParamsRef = useRef(trackParams)
+  trackParamsRef.current = trackParams
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   useEffect(() => {
@@ -65,8 +73,14 @@ function DocxPreview({ fileUrl }: { fileUrl: string }) {
           renderFooters: true,
         })
         if (!cancelled) setStatus('ready')
-      } catch {
-        if (!cancelled) setStatus('error')
+      } catch (e) {
+        if (!cancelled) {
+          setStatus('error')
+          trackEvent(AnalyticsEvent.VIEWER_ERROR, {
+            ...trackParamsRef.current,
+            message: (e instanceof Error ? e.message : 'preview_failed').slice(0, 120),
+          })
+        }
       }
     })()
 
@@ -95,8 +109,16 @@ type SheetPreview = {
   totalRows: number
 }
 
-function XlsxPreview({ fileUrl }: { fileUrl: string }) {
+function XlsxPreview({
+  fileUrl,
+  trackParams,
+}: {
+  fileUrl: string
+  trackParams: ReturnType<typeof viewerParams>
+}) {
   const { t } = useI18n()
+  const trackParamsRef = useRef(trackParams)
+  trackParamsRef.current = trackParams
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [sheets, setSheets] = useState<SheetPreview[]>([])
   const [active, setActive] = useState(0)
@@ -139,8 +161,14 @@ function XlsxPreview({ fileUrl }: { fileUrl: string }) {
           setSheets(parsed)
           setStatus('ready')
         }
-      } catch {
-        if (!cancelled) setStatus('error')
+      } catch (e) {
+        if (!cancelled) {
+          setStatus('error')
+          trackEvent(AnalyticsEvent.VIEWER_ERROR, {
+            ...trackParamsRef.current,
+            message: (e instanceof Error ? e.message : 'preview_failed').slice(0, 120),
+          })
+        }
       }
     })()
 
@@ -274,9 +302,9 @@ export function DocumentViewer({ source, onClose }: Props) {
           {mode === 'pdf' ? (
             <iframe className="viewer-frame" src={pdfUrl} title={source.filename} />
           ) : mode === 'docx' ? (
-            <DocxPreview fileUrl={fileUrl} />
+            <DocxPreview fileUrl={fileUrl} trackParams={params} />
           ) : mode === 'xlsx' ? (
-            <XlsxPreview fileUrl={fileUrl} />
+            <XlsxPreview fileUrl={fileUrl} trackParams={params} />
           ) : (
             <div className="viewer-fallback">
               <p>

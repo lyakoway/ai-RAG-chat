@@ -114,20 +114,34 @@ export default function App() {
 
   const openConversation = useCallback(
     async (id: string) => {
-      const detail = await api.getConversation(id)
-      setConversationId(id)
-      if (detail.model) setModel(detail.model)
-      reset(detail.messages)
-      setSidebarOpen(false)
+      try {
+        const detail = await api.getConversation(id)
+        setConversationId(id)
+        if (detail.model) setModel(detail.model)
+        reset(detail.messages)
+        setSidebarOpen(false)
+      } catch (e) {
+        trackEvent(AnalyticsEvent.CONVERSATION_OPEN_ERROR, {
+          conversation_id: id,
+          message: (e instanceof Error ? e.message : 'open_failed').slice(0, 120),
+        })
+      }
     },
     [reset],
   )
 
   const deleteConversation = useCallback(
     async (id: string) => {
-      await api.deleteConversation(id)
-      if (id === conversationId) resetChat()
-      refreshConversations()
+      try {
+        await api.deleteConversation(id)
+        if (id === conversationId) resetChat()
+        refreshConversations()
+      } catch (e) {
+        trackEvent(AnalyticsEvent.CONVERSATION_DELETE_ERROR, {
+          conversation_id: id,
+          message: (e instanceof Error ? e.message : 'delete_failed').slice(0, 120),
+        })
+      }
     },
     [conversationId, resetChat, refreshConversations],
   )
