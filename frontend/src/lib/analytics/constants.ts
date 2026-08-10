@@ -9,7 +9,11 @@ export const AnalyticsEvent = {
   CHAT_MESSAGE_SEND: 'chat_message_send',
   CHAT_NEW: 'chat_new',
   CHAT_SUGGESTION_CLICK: 'chat_suggestion_click',
+  /** Ошибка стрима ответа (RAG или агент) */
+  CHAT_ERROR: 'chat_error',
   DOCUMENT_UPLOAD: 'document_upload',
+  /** Ошибка загрузки файла(ов) в панели документов */
+  DOCUMENT_UPLOAD_ERROR: 'document_upload_error',
   DOCUMENT_DELETE: 'document_delete',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',
   CATEGORY_FILTER: 'category_filter',
@@ -18,8 +22,6 @@ export const AnalyticsEvent = {
   MODE_CHANGE: 'mode_change',
   /** Успешный ответ в режиме AI Агент (после шагов tools) */
   AGENT_RUN_DONE: 'agent_run_done',
-  /** Ошибка / обрыв прогона в режиме AI Агент */
-  AGENT_RUN_ERROR: 'agent_run_error',
   THEME_TOGGLE: 'theme_toggle',
   LANGUAGE_TOGGLE: 'language_toggle',
   /** Клик по имени файла источника → открытие просмотрщика */
