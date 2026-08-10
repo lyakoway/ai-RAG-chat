@@ -56,7 +56,13 @@ export function DocumentsPanel({
       })
       onUploaded()
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('uploadError'))
+      const message = e instanceof Error ? e.message : t('uploadError')
+      trackEvent(AnalyticsEvent.DOCUMENT_UPLOAD_ERROR, {
+        category: cat,
+        count: list.length,
+        message: message.slice(0, 120),
+      })
+      setError(message)
     } finally {
       setUploading(false)
     }
