@@ -14,7 +14,10 @@ export const AnalyticsEvent = {
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',
   CATEGORY_FILTER: 'category_filter',
   MODEL_CHANGE: 'model_change',
+  /** Переключатель «Режим: RAG Chat | AI Агент» */
   MODE_CHANGE: 'mode_change',
+  /** Успешный ответ в режиме AI Агент (после шагов tools) */
+  AGENT_RUN_DONE: 'agent_run_done',
   THEME_TOGGLE: 'theme_toggle',
   LANGUAGE_TOGGLE: 'language_toggle',
   /** Клик по имени файла источника → открытие просмотрщика */

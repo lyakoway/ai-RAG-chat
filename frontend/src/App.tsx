@@ -149,10 +149,14 @@ export default function App() {
     [send, model, category, lang, mode],
   )
 
-  const handleModeChange = useCallback((next: ChatMode) => {
-    trackEvent(AnalyticsEvent.MODE_CHANGE, { mode: next })
-    setMode(next)
-  }, [])
+  const handleModeChange = useCallback(
+    (next: ChatMode) => {
+      if (next === mode) return
+      trackEvent(AnalyticsEvent.MODE_CHANGE, { from: mode, mode: next })
+      setMode(next)
+    },
+    [mode],
+  )
 
   const handleModelChange = useCallback((id: string) => {
     trackEvent(AnalyticsEvent.MODEL_CHANGE, { model: id })
