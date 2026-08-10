@@ -12,10 +12,11 @@ import { AnalyticsEvent, trackEvent } from './lib/analytics'
 import { useI18n } from './lib/i18n'
 import { api } from './lib/api'
 import { initialPref, stripPrefParams } from './lib/prefs'
-import type { Conversation, DocumentItem, ModelInfo, Source } from './lib/types'
+import type { ChatMode, Conversation, DocumentItem, ModelInfo, Source } from './lib/types'
 
 type Theme = 'light' | 'dark'
 const THEMES: readonly Theme[] = ['light', 'dark']
+const MODES: readonly ChatMode[] = ['rag', 'agent']
 
 export default function App() {
   const { lang } = useI18n()
@@ -28,10 +29,16 @@ export default function App() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  // URL params (?lang=&theme=) set the initial state once, then are stripped
+  // ---- Chat mode: classic RAG vs multi-step AI agent ----
+  const [mode, setMode] = useState<ChatMode>(() => initialPref('mode', MODES, 'rag'))
+  useEffect(() => {
+    localStorage.setItem('mode', mode)
+  }, [mode])
+
+  // URL params (?lang=&theme=&mode=) set the initial state once, then are stripped
   // so the user's own toggles stay authoritative on later reloads.
   useEffect(() => {
-    stripPrefParams(['lang', 'theme'])
+    stripPrefParams(['lang', 'theme', 'mode'])
   }, [])
 
   // ---- Models ----
@@ -130,11 +137,22 @@ export default function App() {
       trackEvent(AnalyticsEvent.CHAT_MESSAGE_SEND, {
         model,
         category: category === 'All' ? 'all' : category,
+        mode,
       })
-      send(text, { model, category: category === 'All' ? null : category, lang })
+      send(text, {
+        model,
+        category: category === 'All' ? null : category,
+        lang,
+        mode,
+      })
     },
-    [send, model, category, lang],
+    [send, model, category, lang, mode],
   )
+
+  const handleModeChange = useCallback((next: ChatMode) => {
+    trackEvent(AnalyticsEvent.MODE_CHANGE, { mode: next })
+    setMode(next)
+  }, [])
 
   const handleModelChange = useCallback((id: string) => {
     trackEvent(AnalyticsEvent.MODEL_CHANGE, { model: id })
@@ -185,6 +203,8 @@ export default function App() {
         categories={categories}
         category={category}
         onCategoryChange={handleCategoryChange}
+        mode={mode}
+        onModeChange={handleModeChange}
       />
 
       <main className="main">
@@ -195,6 +215,8 @@ export default function App() {
           categories={categories}
           category={category}
           onCategoryChange={handleCategoryChange}
+          mode={mode}
+          onModeChange={handleModeChange}
           docsOpen={docsOpen}
           onToggleDocs={handleToggleDocs}
           readyDocs={readyDocs}
@@ -207,6 +229,7 @@ export default function App() {
           onStop={stop}
           hasDocuments={readyDocs > 0}
           onOpenSource={handleOpenSource}
+          mode={mode}
         />
       </main>
 

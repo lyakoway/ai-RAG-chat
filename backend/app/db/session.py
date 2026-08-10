@@ -35,3 +35,15 @@ def init_db() -> None:
     from app.db import models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+    _ensure_sqlite_column("messages", "agent_steps", "JSON")
+
+
+def _ensure_sqlite_column(table: str, column: str, col_type: str) -> None:
+    """Add a column to existing SQLite tables (create_all does not alter)."""
+    if not settings.database_url.startswith("sqlite"):
+        return
+    with engine.begin() as conn:
+        rows = conn.exec_driver_sql(f"PRAGMA table_info({table})").fetchall()
+        names = {r[1] for r in rows}
+        if column not in names:
+            conn.exec_driver_sql(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")

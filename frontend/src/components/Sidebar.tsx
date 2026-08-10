@@ -2,7 +2,7 @@ import { IconChat, IconGlobe, IconMoon, IconPlus, IconSpark, IconSun, IconTrash 
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { Filters } from './Filters'
 import { useI18n, type TKey } from '../lib/i18n'
-import type { Conversation, ModelInfo } from '../lib/types'
+import type { ChatMode, Conversation, ModelInfo } from '../lib/types'
 
 interface Props {
   open: boolean // mobile drawer state
@@ -20,6 +20,8 @@ interface Props {
   categories: string[]
   category: string
   onCategoryChange: (c: string) => void
+  mode: ChatMode
+  onModeChange: (mode: ChatMode) => void
 }
 
 const GROUP_KEYS: Record<string, TKey> = {
@@ -54,6 +56,8 @@ export function Sidebar({
   categories,
   category,
   onCategoryChange,
+  mode,
+  onModeChange,
 }: Props) {
   const { t, toggleLang } = useI18n()
   const groups = groupByDate(conversations)
@@ -82,6 +86,8 @@ export function Sidebar({
           categories={categories}
           category={category}
           onCategoryChange={onCategoryChange}
+          mode={mode}
+          onModeChange={onModeChange}
         />
       </div>
 

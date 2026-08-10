@@ -14,6 +14,7 @@ export const AnalyticsEvent = {
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',
   CATEGORY_FILTER: 'category_filter',
   MODEL_CHANGE: 'model_change',
+  MODE_CHANGE: 'mode_change',
   THEME_TOGGLE: 'theme_toggle',
   LANGUAGE_TOGGLE: 'language_toggle',
   /** Клик по имени файла источника → открытие просмотрщика */

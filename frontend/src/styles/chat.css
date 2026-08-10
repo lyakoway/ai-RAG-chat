@@ -319,6 +319,109 @@
   text-align: center;
 }
 
+/* ================= Agent steps timeline ================= */
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 auto 10px;
+  padding: 4px 12px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+.mode-badge.rag {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+.mode-badge.agent {
+  background: color-mix(in srgb, #0ea5e9 14%, transparent);
+  color: #0284c7;
+}
+[data-theme="dark"] .mode-badge.agent {
+  color: #7dd3fc;
+  background: color-mix(in srgb, #38bdf8 16%, transparent);
+}
+.welcome-logo.agent {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+}
+
+.agent-steps {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--bg-elev) 88%, #0ea5e9 12%);
+}
+.agent-steps-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+.agent-steps-live {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.agent-steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agent-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  animation: fadeUp 0.18s var(--ease);
+}
+.agent-step.pending {
+  opacity: 0.72;
+  border-style: dashed;
+}
+.agent-step.fail {
+  border-color: color-mix(in srgb, #ef4444 40%, var(--border));
+}
+.agent-step-index {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, #0ea5e9 16%, transparent);
+  color: #0284c7;
+  font-size: 11px;
+  font-weight: 700;
+}
+[data-theme="dark"] .agent-step-index { color: #7dd3fc; }
+.agent-step-body { min-width: 0; flex: 1; }
+.agent-step-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text);
+}
+.agent-step-detail {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 /* ================= Document viewer modal ================= */
 .viewer-overlay {
   position: fixed;

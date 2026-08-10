@@ -1,7 +1,7 @@
 import { Dropdown, type DropdownOption } from './Dropdown'
-import { IconLayers, IconSpark } from '../lib/icons'
+import { IconBot, IconLayers, IconSpark } from '../lib/icons'
 import { useI18n } from '../lib/i18n'
-import type { ModelInfo } from '../lib/types'
+import type { ChatMode, ModelInfo } from '../lib/types'
 
 interface Props {
   models: ModelInfo[]
@@ -10,6 +10,8 @@ interface Props {
   categories: string[]
   category: string
   onCategoryChange: (c: string) => void
+  mode: ChatMode
+  onModeChange: (mode: ChatMode) => void
 }
 
 const providerLabel: Record<string, string> = {
@@ -17,10 +19,10 @@ const providerLabel: Record<string, string> = {
   anthropic: 'Anthropic',
   ollama: 'Ollama',
   mock: 'Demo',
+  zai: 'Z.ai',
 }
 
-/** Model + category selectors. Rendered inline in the top bar on desktop,
- *  and stacked inside the sidebar drawer on mobile. */
+/** Mode + model + category. Rendered in the top bar (desktop) and sidebar (mobile). */
 export function Filters({
   models,
   model,
@@ -28,8 +30,16 @@ export function Filters({
   categories,
   category,
   onCategoryChange,
+  mode,
+  onModeChange,
 }: Props) {
   const { t } = useI18n()
+
+  const modeOptions: DropdownOption[] = [
+    { value: 'rag', label: t('modeRag'), hint: t('modeRagHint') },
+    { value: 'agent', label: t('modeAgent'), hint: t('modeAgentHint') },
+  ]
+
   const modelOptions: DropdownOption[] = models.map((m) => ({
     value: m.id,
     label: m.label,
@@ -49,6 +59,13 @@ export function Filters({
 
   return (
     <>
+      <Dropdown
+        value={mode}
+        options={modeOptions}
+        onChange={(v) => onModeChange(v as ChatMode)}
+        icon={<IconBot width={16} height={16} />}
+        label={t('mode')}
+      />
       <Dropdown
         value={model}
         options={modelOptions}

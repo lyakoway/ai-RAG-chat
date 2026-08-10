@@ -20,11 +20,23 @@ export interface DocumentItem {
   created_at: string
 }
 
+export type ChatMode = 'rag' | 'agent'
+
+export interface AgentStep {
+  index: number
+  type: string
+  name: string
+  args?: Record<string, unknown>
+  ok?: boolean
+  detail?: string
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   sources?: Source[] | null
+  agent_steps?: AgentStep[] | null
   created_at?: string
   streaming?: boolean
 }

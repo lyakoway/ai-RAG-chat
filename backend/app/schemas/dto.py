@@ -42,14 +42,25 @@ class ChatRequest(BaseModel):
     document_ids: list[str] | None = None        # or restrict to specific docs
     top_k: int | None = None
     lang: str = "ru"                             # UI language: "ru" | "en"
+    mode: str = "rag"                            # "rag" | "agent"
 
 
 # ---------- Conversations ----------
+class AgentStepOut(BaseModel):
+    index: int
+    type: str = "tool"
+    name: str
+    args: dict = Field(default_factory=dict)
+    ok: bool = True
+    detail: str = ""
+
+
 class MessageOut(BaseModel):
     id: str
     role: str
     content: str
     sources: list[Source] | None = None
+    agent_steps: list[AgentStepOut] | None = None
     created_at: datetime
 
     class Config:
