@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { streamChat } from '../lib/stream'
-import type { ChatMessage, Source } from '../lib/types'
+import type { AgentStep, ChatMessage, ChatMode, Source } from '../lib/types'
 
 let tmpId = 0
 const nextId = () => `tmp-${++tmpId}`
@@ -10,6 +10,7 @@ interface SendOptions {
   category?: string | null
   documentIds?: string[] | null
   lang?: string
+  mode?: ChatMode
 }
 
 interface UseChatArgs {
@@ -43,6 +44,7 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
     (text: string, opts: SendOptions) => {
       if (!text.trim() || isStreaming) return
 
+      const mode = opts.mode ?? 'rag'
       const userMsg: ChatMessage = { id: nextId(), role: 'user', content: text }
       const aiId = nextId()
       const aiMsg: ChatMessage = {
@@ -50,6 +52,7 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
         role: 'assistant',
         content: '',
         sources: [],
+        agent_steps: mode === 'agent' ? [] : undefined,
         streaming: true,
       }
       setMessages((prev) => [...prev, userMsg, aiMsg])
@@ -66,8 +69,18 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
           category: opts.category,
           document_ids: opts.documentIds,
           lang: opts.lang,
+          mode,
         },
         {
+          onAgentStep: (step: AgentStep) => {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === aiId
+                  ? { ...m, agent_steps: [...(m.agent_steps ?? []), step] }
+                  : m,
+              ),
+            )
+          },
           onSources: (cid: string, sources: Source[]) => {
             if (!conversationId) setConversationId(cid)
             patchAi({ sources })

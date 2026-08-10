@@ -1,7 +1,7 @@
 import { Filters } from './Filters'
 import { IconDoc, IconMenu } from '../lib/icons'
 import { useI18n } from '../lib/i18n'
-import type { ModelInfo } from '../lib/types'
+import type { ChatMode, ModelInfo } from '../lib/types'
 
 interface Props {
   models: ModelInfo[]
@@ -10,6 +10,8 @@ interface Props {
   categories: string[]
   category: string
   onCategoryChange: (c: string) => void
+  mode: ChatMode
+  onModeChange: (mode: ChatMode) => void
   docsOpen: boolean
   onToggleDocs: () => void
   readyDocs: number
@@ -23,6 +25,8 @@ export function TopBar({
   categories,
   category,
   onCategoryChange,
+  mode,
+  onModeChange,
   docsOpen,
   onToggleDocs,
   readyDocs,
@@ -44,6 +48,8 @@ export function TopBar({
           categories={categories}
           category={category}
           onCategoryChange={onCategoryChange}
+          mode={mode}
+          onModeChange={onModeChange}
         />
       </div>
 

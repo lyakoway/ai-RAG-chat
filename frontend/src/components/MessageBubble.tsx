@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { IconSpark } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { injectCitations } from '../lib/citations'
+import { AgentSteps } from './AgentSteps'
 import { SourceList } from './SourceList'
 import { useI18n } from '../lib/i18n'
 import type { ChatMessage, Source } from '../lib/types'
@@ -16,7 +17,9 @@ interface Props {
 export function MessageBubble({ message, onOpenSource }: Props) {
   const { t } = useI18n()
   const isUser = message.role === 'user'
-  const showCursor = message.streaming && !message.content
+  const steps = message.agent_steps ?? []
+  const showCursor =
+    message.streaming && !message.content && steps.length === 0
   const sources = message.sources ?? []
 
   const [sourcesOpen, setSourcesOpen] = useState(false)
@@ -63,22 +66,30 @@ export function MessageBubble({ message, onOpenSource }: Props) {
         </div>
       )}
       <div className="msg-body">
-        <div className={`bubble ${isUser ? 'bubble-user' : 'bubble-ai'}`}>
-          {showCursor ? (
-            <div className="typing">
-              <span /><span /><span />
-            </div>
-          ) : isUser ? (
-            <span className="bubble-plain">{message.content}</span>
-          ) : (
-            <div className="markdown">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                {message.content}
-              </ReactMarkdown>
-              {message.streaming && <span className="caret" />}
-            </div>
-          )}
-        </div>
+        {!isUser && (steps.length > 0 || (message.streaming && message.agent_steps)) && (
+          <AgentSteps
+            steps={steps}
+            streaming={Boolean(message.streaming && !message.content)}
+          />
+        )}
+        {(isUser || showCursor || message.content) && (
+          <div className={`bubble ${isUser ? 'bubble-user' : 'bubble-ai'}`}>
+            {showCursor ? (
+              <div className="typing">
+                <span /><span /><span />
+              </div>
+            ) : isUser ? (
+              <span className="bubble-plain">{message.content}</span>
+            ) : (
+              <div className="markdown">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                  {message.content}
+                </ReactMarkdown>
+                {message.streaming && <span className="caret" />}
+              </div>
+            )}
+          </div>
+        )}
         {!isUser && sources.length > 0 && (
           <SourceList
             sources={sources}

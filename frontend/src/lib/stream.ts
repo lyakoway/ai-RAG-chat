@@ -1,4 +1,4 @@
-import type { Source } from './types'
+import type { AgentStep, ChatMode, Source } from './types'
 
 export interface ChatStreamRequest {
   message: string
@@ -7,9 +7,11 @@ export interface ChatStreamRequest {
   category?: string | null
   document_ids?: string[] | null
   lang?: string
+  mode?: ChatMode
 }
 
 export interface ChatStreamHandlers {
+  onAgentStep?: (step: AgentStep) => void
   onSources?: (conversationId: string, sources: Source[]) => void
   onToken?: (delta: string) => void
   onDone?: (messageId: string, conversationId: string) => void
@@ -74,6 +76,9 @@ function dispatch(frame: string, handlers: ChatStreamHandlers) {
   if (!data) return
   const payload = JSON.parse(data)
   switch (event) {
+    case 'agent_step':
+      handlers.onAgentStep?.(payload as AgentStep)
+      break
     case 'sources':
       handlers.onSources?.(payload.conversation_id, payload.sources)
       break

@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
-import { IconLayers, IconSpark } from '../lib/icons'
+import { IconBot, IconLayers, IconSpark } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { useI18n } from '../lib/i18n'
-import type { ChatMessage, Source } from '../lib/types'
+import type { ChatMessage, ChatMode, Source } from '../lib/types'
 
 interface Props {
   messages: ChatMessage[]
@@ -13,6 +13,7 @@ interface Props {
   onStop: () => void
   hasDocuments: boolean
   onOpenSource: (source: Source) => void
+  mode: ChatMode
 }
 
 export function ChatView({
@@ -22,9 +23,13 @@ export function ChatView({
   onStop,
   hasDocuments,
   onOpenSource,
+  mode,
 }: Props) {
   const { t } = useI18n()
-  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3')]
+  const isAgent = mode === 'agent'
+  const suggestions = isAgent
+    ? [t('agentSuggestion1'), t('agentSuggestion2'), t('agentSuggestion3')]
+    : [t('suggestion1'), t('suggestion2'), t('suggestion3')]
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -34,13 +39,22 @@ export function ChatView({
   const empty = messages.length === 0
 
   return (
-    <div className="chat">
+    <div className={`chat ${isAgent ? 'mode-agent' : 'mode-rag'}`}>
       <div className="chat-scroll">
         {empty ? (
           <div className="welcome">
-            <div className="welcome-logo"><IconSpark width={30} height={30} /></div>
-            <h1 className="welcome-title">{t('welcomeTitle')}</h1>
-            <p className="welcome-sub">{t('welcomeSub')}</p>
+            <div className={`welcome-logo ${isAgent ? 'agent' : ''}`}>
+              {isAgent ? <IconBot width={30} height={30} /> : <IconSpark width={30} height={30} />}
+            </div>
+            <div className={`mode-badge ${isAgent ? 'agent' : 'rag'}`}>
+              {isAgent ? t('modeAgent') : t('modeRag')}
+            </div>
+            <h1 className="welcome-title">
+              {isAgent ? t('welcomeTitleAgent') : t('welcomeTitle')}
+            </h1>
+            <p className="welcome-sub">
+              {isAgent ? t('welcomeSubAgent') : t('welcomeSub')}
+            </p>
 
             {!hasDocuments && (
               <div className="welcome-note">
@@ -58,6 +72,7 @@ export function ChatView({
                   onClick={() => {
                     trackEvent(AnalyticsEvent.CHAT_SUGGESTION_CLICK, {
                       index: i + 1,
+                      mode,
                     })
                     onSend(s)
                   }}
