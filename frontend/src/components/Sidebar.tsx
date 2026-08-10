@@ -1,11 +1,13 @@
 import { IconChat, IconGlobe, IconMoon, IconPlus, IconSpark, IconSun, IconTrash } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
+import { useSwipeDismiss } from '../hooks/useSwipeDismiss'
 import { Filters } from './Filters'
 import { useI18n, type TKey } from '../lib/i18n'
 import type { ChatMode, Conversation, ModelInfo } from '../lib/types'
 
 interface Props {
   open: boolean // mobile drawer state
+  onClose: () => void
   conversations: Conversation[]
   activeId: string | null
   onNew: () => void
@@ -43,6 +45,7 @@ function groupByDate(items: Conversation[]) {
 
 export function Sidebar({
   open,
+  onClose,
   conversations,
   activeId,
   onNew,
@@ -62,9 +65,14 @@ export function Sidebar({
   const { t, toggleLang } = useI18n()
   const groups = groupByDate(conversations)
   const order = ['today', 'week', 'earlier']
+  const swipe = useSwipeDismiss(onClose, 'left', open)
 
   return (
-    <aside className={`sidebar ${open ? 'open' : ''}`}>
+    <aside
+      className={`sidebar ${open ? 'open' : ''} ${swipe.swiping ? 'swiping' : ''}`}
+      style={swipe.style}
+      {...swipe.handlers}
+    >
       <div className="brand">
         <div className="brand-logo"><IconSpark width={20} height={20} /></div>
         <div>
