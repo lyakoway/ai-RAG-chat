@@ -1,0 +1,76 @@
+/* ================= Vector search view =================
+   Reuses .chat / .welcome / .composer / .source-card from chat.css. */
+
+/* Distinct emerald identity for the search mode. */
+.welcome-logo.search {
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+}
+.mode-badge.search {
+  background: color-mix(in srgb, #10b981 14%, transparent);
+  color: #059669;
+}
+[data-theme='dark'] .mode-badge.search {
+  color: #6ee7b7;
+  background: color-mix(in srgb, #34d399 16%, transparent);
+}
+
+/* Input row: the shared .composer-box is flex-end aligned for a textarea;
+   a single-line input needs centering. */
+.composer-box:has(.composer-input:not(textarea)) {
+  align-items: center;
+}
+input.composer-input { height: 38px; padding: 0; max-height: none; }
+
+/* ---- Results ---- */
+.search-results {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+  animation: fadeUp 0.25s var(--ease);
+}
+.search-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-soft);
+}
+.search-took {
+  font-weight: 500;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.search-empty {
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-muted);
+  font-size: 13.5px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.search-list .source-card.clickable { cursor: pointer; }
+.search-list .source-card.clickable:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+.search-list .source-snippet {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .search-results { padding: 20px 14px 32px; }
+}

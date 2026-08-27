@@ -23,6 +23,10 @@ export const AnalyticsEvent = {
   MODEL_CHANGE: 'model_change',
   /** Переключатель «Режим: RAG Chat | AI Агент» */
   MODE_CHANGE: 'mode_change',
+  /** Поиск выполнен в режиме «Векторный поиск» */
+  VECTOR_SEARCH: 'vector_search',
+  /** Ошибка запроса векторного поиска */
+  VECTOR_SEARCH_ERROR: 'vector_search_error',
   /** Успешный ответ в режиме AI Агент (после шагов tools) */
   AGENT_RUN_DONE: 'agent_run_done',
   THEME_TOGGLE: 'theme_toggle',

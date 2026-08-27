@@ -38,6 +38,7 @@ export function Filters({
   const modeOptions: DropdownOption[] = [
     { value: 'rag', label: t('modeRag'), hint: t('modeRagHint') },
     { value: 'agent', label: t('modeAgent'), hint: t('modeAgentHint') },
+    { value: 'search', label: t('modeSearch'), hint: t('modeSearchHint') },
   ]
 
   const modelOptions: DropdownOption[] = models.map((m) => ({
@@ -66,13 +67,16 @@ export function Filters({
         icon={<IconBot width={16} height={16} />}
         label={t('mode')}
       />
-      <Dropdown
-        value={model}
-        options={modelOptions}
-        onChange={onModelChange}
-        icon={<IconSpark width={16} height={16} />}
-        label={t('model')}
-      />
+      {/* LLM model is irrelevant for pure vector search. */}
+      {mode !== 'search' && (
+        <Dropdown
+          value={model}
+          options={modelOptions}
+          onChange={onModelChange}
+          icon={<IconSpark width={16} height={16} />}
+          label={t('model')}
+        />
+      )}
       <Dropdown
         value={category}
         options={categoryOptions}
