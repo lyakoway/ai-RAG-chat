@@ -74,6 +74,13 @@ GOLDEN: list[dict] = [
     {"q": "Через сколько минут простоя завершается сессия?", "doc": "Руководство_пользователя.pdf"},
     {"q": "Какие требования к паролю при регистрации?", "doc": "Руководство_пользователя.pdf"},
     {"q": "Кому доступен экспорт данных?", "doc": "Руководство_пользователя.pdf"},
+    # --- English (bilingual demo pack) ---
+    {"q": "How many days per week can employees work remotely?", "doc": "Remote_Work_Policy.docx"},
+    {"q": "What is the annual paid leave entitlement?", "doc": "Remote_Work_Policy.docx"},
+    {"q": "How much does the Business plan cost per month?", "doc": "Pricing_and_Discounts.xlsx"},
+    {"q": "What discount is offered for annual payment?", "doc": "Pricing_and_Discounts.xlsx"},
+    {"q": "What file formats does data import support?", "doc": "User_Guide.pdf"},
+    {"q": "After how many minutes of inactivity does the session end?", "doc": "User_Guide.pdf"},
 ]
 
 

@@ -41,8 +41,11 @@ class Settings(BaseSettings):
     local_embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     openai_embedding_model: str = "text-embedding-3-small"
 
-    # --- Advanced retrieval (opt-in via env: SEARCH_HYBRID=1 / SEARCH_RERANK=1) ---
-    search_hybrid: bool = False     # BM25 + vectors fused with RRF
+    # --- Advanced retrieval (env: SEARCH_RERANK=1 включает реранк) ---
+    # Гибрид (BM25 + вектора через RRF) включён по умолчанию: на двуязычном
+    # демо-корпусе он вытягивает правильный документ из-под языкового «двойника»
+    # (Recall@1 50% → 92%). Отключить: SEARCH_HYBRID=0.
+    search_hybrid: bool = True
     search_rerank: bool = False     # cross-encoder rerank of fused candidates
     retrieval_candidates: int = 20  # candidate pool size before rerank
     rerank_model: str = "BAAI/bge-reranker-base"  # multilingual, local ONNX (~1 GB)
