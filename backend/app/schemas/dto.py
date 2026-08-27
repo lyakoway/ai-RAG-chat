@@ -17,6 +17,7 @@ class DocumentOut(BaseModel):
     chunk_count: int
     status: str
     error: str | None = None
+    lang: str | None = None
     created_at: datetime
 
     class Config:

@@ -18,6 +18,8 @@ export const AnalyticsEvent = {
   DEMO_DOCS_LOAD: 'demo_documents_load',
   /** Ошибка загрузки демо-пака */
   DEMO_DOCS_LOAD_ERROR: 'demo_documents_load_error',
+  /** Скачивание файла из панели документов */
+  DOCUMENT_DOWNLOAD: 'document_download',
   DOCUMENT_DELETE: 'document_delete',
   DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',

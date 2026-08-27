@@ -67,3 +67,9 @@ export const IconGlobe = (p: SVGProps<SVGSVGElement>) => (
 export const IconSearch = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
 )
+export const IconDownload = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M12 4v11M8 11l4 4 4-4M5 19h14" /></svg>
+)
+export const IconEye = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" /><circle cx="12" cy="12" r="2.8" /></svg>
+)

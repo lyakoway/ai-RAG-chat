@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core import vectorstore
-from app.core.ingestion import ingest_document
+from app.core.ingestion import detect_lang_from_filename, ingest_document
 from app.db.models import Document
 from app.db.session import SessionLocal, get_db
 from app.schemas.dto import DocumentOut
@@ -22,6 +22,17 @@ settings = get_settings()
 
 ALLOWED_EXT = {".pdf", ".docx", ".doc", ".xlsx", ".xls"}
 DEMO_CATEGORY = "Demo"
+
+# RU/EN-двойники демо-пака: удаление одного документа сносит и его перевод
+# (принцип взаимности), поэтому пара должна быть известна заранее.
+DEMO_PAIRS = {
+    "Политика_удалённой_работы.docx": "remote_work_policy",
+    "Remote_Work_Policy.docx": "remote_work_policy",
+    "Руководство_пользователя.pdf": "user_guide",
+    "User_Guide.pdf": "user_guide",
+    "Тарифы_и_скидки.xlsx": "pricing",
+    "Pricing_and_Discounts.xlsx": "pricing",
+}
 
 
 def _run_ingestion(document_id: str, path: str) -> None:
@@ -51,6 +62,9 @@ async def upload_document(
         content_type=file.content_type or "application/octet-stream",
         category=(category or "General").strip() or "General",
         status="processing",
+        # Предварительный язык виден сразу, до индексации (потом уточняется
+        # по содержимому в ingest_document).
+        lang=detect_lang_from_filename(file.filename or ""),
     )
     db.add(doc)
     db.commit()
@@ -92,6 +106,8 @@ def load_demo_documents(
             content_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
             category=DEMO_CATEGORY,
             status="processing",
+            lang=detect_lang_from_filename(path.name),
+            pair_key=DEMO_PAIRS.get(path.name),
         )
         db.add(doc)
         db.commit()
@@ -155,9 +171,26 @@ def delete_document(document_id: str, db: Session = Depends(get_db)):
     doc = db.get(Document, document_id)
     if not doc:
         raise HTTPException(404, "Документ не найден")
-    vectorstore.delete_document(document_id)
-    ext = Path(doc.filename).suffix.lower()
-    path = settings.upload_dir / f"{doc.id}{ext}"
-    path.unlink(missing_ok=True)
-    db.delete(doc)
+
+    # Принцип взаимности: у парных документов (RU/EN-двойники демо-пака)
+    # удаляем сразу оба; обычные загрузки удаляются поодиночке.
+    ids = [document_id]
+    if doc.pair_key:
+        ids += [
+            d.id
+            for d in db.scalars(
+                select(Document).where(
+                    Document.pair_key == doc.pair_key, Document.id != document_id
+                )
+            )
+        ]
+
+    for doc_id in ids:
+        vectorstore.delete_document(doc_id)
+        target = db.get(Document, doc_id)
+        if target is None:
+            continue
+        ext = Path(target.filename).suffix.lower()
+        (settings.upload_dir / f"{doc_id}{ext}").unlink(missing_ok=True)
+        db.delete(target)
     db.commit()

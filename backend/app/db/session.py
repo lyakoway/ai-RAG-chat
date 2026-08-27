@@ -36,6 +36,8 @@ def init_db() -> None:
 
     Base.metadata.create_all(bind=engine)
     _ensure_sqlite_column("messages", "agent_steps", "JSON")
+    _ensure_sqlite_column("documents", "lang", "VARCHAR(8)")
+    _ensure_sqlite_column("documents", "pair_key", "VARCHAR(64)")
 
 
 def _ensure_sqlite_column(table: str, column: str, col_type: str) -> None:

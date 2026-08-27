@@ -17,6 +17,7 @@ export interface DocumentItem {
   chunk_count: number
   status: 'processing' | 'ready' | 'error'
   error: string | null
+  lang: string | null
   created_at: string
 }
 
