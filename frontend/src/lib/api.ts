@@ -40,6 +40,8 @@ export const api = {
   },
   deleteDocument: (id: string) =>
     fetch(`${BASE}/documents/${id}`, { method: 'DELETE' }).then(json<void>),
+  loadDemoDocuments: () =>
+    fetch(`${BASE}/documents/demo`, { method: 'POST' }).then(json<DocumentItem[]>),
   documentFileUrl: (id: string) => `${BASE}/documents/${id}/file`,
 
   // ---- Vector search ----

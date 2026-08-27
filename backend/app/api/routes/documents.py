@@ -1,6 +1,7 @@
-"""Document endpoints: upload, list, categories, delete, download."""
+"""Document endpoints: upload, list, categories, demo pack, delete, download."""
 from __future__ import annotations
 
+import mimetypes
 import shutil
 from pathlib import Path
 
@@ -20,6 +21,7 @@ router = APIRouter(prefix="/api/documents", tags=["documents"])
 settings = get_settings()
 
 ALLOWED_EXT = {".pdf", ".docx", ".doc", ".xlsx", ".xls"}
+DEMO_CATEGORY = "Demo"
 
 
 def _run_ingestion(document_id: str, path: str) -> None:
@@ -64,6 +66,47 @@ async def upload_document(
 
     background.add_task(_run_ingestion, doc.id, str(dest))
     return doc
+
+
+@router.post("/demo", response_model=list[DocumentOut], status_code=201)
+def load_demo_documents(
+    background: BackgroundTasks, db: Session = Depends(get_db)
+) -> list[Document]:
+    """One-click demo pack: copies backend/samples into the upload flow.
+
+    Idempotent — files already present in the library (by filename) are skipped,
+    so pressing the button twice never duplicates documents.
+    """
+    samples_dir = settings.samples_dir
+    if not samples_dir.is_dir():
+        raise HTTPException(404, "Демо-файлы недоступны на сервере")
+
+    existing = set(db.scalars(select(Document.filename)))
+    created: list[Document] = []
+    for path in sorted(samples_dir.iterdir()):
+        ext = path.suffix.lower()
+        if ext not in ALLOWED_EXT or path.name in existing:
+            continue
+        doc = Document(
+            filename=path.name,
+            content_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
+            category=DEMO_CATEGORY,
+            status="processing",
+        )
+        db.add(doc)
+        db.commit()
+        db.refresh(doc)
+
+        dest = settings.upload_dir / f"{doc.id}{ext}"
+        shutil.copyfile(path, dest)
+        doc.size_bytes = dest.stat().st_size
+        db.add(doc)
+        db.commit()
+        db.refresh(doc)
+
+        background.add_task(_run_ingestion, doc.id, str(dest))
+        created.append(doc)
+    return created
 
 
 @router.get("", response_model=list[DocumentOut])

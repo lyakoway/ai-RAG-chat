@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-SAMPLES = Path(__file__).resolve().parent.parent.parent / "samples"
+SAMPLES = Path(__file__).resolve().parent.parent / "samples"
 
 
 def make_docx() -> None:

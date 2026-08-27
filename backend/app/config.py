@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     upload_dir: Path = DATA_DIR / "uploads"
     chroma_dir: Path = DATA_DIR / "chroma"
     database_url: str = f"sqlite:///{DATA_DIR / 'app.db'}"
+    # Demo files shipped with the repo (backend/samples) for one-click loading.
+    samples_dir: Path = BASE_DIR / "samples"
 
     # --- Retrieval / chunking ---
     chunk_size: int = 800          # tokens
@@ -38,6 +40,12 @@ class Settings(BaseSettings):
     embedding_provider: str = "local"          # "local" | "openai"
     local_embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     openai_embedding_model: str = "text-embedding-3-small"
+
+    # --- Advanced retrieval (opt-in via env: SEARCH_HYBRID=1 / SEARCH_RERANK=1) ---
+    search_hybrid: bool = False     # BM25 + vectors fused with RRF
+    search_rerank: bool = False     # cross-encoder rerank of fused candidates
+    retrieval_candidates: int = 20  # candidate pool size before rerank
+    rerank_model: str = "BAAI/bge-reranker-base"  # multilingual, local ONNX (~1 GB)
 
     # --- LLM provider keys (optional) ---
     openai_api_key: str | None = None

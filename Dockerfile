@@ -28,6 +28,8 @@ COPY backend/requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY backend/app ./app
+# Demo documents for the one-click loader (POST /api/documents/demo).
+COPY backend/samples ./samples
 # FastAPI serves this at "/" (COPY forbids inline comments on the same line).
 COPY --from=frontend /fe/dist ./static
 

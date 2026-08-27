@@ -14,6 +14,10 @@ export const AnalyticsEvent = {
   DOCUMENT_UPLOAD: 'document_upload',
   /** Ошибка загрузки файла(ов) в панели документов */
   DOCUMENT_UPLOAD_ERROR: 'document_upload_error',
+  /** Кнопка «Загрузить демо-документы» на пустой панели */
+  DEMO_DOCS_LOAD: 'demo_documents_load',
+  /** Ошибка загрузки демо-пака */
+  DEMO_DOCS_LOAD_ERROR: 'demo_documents_load_error',
   DOCUMENT_DELETE: 'document_delete',
   DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',

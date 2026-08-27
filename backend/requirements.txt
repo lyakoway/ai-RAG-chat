@@ -10,7 +10,8 @@ SQLAlchemy==2.0.36
 
 # --- Vector store & embeddings ---
 chromadb==0.5.23
-fastembed==0.5.1          # local ONNX embeddings, multilingual, no torch
+fastembed==0.5.1          # local ONNX embeddings + cross-encoder reranker
+rank-bm25==0.2.2          # lexical search for hybrid retrieval (pure python)
 
 # --- Document parsing ---
 pypdf==5.1.0              # PDF text + page numbers
