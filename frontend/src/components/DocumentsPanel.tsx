@@ -36,9 +36,29 @@ export function DocumentsPanel({
   const { t } = useI18n()
   const [category, setCategory] = useState('General')
   const [uploading, setUploading] = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const loadDemo = async () => {
+    if (demoLoading) return
+    setError(null)
+    setDemoLoading(true)
+    try {
+      await api.loadDemoDocuments()
+      trackEvent(AnalyticsEvent.DEMO_DOCS_LOAD)
+      onUploaded()
+    } catch (e) {
+      const message = e instanceof Error ? e.message : t('uploadError')
+      trackEvent(AnalyticsEvent.DEMO_DOCS_LOAD_ERROR, {
+        message: message.slice(0, 120),
+      })
+      setError(message)
+    } finally {
+      setDemoLoading(false)
+    }
+  }
 
   const upload = async (files: FileList | File[]) => {
     setError(null)
@@ -151,7 +171,18 @@ export function DocumentsPanel({
       </div>
 
       <div className="docs-list">
-        {documents.length === 0 && <p className="docs-empty">{t('docsEmpty')}</p>}
+        {documents.length === 0 && (
+          <div className="docs-empty-block">
+            <p className="docs-empty">{t('docsEmpty')}</p>
+            <button
+              className="btn btn-ghost demo-load-btn"
+              onClick={loadDemo}
+              disabled={demoLoading}
+            >
+              {demoLoading ? '…' : t('demoDocsBtn')}
+            </button>
+          </div>
+        )}
         {documents.map((d) => (
           <div key={d.id} className="doc-item">
             <div className={`doc-ext ext-${fileExt(d.filename).toLowerCase()}`}>

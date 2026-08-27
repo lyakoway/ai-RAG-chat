@@ -88,6 +88,16 @@
 /* ---- List ---- */
 .docs-list { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .docs-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 24px 12px; }
+.docs-empty-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+.docs-empty-block .docs-empty { padding: 0; }
+.demo-load-btn { font-size: 12.5px; padding: 9px 14px; }
+.demo-load-btn:disabled { opacity: 0.6; }
 
 .doc-item {
   display: flex;

@@ -9,6 +9,7 @@ venv/
 backend/data/*.db
 backend/data/chroma/
 backend/data/uploads/
+backend/data/eval/
 backend/.env
 
 # Node / frontend

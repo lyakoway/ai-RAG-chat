@@ -68,24 +68,36 @@ def query(
     category: str | None = None,
     document_ids: list[str] | None = None,
 ) -> list[dict]:
-    """Return retrieved chunks with metadata + similarity score (0..1)."""
+    """Retrieval entry point (chat RAG, agent tool, /api/search).
+
+    Pipeline: vector ANN → optional BM25 fusion (RRF) → optional cross-encoder
+    rerank → top_k. Advanced stages are opt-in via env (SEARCH_HYBRID /
+    SEARCH_RERANK) so the plain demo stays lightweight.
+    """
     where = _build_where(category, document_ids)
     emb = get_embeddings()
+
+    use_hybrid = settings.search_hybrid
+    use_rerank = settings.search_rerank
+    n_candidates = max(top_k, settings.retrieval_candidates) if (use_hybrid or use_rerank) else top_k
+
     qvec = emb.embed_query(text)
     res = _collection().query(
         query_embeddings=[qvec],
-        n_results=top_k,
+        n_results=n_candidates,
         where=where or None,
         include=["documents", "metadatas", "distances"],
     )
+    ids = res.get("ids", [[]])[0]
     docs = res.get("documents", [[]])[0]
     metas = res.get("metadatas", [[]])[0]
     dists = res.get("distances", [[]])[0]
 
     hits: list[dict] = []
-    for doc, meta, dist in zip(docs, metas, dists):
+    for chunk_id, doc, meta, dist in zip(ids, docs, metas, dists):
         hits.append(
             {
+                "id": chunk_id,
                 "text": doc,
                 "document_id": meta.get("document_id"),
                 "filename": meta.get("filename"),
@@ -97,7 +109,47 @@ def query(
                 "score": round(1.0 - float(dist), 4),
             }
         )
+
+    if use_hybrid:
+        hits = _fuse_with_bm25(
+            text=text, vector_hits=hits, n_candidates=n_candidates,
+            category=category, document_ids=document_ids,
+        )
+
+    if use_rerank:
+        from app.core.rerank import rerank
+
+        hits = rerank(text, hits)[:top_k]
+        import math
+
+        for h in hits:
+            # cross-encoder logits -> bounded 0..1 for the UI percent display
+            h["score"] = round(1.0 / (1.0 + math.exp(-h["score"] * 4)), 4)
+    else:
+        hits = hits[:top_k]
     return hits
+
+
+def _fuse_with_bm25(
+    *,
+    text: str,
+    vector_hits: list[dict],
+    n_candidates: int,
+    category: str | None,
+    document_ids: list[str] | None,
+) -> list[dict]:
+    from app.core.bm25 import bm25_search, rrf_fuse
+
+    vec_ranking = {h["id"]: h["score"] for h in vector_hits}
+    lex_ranking = bm25_search(
+        text=text, top_k=n_candidates, category=category, document_ids=document_ids
+    )
+    fused = rrf_fuse([vec_ranking, lex_ranking])
+    by_id = {h["id"]: h for h in vector_hits}
+    ordered = [by_id[i] for i in sorted(fused, key=fused.get, reverse=True) if i in by_id]
+    # BM25-only matches outside the vector pool are dropped: with the current
+    # snapshot flow they would need a second Chroma lookup for marginal gain.
+    return ordered[:n_candidates]
 
 
 def _build_where(category: str | None, document_ids: list[str] | None) -> dict:
