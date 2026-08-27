@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import './styles/chat.css'
 import './styles/documents.css'
+import './styles/search.css'
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { ChatView } from './components/ChatView'
+import { SearchView } from './components/SearchView'
 import { DocumentsPanel } from './components/DocumentsPanel'
 import { DocumentViewer } from './components/DocumentViewer'
 import { useChat } from './hooks/useChat'
@@ -16,7 +18,7 @@ import type { ChatMode, Conversation, DocumentItem, ModelInfo, Source } from './
 
 type Theme = 'light' | 'dark'
 const THEMES: readonly Theme[] = ['light', 'dark']
-const MODES: readonly ChatMode[] = ['rag', 'agent']
+const MODES: readonly ChatMode[] = ['rag', 'agent', 'search']
 
 export default function App() {
   const { lang } = useI18n()
@@ -241,15 +243,23 @@ export default function App() {
           readyDocs={readyDocs}
           onMenu={() => setSidebarOpen(true)}
         />
-        <ChatView
-          messages={messages}
-          isStreaming={isStreaming}
-          onSend={handleSend}
-          onStop={stop}
-          hasDocuments={readyDocs > 0}
-          onOpenSource={handleOpenSource}
-          mode={mode}
-        />
+        {mode === 'search' ? (
+          <SearchView
+            hasDocuments={readyDocs > 0}
+            category={category}
+            onOpenSource={handleOpenSource}
+          />
+        ) : (
+          <ChatView
+            messages={messages}
+            isStreaming={isStreaming}
+            onSend={handleSend}
+            onStop={stop}
+            hasDocuments={readyDocs > 0}
+            onOpenSource={handleOpenSource}
+            mode={mode}
+          />
+        )}
       </main>
 
       {docsOpen && (

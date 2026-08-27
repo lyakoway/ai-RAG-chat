@@ -20,7 +20,7 @@ export interface DocumentItem {
   created_at: string
 }
 
-export type ChatMode = 'rag' | 'agent'
+export type ChatMode = 'rag' | 'agent' | 'search'
 
 export interface AgentStep {
   index: number
@@ -59,4 +59,11 @@ export interface ModelInfo {
   label: string
   available: boolean
   description: string
+}
+
+export interface SearchResponse {
+  query: string
+  took_ms: number
+  embedding_model: string
+  results: Source[]
 }

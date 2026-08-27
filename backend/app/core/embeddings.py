@@ -51,6 +51,13 @@ def get_embeddings():
     return LocalEmbeddings(model)
 
 
+def active_model_name() -> str:
+    """Human-readable id of the embedding model currently in use."""
+    if settings.embedding_provider == "openai" and settings.openai_api_key:
+        return settings.openai_embedding_model
+    return _resolve_local_model(settings.local_embedding_model)
+
+
 def _resolve_local_model(name: str) -> str:
     # fastembed ships this multilingual model under this exact id.
     known_multilingual = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"

@@ -3,6 +3,7 @@ import type {
   ConversationDetail,
   DocumentItem,
   ModelInfo,
+  SearchResponse,
 } from './types'
 
 const BASE = '/api'
@@ -40,6 +41,14 @@ export const api = {
   deleteDocument: (id: string) =>
     fetch(`${BASE}/documents/${id}`, { method: 'DELETE' }).then(json<void>),
   documentFileUrl: (id: string) => `${BASE}/documents/${id}/file`,
+
+  // ---- Vector search ----
+  search: (q: string, opts?: { category?: string; top_k?: number }) => {
+    const p = new URLSearchParams({ q })
+    if (opts?.category && opts.category !== 'All') p.set('category', opts.category)
+    if (opts?.top_k) p.set('top_k', String(opts.top_k))
+    return fetch(`${BASE}/search?${p}`).then(json<SearchResponse>)
+  },
 
   // ---- Conversations ----
   listConversations: () => fetch(`${BASE}/conversations`).then(json<Conversation[]>),

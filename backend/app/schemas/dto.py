@@ -33,6 +33,14 @@ class Source(BaseModel):
     chunk_index: int | None = None
 
 
+# ---------- Vector search ----------
+class SearchResponse(BaseModel):
+    query: str
+    took_ms: int
+    embedding_model: str
+    results: list[Source] = Field(default_factory=list)
+
+
 # ---------- Chat ----------
 class ChatRequest(BaseModel):
     message: str
