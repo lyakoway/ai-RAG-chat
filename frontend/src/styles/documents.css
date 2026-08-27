@@ -135,6 +135,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Клик по имени открывает просмотрщик (для .doc fallback покажет кнопку скачивания). */
+.doc-name.clickable {
+  display: block;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s;
+}
+.doc-name.clickable:hover { color: var(--accent); }
+.doc-actions {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.doc-action {
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.doc-action:hover { color: var(--accent); background: var(--bg-soft); }
 .doc-meta {
   display: flex;
   align-items: center;
@@ -165,7 +186,6 @@
 }
 
 .doc-del {
-  align-self: flex-start;
   color: var(--text-muted);
   padding: 4px;
   border-radius: 6px;

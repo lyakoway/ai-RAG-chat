@@ -34,6 +34,10 @@ class Document(Base):
     chunk_count: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(String(32), default="processing")  # processing|ready|error
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Язык содержимого ("ru" | "en"), определяется при индексации; None = неизвестен.
+    lang: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    # Ключ пары RU/EN-двойников демо-пака: удаление одного сносит и перевод.
+    pair_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 

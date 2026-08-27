@@ -1,6 +1,7 @@
 """Ingestion service: parse -> chunk -> embed -> index, updating the DB row."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from sqlalchemy.orm import Session
@@ -9,6 +10,29 @@ from app.core import vectorstore
 from app.core.chunking import chunk_segments
 from app.db.models import Document
 from app.parsers.base import ParseError, page_count, parse_document
+
+_CYRILLIC = re.compile(r"[а-яё]", re.IGNORECASE)
+_LATIN = re.compile(r"[a-z]", re.IGNORECASE)
+
+
+def detect_lang(text: str) -> str | None:
+    """Rough content language: 'ru' | 'en' by letter counts, None if no letters."""
+    sample = text[:3000]
+    cyr = len(_CYRILLIC.findall(sample))
+    lat = len(_LATIN.findall(sample))
+    if cyr == 0 and lat == 0:
+        return None
+    return "ru" if cyr > lat else "en"
+
+
+def detect_lang_from_filename(name: str) -> str | None:
+    """Provisional language for the upload record (before indexing).
+
+    Needed so the documents panel can bucket files by UI language immediately,
+    while they are still processing. Content-based detect_lang() refines it
+    after parsing.
+    """
+    return "ru" if _CYRILLIC.search(name) else ("en" if _LATIN.search(name) else None)
 
 
 def ingest_document(db: Session, document: Document, path: Path) -> None:
@@ -24,6 +48,10 @@ def ingest_document(db: Session, document: Document, path: Path) -> None:
         )
         document.page_count = page_count(segments)
         document.chunk_count = len(chunks)
+        # Уточняем предварительный язык (из имени файла) по содержимому.
+        detected = detect_lang("\n".join(s.text for s in segments))
+        if detected:
+            document.lang = detected
         document.status = "ready"
         document.error = None
     except ParseError as exc:

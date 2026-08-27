@@ -1,17 +1,17 @@
 import { useRef, useState } from 'react'
-import { IconDoc, IconTrash, IconUpload } from '../lib/icons'
+import { IconDoc, IconDownload, IconEye, IconTrash, IconUpload } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { useSwipeDismiss } from '../hooks/useSwipeDismiss'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
-import type { DocumentItem } from '../lib/types'
+import type { DocumentItem, Source } from '../lib/types'
 
 interface Props {
   documents: DocumentItem[]
   categories: string[]
-  readyDocs: number
   onUploaded: () => void
   onDeleted: () => void
+  onOpenSource: (source: Source) => void
   onClose: () => void
 }
 
@@ -28,12 +28,12 @@ function fileExt(name: string) {
 export function DocumentsPanel({
   documents,
   categories,
-  readyDocs,
   onUploaded,
   onDeleted,
+  onOpenSource,
   onClose,
 }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [category, setCategory] = useState('General')
   const [uploading, setUploading] = useState(false)
   const [demoLoading, setDemoLoading] = useState(false)
@@ -104,6 +104,9 @@ export function DocumentsPanel({
   }
 
   const knownCategories = Array.from(new Set(['General', ...categories]))
+  // Показываем документы на языке интерфейса; файлы с неизвестным языком — всегда.
+  const visible = documents.filter((d) => !d.lang || d.lang === lang)
+  const visibleReady = visible.filter((d) => d.status === 'ready').length
   const swipe = useSwipeDismiss(onClose, 'right')
 
   return (
@@ -116,7 +119,7 @@ export function DocumentsPanel({
         <h2>
           <IconDoc width={18} height={18} />
           {t('documents')}
-          <span className="docs-count">{readyDocs}</span>
+          <span className="docs-count">{visibleReady}</span>
         </h2>
         <button className="docs-close" onClick={onClose} title={t('hidePanel')}>✕</button>
       </div>
@@ -183,13 +186,31 @@ export function DocumentsPanel({
             </button>
           </div>
         )}
-        {documents.map((d) => (
+        {documents.length > 0 && visible.length === 0 && (
+          <p className="docs-empty">{t('docsEmptyLang')}</p>
+        )}
+        {visible.map((d) => (
           <div key={d.id} className="doc-item">
             <div className={`doc-ext ext-${fileExt(d.filename).toLowerCase()}`}>
               {fileExt(d.filename)}
             </div>
             <div className="doc-info">
-              <div className="doc-name" title={d.filename}>{d.filename}</div>
+              <button
+                className="doc-name clickable"
+                title={t('docOpen')}
+                onClick={() =>
+                  onOpenSource({
+                    document_id: d.id,
+                    filename: d.filename,
+                    page: null,
+                    snippet: '',
+                    score: null,
+                    chunk_index: null,
+                  })
+                }
+              >
+                {d.filename}
+              </button>
               <div className="doc-meta">
                 <span className="doc-badge">{d.category}</span>
                 <span>{formatSize(d.size_bytes)}</span>
@@ -208,13 +229,44 @@ export function DocumentsPanel({
                 </div>
               )}
             </div>
-            <button
-              className="doc-del"
-              onClick={() => remove(d.id, d.filename)}
-              title={t('deleteDoc')}
-            >
-              <IconTrash width={16} height={16} />
-            </button>
+            <div className="doc-actions">
+              {d.status === 'ready' && (
+                <button
+                  className="doc-action"
+                  title={t('docOpen')}
+                  onClick={() =>
+                    onOpenSource({
+                      document_id: d.id,
+                      filename: d.filename,
+                      page: null,
+                      snippet: '',
+                      score: null,
+                      chunk_index: null,
+                    })
+                  }
+                >
+                  <IconEye width={16} height={16} />
+                </button>
+              )}
+              {d.status === 'ready' && (
+                <a
+                  className="doc-action"
+                  href={api.documentFileUrl(d.id)}
+                  download={d.filename}
+                  title={t('docDownload')}
+                  onClick={() => trackEvent(AnalyticsEvent.DOCUMENT_DOWNLOAD, { filename: d.filename })}
+                >
+                  <IconDownload width={16} height={16} />
+                </a>
+              )}
+              <button
+                className="doc-del"
+                onClick={() => remove(d.id, d.filename)}
+                title={t('deleteDoc')}
+              >
+                <IconTrash width={16} height={16} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
