@@ -18,9 +18,10 @@ interface UseChatArgs {
   conversationId: string | null
   setConversationId: (id: string) => void
   onFinished?: () => void // e.g. refresh conversation list
+  onError?: (msg: string) => void // raw provider/stream error (for the error modal)
 }
 
-export function useChat({ conversationId, setConversationId, onFinished }: UseChatArgs) {
+export function useChat({ conversationId, setConversationId, onFinished, onError }: UseChatArgs) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isStreaming, setStreaming] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
@@ -112,6 +113,7 @@ export function useChat({ conversationId, setConversationId, onFinished }: UseCh
               message: msg.slice(0, 120),
               ...(mode === 'agent' ? { steps: agentStepCount } : {}),
             })
+            onError?.(msg)
             patchAi({
               content: (aiMsg.content || '') + `\n\n⚠️ ${msg}`,
               streaming: false,

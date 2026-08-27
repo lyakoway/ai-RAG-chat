@@ -3,12 +3,14 @@ import './App.css'
 import './styles/chat.css'
 import './styles/documents.css'
 import './styles/search.css'
+import './styles/provider-error.css'
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { ChatView } from './components/ChatView'
 import { SearchView } from './components/SearchView'
 import { DocumentsPanel } from './components/DocumentsPanel'
 import { DocumentViewer } from './components/DocumentViewer'
+import { ProviderErrorModal, isProviderError } from './components/ProviderErrorModal'
 import { useChat } from './hooks/useChat'
 import { AnalyticsEvent, trackEvent } from './lib/analytics'
 import { useI18n } from './lib/i18n'
@@ -92,10 +94,14 @@ export default function App() {
   }, [refreshConversations])
 
   // ---- Chat ----
+  const [providerError, setProviderError] = useState<string | null>(null)
   const { messages, isStreaming, send, stop, reset } = useChat({
     conversationId,
     setConversationId,
     onFinished: refreshConversations,
+    onError: (msg) => {
+      if (isProviderError(msg)) setProviderError(msg)
+    },
   })
 
   const readyDocs = useMemo(
@@ -285,6 +291,13 @@ export default function App() {
       )}
 
       <DocumentViewer source={viewerSource} onClose={() => setViewerSource(null)} />
+
+      {providerError && (
+        <ProviderErrorModal
+          message={providerError}
+          onClose={() => setProviderError(null)}
+        />
+      )}
     </div>
   )
 }

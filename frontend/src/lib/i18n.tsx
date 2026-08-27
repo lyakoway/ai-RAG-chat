@@ -75,6 +75,13 @@ const dict = {
     openSource: 'Открыть источник',
     page: 'стр. {n}',
 
+    providerErrorTitle: 'Модель недоступна',
+    providerErrorBody:
+      'Выбранный LLM-провайдер отклонил запрос — чаще всего это значит, что исчерпан баланс аккаунта или неверный API-ключ. Пополните баланс провайдера, выберите другую модель в селекторе — или напишите нам, поможем настроить.',
+    providerErrorContact: 'Связаться с нами',
+    providerErrorClose: 'Закрыть',
+    providerErrorDetails: 'Подробности',
+
     hidePanel: 'Скрыть панель',
     categoryPlaceholder: 'Например: HR, Финансы, Договоры',
     dropzoneIdle: 'Перетащите файлы или нажмите',
@@ -166,6 +173,13 @@ const dict = {
     sourceN: 'Source {n}',
     openSource: 'Open source',
     page: 'p. {n}',
+
+    providerErrorTitle: 'Model unavailable',
+    providerErrorBody:
+      'The selected LLM provider declined the request — most often this means the account balance is exhausted or the API key is invalid. Top up the provider balance, choose another model in the selector, or contact us and we will help you set it up.',
+    providerErrorContact: 'Contact us',
+    providerErrorClose: 'Close',
+    providerErrorDetails: 'Details',
 
     hidePanel: 'Hide panel',
     categoryPlaceholder: 'e.g. HR, Finance, Contracts',
