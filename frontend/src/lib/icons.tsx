@@ -73,3 +73,9 @@ export const IconDownload = (p: SVGProps<SVGSVGElement>) => (
 export const IconEye = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" /><circle cx="12" cy="12" r="2.8" /></svg>
 )
+export const IconThumbUp = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M7 11v9M7 11l4-7c1.5 0 2.5 1 2.5 2.5L13 10h5.5c1 0 1.7 1 1.4 2l-1.6 6c-.2.9-1 1.5-1.9 1.5H7M7 11H4l0 9h3" /></svg>
+)
+export const IconThumbDown = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M17 13V4M17 13l-4 7c-1.5 0-2.5-1-2.5-2.5L11 14H5.5c-1 0-1.7-1-1.4-2l1.6-6c.2-.9 1-1.5 1.9-1.5H17M17 13h3l0-9h-3" /></svg>
+)

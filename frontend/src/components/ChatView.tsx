@@ -13,6 +13,7 @@ interface Props {
   onStop: () => void
   hasDocuments: boolean
   onOpenSource: (source: Source) => void
+  onFeedback: (messageId: string, value: 'up' | 'down' | null) => void
   mode: ChatMode
 }
 
@@ -23,6 +24,7 @@ export function ChatView({
   onStop,
   hasDocuments,
   onOpenSource,
+  onFeedback,
   mode,
 }: Props) {
   const { t } = useI18n()
@@ -85,7 +87,7 @@ export function ChatView({
         ) : (
           <div className="messages">
             {messages.map((m) => (
-              <MessageBubble key={m.id} message={m} onOpenSource={onOpenSource} />
+              <MessageBubble key={m.id} message={m} onOpenSource={onOpenSource} onFeedback={onFeedback} />
             ))}
             <div ref={endRef} />
           </div>

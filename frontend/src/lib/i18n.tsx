@@ -74,6 +74,8 @@ const dict = {
     sourceN: 'Источник {n}',
     openSource: 'Открыть источник',
     page: 'стр. {n}',
+    feedbackUp: 'Ответ был полезен',
+    feedbackDown: 'Ответ можно улучшить',
 
     providerErrorTitle: 'Модель недоступна',
     providerErrorBody:
@@ -177,6 +179,8 @@ const dict = {
     sourceN: 'Source {n}',
     openSource: 'Open source',
     page: 'p. {n}',
+    feedbackUp: 'This answer was helpful',
+    feedbackDown: 'This answer could be better',
 
     providerErrorTitle: 'Model unavailable',
     providerErrorBody:

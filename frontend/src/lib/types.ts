@@ -39,6 +39,7 @@ export interface ChatMessage {
   content: string
   sources?: Source[] | null
   agent_steps?: AgentStep[] | null
+  feedback?: string | null
   created_at?: string
   streaming?: boolean
 }

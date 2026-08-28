@@ -16,6 +16,7 @@ pinned: false
 
 ### 🔗 Живое демо → **https://lyakoway-rag-chat.hf.space**
 
+[![CI](https://github.com/lyakoway/ai-RAG-chat/actions/workflows/ci.yml/badge.svg)](https://github.com/lyakoway/ai-RAG-chat/actions/workflows/ci.yml)
 [![Demo](https://img.shields.io/badge/demo-🤗%20Hugging%20Face%20Spaces-ff9d00)](https://lyakoway-rag-chat.hf.space)
 ![backend](https://img.shields.io/badge/backend-FastAPI-009688)
 ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61dafb)
@@ -25,8 +26,15 @@ pinned: false
 <sub>Демо на бесплатном тарифе может «засыпать» — первый заход после простоя
 поднимается ~50 сек.</sub>
 
-<!-- Скриншот интерфейса: положите файл в docs/screenshot.png и раскомментируйте строку ниже. -->
-<!-- ![Скриншот интерфейса](docs/screenshot.png) -->
+## Скриншоты
+
+| Чат с цитатами и фидбеком | Векторный поиск с score |
+|---|---|
+| ![Чат с цитатами](docs/screenshots/chat-citations-ru.png) | ![Векторный поиск](docs/screenshots/vector-search-ru.png) |
+
+Источники с оценками релевантности и кнопки 👍/👎 на ответах:
+
+![Источники и фидбек](docs/screenshots/sources-feedback-ru.png)
 
 ## Возможности
 
@@ -253,6 +261,21 @@ SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # чистый векто
 - Ключи задаются как **секреты Space** (`ZAI_API_KEY` и т.п.), в код не попадают.
 - Для локального запуска двумя сервисами есть [`docker-compose.yml`](docker-compose.yml)
   (nginx проксирует `/api` на бэкенд) — см. [Через Docker](#через-docker).
+
+## Тесты
+
+Бэкенд покрыт pytest: парсеры (PDF/DOCX/XLSX), чанкинг, определение языка
+(RU/EN/中文/日本語/한국어), API (демо-пак, поиск, чат с мок-моделью, фидбек 👍/👎).
+Тесты гоняются в изолированном хранилище `backend/data/test/` — рабочие данные
+не затрагиваются:
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+pytest -q
+```
+
+CI (GitHub Actions) прогоняет тесты бэкенда и сборку фронтенда на каждый push.
 
 ## Стек
 

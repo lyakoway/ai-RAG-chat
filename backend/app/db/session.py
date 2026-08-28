@@ -38,6 +38,7 @@ def init_db() -> None:
     _ensure_sqlite_column("messages", "agent_steps", "JSON")
     _ensure_sqlite_column("documents", "lang", "VARCHAR(8)")
     _ensure_sqlite_column("documents", "pair_key", "VARCHAR(64)")
+    _ensure_sqlite_column("messages", "feedback", "VARCHAR(8)")
 
 
 def _ensure_sqlite_column(table: str, column: str, col_type: str) -> None:

@@ -1,7 +1,7 @@
 import { useState, type ComponentProps, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { IconSpark } from '../lib/icons'
+import { IconSpark, IconThumbDown, IconThumbUp } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { injectCitations } from '../lib/citations'
 import { AgentSteps } from './AgentSteps'
@@ -12,9 +12,10 @@ import type { ChatMessage, Source } from '../lib/types'
 interface Props {
   message: ChatMessage
   onOpenSource: (source: Source) => void
+  onFeedback: (messageId: string, value: 'up' | 'down' | null) => void
 }
 
-export function MessageBubble({ message, onOpenSource }: Props) {
+export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
   const { t } = useI18n()
   const isUser = message.role === 'user'
   const steps = message.agent_steps ?? []
@@ -45,6 +46,12 @@ export function MessageBubble({ message, onOpenSource }: Props) {
       count: sources.length,
     })
     setSourcesOpen(next)
+  }
+
+  const handleFeedback = (value: 'up' | 'down') => {
+    const next = message.feedback === value ? null : value // повторный клик снимает
+    trackEvent(AnalyticsEvent.ANSWER_FEEDBACK, { value: next ?? 'clear' })
+    onFeedback(message.id, next)
   }
 
   // Markdown renderers that make citation markers ([1]) clickable.
@@ -98,6 +105,24 @@ export function MessageBubble({ message, onOpenSource }: Props) {
             activeIndex={activeSource}
             onOpenSource={onOpenSource}
           />
+        )}
+        {!isUser && !message.streaming && message.content && (
+          <div className="msg-feedback">
+            <button
+              className={`fb-btn ${message.feedback === 'up' ? 'active' : ''}`}
+              onClick={() => handleFeedback('up')}
+              title={t('feedbackUp')}
+            >
+              <IconThumbUp width={15} height={15} />
+            </button>
+            <button
+              className={`fb-btn ${message.feedback === 'down' ? 'active' : ''}`}
+              onClick={() => handleFeedback('down')}
+              title={t('feedbackDown')}
+            >
+              <IconThumbDown width={15} height={15} />
+            </button>
+          </div>
         )}
       </div>
     </div>
