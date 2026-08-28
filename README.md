@@ -149,7 +149,7 @@ cd backend && .venv/bin/python scripts/make_samples.py
 | Провайдер | Как включить |
 |-----------|--------------|
 | **Demo (offline)** | работает всегда, без настройки |
-| **Z.ai (GLM)** | `ZAI_API_KEY=...` в `backend/.env`; ключ — на [z.ai/model-api](https://z.ai/model-api). Модель `glm-4.5-flash` **бесплатная** |
+| **Z.ai (GLM)** | `ZAI_API_KEY=...` в `backend/.env`; ключ — на [z.ai/model-api](https://z.ai/model-api). В списке моделей — новейшие `glm-5.3`, `glm-5.3-flash`, `glm-5.2`, а также `glm-4.5-flash` (**бесплатная**) |
 | **OpenAI (GPT)** | `OPENAI_API_KEY=sk-...` в `backend/.env` |
 | **Anthropic (Claude)** | `ANTHROPIC_API_KEY=sk-ant-...` в `backend/.env` |
 | **Ollama (локально)** | установите [Ollama](https://ollama.com), `ollama pull llama3.2:3b` (см. ниже) |
