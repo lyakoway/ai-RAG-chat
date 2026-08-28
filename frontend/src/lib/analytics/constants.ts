@@ -22,6 +22,8 @@ export const AnalyticsEvent = {
   DOCUMENT_DOWNLOAD: 'document_download',
   /** Оценка ответа 👍/👎 (value: up | down; повторный клик снимает) */
   ANSWER_FEEDBACK: 'answer_feedback',
+  /** Клик по follow-up подсказке под ответом */
+  FOLLOWUP_CLICK: 'followup_click',
   DOCUMENT_DELETE: 'document_delete',
   DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',

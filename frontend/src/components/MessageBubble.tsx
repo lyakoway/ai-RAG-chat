@@ -1,4 +1,4 @@
-import { useState, type ComponentProps, type ReactNode } from 'react'
+import { useEffect, useState, type ComponentProps, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { IconSpark, IconThumbDown, IconThumbUp } from '../lib/icons'
@@ -13,9 +13,11 @@ interface Props {
   message: ChatMessage
   onOpenSource: (source: Source) => void
   onFeedback: (messageId: string, value: 'up' | 'down' | null) => void
+  onFollowup: (question: string) => void
+  isLast: boolean
 }
 
-export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
+export function MessageBubble({ message, onOpenSource, onFeedback, onFollowup, isLast }: Props) {
   const { t } = useI18n()
   const isUser = message.role === 'user'
   const steps = message.agent_steps ?? []
@@ -25,6 +27,27 @@ export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
 
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const [activeSource, setActiveSource] = useState<number | null>(null)
+  // «Думающие» модели (GLM-5.x) молчат до первого токена — поясняем тишину.
+  const [thinkingLong, setThinkingLong] = useState(false)
+  useEffect(() => {
+    if (!message.streaming || message.content || steps.length > 0) {
+      setThinkingLong(false)
+      return
+    }
+    const t = setTimeout(() => setThinkingLong(true), 4000)
+    return () => clearTimeout(t)
+  }, [message.streaming, message.content, steps.length])
+  // Пауза посреди стрима (троттлинг провайдера) — поясняем, что мы живы.
+  const [paused, setPaused] = useState(false)
+  useEffect(() => {
+    if (!message.streaming || !message.content) {
+      setPaused(false)
+      return
+    }
+    setPaused(false)
+    const t = setTimeout(() => setPaused(true), 8000)
+    return () => clearTimeout(t)
+  }, [message.streaming, message.content])
 
   const goToCitation = (index: number) => {
     const source = sources[index]
@@ -51,7 +74,7 @@ export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
   const handleFeedback = (value: 'up' | 'down') => {
     const next = message.feedback === value ? null : value // повторный клик снимает
     trackEvent(AnalyticsEvent.ANSWER_FEEDBACK, { value: next ?? 'clear' })
-    onFeedback(message.id, next)
+    onFeedback(message.serverId ?? message.id, next)
   }
 
   // Markdown renderers that make citation markers ([1]) clickable.
@@ -84,6 +107,8 @@ export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
             {showCursor ? (
               <div className="typing">
                 <span /><span /><span />
+                {thinkingLong && <span className="thinking-note">{t('modelThinking')}</span>}
+                {paused && <span className="thinking-note">{t('providerSlow')}</span>}
               </div>
             ) : isUser ? (
               <span className="bubble-plain">{message.content}</span>
@@ -122,6 +147,15 @@ export function MessageBubble({ message, onOpenSource, onFeedback }: Props) {
             >
               <IconThumbDown width={15} height={15} />
             </button>
+          </div>
+        )}
+        {!isUser && isLast && !message.streaming && (message.followups?.length ?? 0) > 0 && (
+          <div className="msg-followups">
+            {message.followups!.map((q) => (
+              <button key={q} className="followup-chip" onClick={() => onFollowup(q)}>
+                {q}
+              </button>
+            ))}
           </div>
         )}
       </div>
