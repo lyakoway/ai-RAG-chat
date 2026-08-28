@@ -1,22 +1,21 @@
 import { useCallback, useState } from 'react'
 import { api } from '../lib/api'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
+import { buildDocumentSuggestions } from '../lib/suggestions'
 import { useI18n } from '../lib/i18n'
 import { IconExternal, IconLayers, IconSearch } from '../lib/icons'
-import type { Source } from '../lib/types'
+import type { DocumentItem, Source } from '../lib/types'
 
 interface Props {
-  hasDocuments: boolean
+  documents: DocumentItem[]
   category: string // 'All' or a concrete category
   onOpenSource: (source: Source) => void
 }
 
-/**
- * Vector search view: direct semantic search over document chunks
- * (fastembed embeddings + Chroma), no LLM involved.
- */
-export function SearchView({ hasDocuments, category, onOpenSource }: Props) {
-  const { t } = useI18n()
+/** Векторный поиск: прямой семантический поиск по фрагментам документов
+ *  (fastembed + Chroma), без LLM. */
+export function SearchView({ documents, category, onOpenSource }: Props) {
+  const { t, lang } = useI18n()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Source[] | null>(null)
   const [tookMs, setTookMs] = useState<number | null>(null)
@@ -54,6 +53,8 @@ export function SearchView({ hasDocuments, category, onOpenSource }: Props) {
   )
 
   const empty = results !== null && results.length === 0
+  const hasDocuments = documents.some((d) => d.status === 'ready')
+  const suggestions = buildDocumentSuggestions(documents, lang)
 
   return (
     <div className="chat">
@@ -75,8 +76,7 @@ export function SearchView({ hasDocuments, category, onOpenSource }: Props) {
             )}
 
             <div className="suggestions">
-              {[t('searchSuggestion1'), t('searchSuggestion2'), t('searchSuggestion3')].map(
-                (s) => (
+              {suggestions.map((s) => (
                   <button
                     key={s}
                     className="suggestion"
