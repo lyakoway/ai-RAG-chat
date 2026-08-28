@@ -3,15 +3,16 @@ import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 import { IconBot, IconLayers, IconSpark } from '../lib/icons'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
+import { buildDocumentSuggestions } from '../lib/suggestions'
 import { useI18n } from '../lib/i18n'
-import type { ChatMessage, ChatMode, Source } from '../lib/types'
+import type { ChatMessage, ChatMode, DocumentItem, Source } from '../lib/types'
 
 interface Props {
   messages: ChatMessage[]
   isStreaming: boolean
   onSend: (text: string) => void
   onStop: () => void
-  hasDocuments: boolean
+  documents: DocumentItem[]
   onOpenSource: (source: Source) => void
   onFeedback: (messageId: string, value: 'up' | 'down' | null) => void
   onFollowup: (question: string) => void
@@ -23,17 +24,21 @@ export function ChatView({
   isStreaming,
   onSend,
   onStop,
-  hasDocuments,
+  documents,
   onOpenSource,
   onFeedback,
   onFollowup,
   mode,
 }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const isAgent = mode === 'agent'
-  const suggestions = isAgent
+  // Подсказки строятся из реальных документов библиотеки; без них — статичные.
+  const staticFallback = isAgent
     ? [t('agentSuggestion1'), t('agentSuggestion2'), t('agentSuggestion3')]
     : [t('suggestion1'), t('suggestion2'), t('suggestion3')]
+  const suggestions = buildDocumentSuggestions(documents, lang)
+  const visibleSuggestions = suggestions.length ? suggestions : staticFallback
+  const hasDocuments = documents.some((d) => d.status === 'ready')
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -68,7 +73,7 @@ export function ChatView({
             )}
 
             <div className="suggestions">
-              {suggestions.map((s, i) => (
+              {visibleSuggestions.map((s, i) => (
                 <button
                   key={s}
                   className="suggestion"

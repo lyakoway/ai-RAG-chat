@@ -275,7 +275,7 @@ export default function App() {
         />
         {mode === 'search' ? (
           <SearchView
-            hasDocuments={readyDocs > 0}
+            documents={documents}
             category={category}
             onOpenSource={handleOpenSource}
           />
@@ -285,7 +285,7 @@ export default function App() {
             isStreaming={isStreaming}
             onSend={handleSend}
             onStop={stop}
-            hasDocuments={readyDocs > 0}
+            documents={documents}
             onOpenSource={handleOpenSource}
             onFeedback={handleMessageFeedback}
             onFollowup={handleFollowup}
