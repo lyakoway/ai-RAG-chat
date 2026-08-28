@@ -29,6 +29,21 @@ export function streamChat(
   const controller = new AbortController()
 
   ;(async () => {
+    // done/error получены? Если стрим закрылся без них (упавший бэкенд,
+    // рестарт Space, рваное соединение) — сообщаем об ошибке, иначе
+    // индикатор «думает…» останется навсегда.
+    let finished = false
+    const finishHandlers = {
+      ...handlers,
+      onDone: (id: string, cid: string) => {
+        finished = true
+        handlers.onDone?.(id, cid)
+      },
+      onError: (msg: string) => {
+        finished = true
+        handlers.onError?.(msg)
+      },
+    }
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -52,14 +67,21 @@ export function streamChat(
         while ((sep = buffer.indexOf('\n\n')) !== -1) {
           const frame = buffer.slice(0, sep)
           buffer = buffer.slice(sep + 2)
-          dispatch(frame, handlers)
+          dispatch(frame, finishHandlers)
         }
+      }
+      if (!finished && !controller.signal.aborted) {
+        finishHandlers.onError?.(
+          localStorage.getItem('lang') === 'en'
+            ? 'Connection lost before completion — please try again'
+            : 'Соединение прервалось до завершения ответа — попробуйте ещё раз',
+        )
       }
     } catch (err) {
       if (controller.signal.aborted) return // user cancelled — not an error
       const fallback =
         localStorage.getItem('lang') === 'en' ? 'Connection error' : 'Ошибка соединения'
-      handlers.onError?.(err instanceof Error ? err.message : fallback)
+      finishHandlers.onError?.(err instanceof Error ? err.message : fallback)
     }
   })()
 

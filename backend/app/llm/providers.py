@@ -15,6 +15,12 @@ from app.llm.base import ChatMessage
 
 settings = get_settings()
 
+# Лимит ожидания LLM-провайдера: без него зависший апстрим (например, Z.ai
+# при исчерпанной квоте) держит SSE-стрим открытым до дефолтных 600 с SDK,
+# и пользователь смотрит на «думает…» десять минут. GLM-4.6 — «думающая»
+# модель: до первого токена может пройти минуту+, поэтому запас 180 с.
+LLM_TIMEOUT_SECONDS = 180.0
+
 
 class MockProvider:
     """Deterministic offline provider — grounds its answer in retrieved context
@@ -75,6 +81,8 @@ class MockProvider:
 class OpenAIProvider:
     provider = "openai"
     base_url: str | None = None  # None → официальный эндпоинт OpenAI
+    # Нестандартные поля API (например, thinking у Z.ai).
+    extra_body: dict | None = None
 
     def __init__(self, model: str = "gpt-4o-mini") -> None:
         self.model = model
@@ -90,12 +98,21 @@ class OpenAIProvider:
     ) -> AsyncIterator[str]:
         from openai import AsyncOpenAI
 
-        client = AsyncOpenAI(api_key=self._api_key(), base_url=self.base_url)
+        client = AsyncOpenAI(
+            api_key=self._api_key(),
+            base_url=self.base_url,
+            timeout=LLM_TIMEOUT_SECONDS,
+            max_retries=1,
+        )
         payload = [{"role": "system", "content": system}] + [
             {"role": m.role, "content": m.content} for m in messages
         ]
         stream = await client.chat.completions.create(
-            model=self.model, messages=payload, stream=True, temperature=0.2
+            model=self.model,
+            messages=payload,
+            stream=True,
+            temperature=0.2,
+            **({"extra_body": self.extra_body} if self.extra_body else {}),
         )
         async for chunk in stream:
             delta = chunk.choices[0].delta.content
@@ -108,6 +125,10 @@ class ZaiProvider(OpenAIProvider):
 
     provider = "zai"
     base_url = "https://api.z.ai/api/paas/v4"
+    # GLM-4.5/4.6 по умолчанию «думают»: рассуждения дают большую часть
+    # задержки до первого видимого токена. Для ответов по документам
+    # отключаем; вернуть режим рассуждений: ZAI_THINKING=enabled.
+    extra_body = {"thinking": {"type": settings.zai_thinking}}
 
     def __init__(self, model: str = "glm-4.6") -> None:
         self.model = model
@@ -130,7 +151,9 @@ class AnthropicProvider:
     ) -> AsyncIterator[str]:
         from anthropic import AsyncAnthropic
 
-        client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+        client = AsyncAnthropic(
+            api_key=settings.anthropic_api_key, timeout=LLM_TIMEOUT_SECONDS, max_retries=1
+        )
         payload = [{"role": m.role, "content": m.content} for m in messages if m.role != "system"]
         async with client.messages.stream(
             model=self.model,
@@ -174,7 +197,9 @@ class OllamaProvider:
         }
         if settings.ollama_num_gpu is not None:
             payload["options"] = {"num_gpu": settings.ollama_num_gpu}
-        async with httpx.AsyncClient(timeout=None) as client:
+        # Локальный Ollama медленный, но живой: длинный read-таймаут вместо None.
+        timeout = httpx.Timeout(connect=10.0, read=600.0, write=60.0, pool=10.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             async with client.stream(
                 "POST", f"{settings.ollama_base_url}/api/chat", json=payload
             ) as resp:

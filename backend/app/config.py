@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     # Z.ai (Zhipu GLM) — OpenAI-совместимый эндпоинт, доступен без VPN.
     zai_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
+    # GLM-4.5/4.6 — «думающие» модели: рассуждения дают большую часть задержки
+    # до первого токена (мы их не стримим). Отключены по умолчанию; включить:
+    # ZAI_THINKING=enabled.
+    zai_thinking: str = "disabled"
     # Number of layers to offload to GPU for Ollama. Leave None to let Ollama
     # decide. Set to 0 to force CPU (needed e.g. on macOS 13, where the GPU/Metal
     # build crashes with GGML_ASSERT).
