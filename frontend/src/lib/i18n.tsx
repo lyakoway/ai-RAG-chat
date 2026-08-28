@@ -76,6 +76,8 @@ const dict = {
     page: 'стр. {n}',
     feedbackUp: 'Ответ был полезен',
     feedbackDown: 'Ответ можно улучшить',
+    modelThinking: 'Модель размышляет — это может занять до минуты…',
+    providerSlow: 'Z.ai отвечает с задержкой — продолжаем…',
 
     providerErrorTitle: 'Модель недоступна',
     providerErrorBody:
@@ -181,6 +183,8 @@ const dict = {
     page: 'p. {n}',
     feedbackUp: 'This answer was helpful',
     feedbackDown: 'This answer could be better',
+    modelThinking: 'The model is thinking — this can take up to a minute…',
+    providerSlow: 'Z.ai is responding slowly — still working…',
 
     providerErrorTitle: 'Model unavailable',
     providerErrorBody:

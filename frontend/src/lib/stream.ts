@@ -16,6 +16,10 @@ export interface ChatStreamHandlers {
   onToken?: (delta: string) => void
   onDone?: (messageId: string, conversationId: string) => void
   onError?: (message: string) => void
+  /** Сгенерированный заголовок диалога (после done) */
+  onTitle?: (conversationId: string, title: string) => void
+  /** Follow-up подсказки для текущего ответа (после done) */
+  onFollowups?: (questions: string[]) => void
 }
 
 /**
@@ -37,6 +41,7 @@ export function streamChat(
       ...handlers,
       onDone: (id: string, cid: string) => {
         finished = true
+        ;(window as unknown as Record<string, unknown>).__sseDone = Date.now()
         handlers.onDone?.(id, cid)
       },
       onError: (msg: string) => {
@@ -59,15 +64,32 @@ export function streamChat(
 
       while (true) {
         const { value, done } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
+        // ВАЖНО: последний чанк приходит ВМЕСТЕ с done:true — обрабатываем
+        // value и только потом выходим, иначе теряем финальные токены и done.
+        if (value) {
+          buffer += decoder.decode(value, { stream: true })
+          ;(window as unknown as Record<string, unknown>).__sseChunks =
+            (((window as unknown as Record<string, unknown>).__sseChunks as number) ?? 0) + 1
+          ;(window as unknown as Record<string, unknown>).__sseBytes =
+            (((window as unknown as Record<string, unknown>).__sseBytes as number) ?? 0) +
+            value.length
 
-        // SSE frames are separated by a blank line.
-        let sep: number
-        while ((sep = buffer.indexOf('\n\n')) !== -1) {
-          const frame = buffer.slice(0, sep)
-          buffer = buffer.slice(sep + 2)
-          dispatch(frame, finishHandlers)
+          // SSE frames are separated by a blank line.
+          let sep: number
+          while ((sep = buffer.indexOf('\n\n')) !== -1) {
+            const frame = buffer.slice(0, sep)
+            buffer = buffer.slice(sep + 2)
+            try {
+              dispatch(frame, finishHandlers)
+            } catch (e) {
+              ;(window as unknown as Record<string, unknown>).__dbgDispatchError = String(e)
+            }
+          }
+        }
+        if (done) {
+          ;(window as unknown as Record<string, unknown>).__dbgStreamClosed = true
+          ;(window as unknown as Record<string, unknown>).__dbgLeftover = buffer
+          break
         }
       }
       if (!finished && !controller.signal.aborted) {
@@ -112,6 +134,14 @@ function dispatch(frame: string, handlers: ChatStreamHandlers) {
       break
     case 'error':
       handlers.onError?.(payload.message)
+      break
+    case 'title':
+      handlers.onTitle?.(payload.conversation_id, payload.title)
+      break
+    case 'followups':
+      handlers.onFollowups?.(payload.followups)
+      break
+    default:
       break
   }
 }

@@ -94,14 +94,24 @@ export default function App() {
   }, [refreshConversations])
 
   // ---- Chat ----
+  const handleTitle = useCallback((cid: string, title: string) => {
+    setConversations((prev) => prev.map((c) => (c.id === cid ? { ...c, title } : c)))
+  }, [])
+  // Автозаголовок пишется фоновой задачей уже после ответа — второй рефреш
+  // через 6 с подхватывает его в сайдбар.
+  const onFinishedWithTitle = useCallback(() => {
+    refreshConversations()
+    setTimeout(refreshConversations, 6000)
+  }, [refreshConversations])
   const [providerError, setProviderError] = useState<string | null>(null)
   const { messages, isStreaming, send, stop, reset } = useChat({
     conversationId,
     setConversationId,
-    onFinished: refreshConversations,
+    onFinished: onFinishedWithTitle,
     onError: (msg) => {
       if (isProviderError(msg)) setProviderError(msg)
     },
+    onTitle: handleTitle,
   })
 
   const readyDocs = useMemo(
@@ -210,6 +220,14 @@ export default function App() {
     })
   }, [])
 
+  const handleFollowup = useCallback(
+    (question: string) => {
+      trackEvent(AnalyticsEvent.FOLLOWUP_CLICK, {})
+      handleSend(question)
+    },
+    [handleSend],
+  )
+
   const handleToggleDocs = useCallback(() => {
     setDocsOpen((v) => {
       const next = !v
@@ -270,6 +288,7 @@ export default function App() {
             hasDocuments={readyDocs > 0}
             onOpenSource={handleOpenSource}
             onFeedback={handleMessageFeedback}
+            onFollowup={handleFollowup}
             mode={mode}
           />
         )}

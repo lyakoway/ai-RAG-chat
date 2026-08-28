@@ -19,9 +19,16 @@ interface UseChatArgs {
   setConversationId: (id: string) => void
   onFinished?: () => void // e.g. refresh conversation list
   onError?: (msg: string) => void // raw provider/stream error (for the error modal)
+  onTitle?: (conversationId: string, title: string) => void // автозаголовок диалога
 }
 
-export function useChat({ conversationId, setConversationId, onFinished, onError }: UseChatArgs) {
+export function useChat({
+  conversationId,
+  setConversationId,
+  onFinished,
+  onError,
+  onTitle,
+}: UseChatArgs) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isStreaming, setStreaming] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
@@ -101,10 +108,20 @@ export function useChat({ conversationId, setConversationId, onFinished, onError
                 model: opts.model,
               })
             }
-            patchAi({ id: messageId, streaming: false })
+            // НЕ меняем id сообщения в стейте: уже поставленные в очередь
+            // обновления (токены) матчатся по нему. Серверный id храним
+            // отдельно — он нужен только для фидбека.
+            patchAi({ serverId: messageId, streaming: false })
             setStreaming(false)
             abortRef.current = null
             onFinished?.()
+          },
+          onTitle: (cid, title) => {
+            if (!conversationId) setConversationId(cid)
+            onTitle?.(cid, title)
+          },
+          onFollowups: (questions) => {
+            patchAi({ followups: questions })
           },
           onError: (msg) => {
             trackEvent(AnalyticsEvent.CHAT_ERROR, {
@@ -124,7 +141,7 @@ export function useChat({ conversationId, setConversationId, onFinished, onError
         },
       )
     },
-    [conversationId, isStreaming, setConversationId, onFinished],
+    [conversationId, isStreaming, setConversationId, onFinished, onError, onTitle],
   )
 
   return { messages, isStreaming, send, stop, reset }

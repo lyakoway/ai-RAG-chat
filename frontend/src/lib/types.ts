@@ -35,11 +35,14 @@ export interface AgentStep {
 
 export interface ChatMessage {
   id: string
+  /** Серверный id (появляется в onDone; нужен для фидбека 👍/👎) */
+  serverId?: string | null
   role: 'user' | 'assistant'
   content: string
   sources?: Source[] | null
   agent_steps?: AgentStep[] | null
   feedback?: string | null
+  followups?: string[] | null
   created_at?: string
   streaming?: boolean
 }
