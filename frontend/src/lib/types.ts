@@ -18,6 +18,7 @@ export interface DocumentItem {
   status: 'processing' | 'ready' | 'error'
   error: string | null
   lang: string | null
+  pair_key: string | null
   created_at: string
 }
 

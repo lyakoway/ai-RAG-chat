@@ -18,6 +18,7 @@ class DocumentOut(BaseModel):
     status: str
     error: str | None = None
     lang: str | None = None
+    pair_key: str | None = None
     created_at: datetime
 
     class Config:

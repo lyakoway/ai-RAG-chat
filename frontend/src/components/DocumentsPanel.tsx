@@ -105,7 +105,20 @@ export function DocumentsPanel({
 
   const knownCategories = Array.from(new Set(['General', ...categories]))
   // Показываем документы на языке интерфейса; файлы с неизвестным языком — всегда.
-  const visible = documents.filter((d) => !d.lang || d.lang === lang)
+  // Парные демо-документы сортируем по общему «слоту» пары, чтобы RU и EN панели
+  // показывали одинаковую последовательность (PDF → DOCX → XLSX).
+  const DEMO_PAIR_ORDER = ['user_guide', 'remote_work_policy', 'pricing']
+  const pairSlot = (d: DocumentItem) => {
+    const i = d.pair_key ? DEMO_PAIR_ORDER.indexOf(d.pair_key) : -1
+    return i === -1 ? DEMO_PAIR_ORDER.length : i
+  }
+  const visible = documents
+    .filter((d) => !d.lang || d.lang === lang)
+    .sort((a, b) => {
+      const delta = pairSlot(a) - pairSlot(b)
+      if (delta !== 0) return delta
+      return b.created_at.localeCompare(a.created_at) // непарные: новые сверху
+    })
   const visibleReady = visible.filter((d) => d.status === 'ready').length
   const swipe = useSwipeDismiss(onClose, 'right')
 
