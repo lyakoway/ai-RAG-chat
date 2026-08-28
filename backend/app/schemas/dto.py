@@ -71,6 +71,7 @@ class MessageOut(BaseModel):
     content: str
     sources: list[Source] | None = None
     agent_steps: list[AgentStepOut] | None = None
+    feedback: str | None = None
     created_at: datetime
 
     class Config:

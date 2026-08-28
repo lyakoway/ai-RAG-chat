@@ -20,6 +20,8 @@ export const AnalyticsEvent = {
   DEMO_DOCS_LOAD_ERROR: 'demo_documents_load_error',
   /** Скачивание файла из панели документов */
   DOCUMENT_DOWNLOAD: 'document_download',
+  /** Оценка ответа 👍/👎 (value: up | down; повторный клик снимает) */
+  ANSWER_FEEDBACK: 'answer_feedback',
   DOCUMENT_DELETE: 'document_delete',
   DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',

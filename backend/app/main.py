@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(conversations.router)
+app.include_router(conversations.feedback_router)
 app.include_router(models.router)
 app.include_router(search.router)
 

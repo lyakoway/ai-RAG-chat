@@ -70,6 +70,8 @@ class Message(Base):
     sources: Mapped[list | None] = mapped_column(JSON, nullable=True)
     # Agent tool timeline (mode=agent): list of {index, type, name, args, ok, detail}
     agent_steps: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # Оценка пользователя: "up" | "down" | None
+    feedback: Mapped[str | None] = mapped_column(String(8), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     conversation: Mapped["Conversation"] = relationship(back_populates="messages")

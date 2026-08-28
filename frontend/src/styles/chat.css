@@ -319,6 +319,21 @@
   text-align: center;
 }
 
+/* ---- Feedback 👍/👎 ---- */
+.msg-feedback {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+.fb-btn {
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.fb-btn:hover { color: var(--text); background: var(--bg-soft); }
+.fb-btn.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
 /* ================= Agent steps timeline ================= */
 .mode-badge {
   display: inline-flex;

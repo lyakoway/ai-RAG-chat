@@ -10,6 +10,7 @@ backend/data/*.db
 backend/data/chroma/
 backend/data/uploads/
 backend/data/eval/
+backend/data/test/
 backend/.env
 
 # Node / frontend

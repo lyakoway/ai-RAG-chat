@@ -204,6 +204,12 @@ export default function App() {
     setViewerSource(source)
   }, [])
 
+  const handleMessageFeedback = useCallback((messageId: string, value: 'up' | 'down' | null) => {
+    api.messageFeedback(messageId, value).catch(() => {
+      // Оценка не критична: молча игнорируем сбой сети.
+    })
+  }, [])
+
   const handleToggleDocs = useCallback(() => {
     setDocsOpen((v) => {
       const next = !v
@@ -263,6 +269,7 @@ export default function App() {
             onStop={stop}
             hasDocuments={readyDocs > 0}
             onOpenSource={handleOpenSource}
+            onFeedback={handleMessageFeedback}
             mode={mode}
           />
         )}

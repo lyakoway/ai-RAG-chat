@@ -56,6 +56,12 @@ export const api = {
   listConversations: () => fetch(`${BASE}/conversations`).then(json<Conversation[]>),
   getConversation: (id: string) =>
     fetch(`${BASE}/conversations/${id}`).then(json<ConversationDetail>),
+  messageFeedback: (messageId: string, value: 'up' | 'down' | null) =>
+    fetch(`${BASE}/messages/${messageId}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value }),
+    }).then(json<{ id: string; feedback: string | null }>),
   renameConversation: (id: string, title: string) =>
     fetch(`${BASE}/conversations/${id}`, {
       method: 'PATCH',
