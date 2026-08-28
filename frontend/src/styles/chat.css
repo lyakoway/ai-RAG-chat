@@ -182,13 +182,21 @@
 }
 .typing span:nth-child(2) { animation-delay: 0.15s; }
 .typing span:nth-child(3) { animation-delay: 0.3s; }
-/* Пояснение для «думающих» моделей (GLM-5.x молчат до первого токена). */
+
+/* Пояснения во время стрима: «думающие» модели (GLM-5.x молчат до первого
+   токена) и паузы троттлинга провайдера посреди ответа. */
+.typing-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
 .thinking-note {
-  margin-left: 10px;
   font-size: 12px;
   color: var(--text-muted);
   animation: fadeUp 0.3s var(--ease);
 }
+.thinking-note.inline { margin-left: 6px; }
 @keyframes typing {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
   30% { transform: translateY(-4px); opacity: 1; }
