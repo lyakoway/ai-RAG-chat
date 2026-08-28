@@ -105,10 +105,11 @@ export function MessageBubble({ message, onOpenSource, onFeedback, onFollowup, i
         {(isUser || showCursor || message.content) && (
           <div className={`bubble ${isUser ? 'bubble-user' : 'bubble-ai'}`}>
             {showCursor ? (
-              <div className="typing">
-                <span /><span /><span />
-                {thinkingLong && <span className="thinking-note">{t('modelThinking')}</span>}
-                {paused && <span className="thinking-note">{t('providerSlow')}</span>}
+              <div className="typing-wrap">
+                <div className="typing">
+                  <span /><span /><span />
+                </div>
+                {thinkingLong && <div className="thinking-note">{t('modelThinking')}</div>}
               </div>
             ) : isUser ? (
               <span className="bubble-plain">{message.content}</span>
@@ -118,6 +119,9 @@ export function MessageBubble({ message, onOpenSource, onFeedback, onFollowup, i
                   {message.content}
                 </ReactMarkdown>
                 {message.streaming && <span className="caret" />}
+                {message.streaming && paused && (
+                  <span className="thinking-note inline">{t('providerSlow')}</span>
+                )}
               </div>
             )}
           </div>
