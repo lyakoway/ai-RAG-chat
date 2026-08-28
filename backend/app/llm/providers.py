@@ -6,6 +6,7 @@ when a given SDK isn't configured.
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import AsyncIterator
 
 import httpx
@@ -125,16 +126,32 @@ class ZaiProvider(OpenAIProvider):
 
     provider = "zai"
     base_url = "https://api.z.ai/api/paas/v4"
-    # GLM-4.5/4.6 по умолчанию «думают»: рассуждения дают большую часть
-    # задержки до первого видимого токена. Для ответов по документам
-    # отключаем; вернуть режим рассуждений: ZAI_THINKING=enabled.
-    extra_body = {"thinking": {"type": settings.zai_thinking}}
 
     def __init__(self, model: str = "glm-4.6") -> None:
         self.model = model
+        self.extra_body = self._thinking_extra(model)
 
     def _api_key(self) -> str | None:
         return settings.zai_api_key
+
+    @staticmethod
+    def _thinking_extra(model: str) -> dict:
+        """Параметр thinking у GLM отличается по поколениям.
+
+        GLM-4.x: {"type": "enabled"|"disabled"}.
+        GLM-5.x думать обязаны: «type» — только «enabled» (иначе 400, код 1210),
+        глубина задаётся полем «level» (low/high/max). Минимум — level: low.
+        """
+        wanted = settings.zai_thinking.lower()
+        if re.search(r"glm-5", model, re.IGNORECASE):
+            if wanted in ("disabled", ""):
+                return {"thinking": {"type": "enabled", "level": "low"}}
+            if wanted == "enabled":
+                return {"thinking": {"type": "enabled"}}
+            return {"thinking": {"type": "enabled", "level": wanted}}
+        if wanted in ("disabled", ""):
+            return {"thinking": {"type": "disabled"}}
+        return {"thinking": {"type": wanted}}
 
 
 class AnthropicProvider:

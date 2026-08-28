@@ -77,9 +77,16 @@ def query(
     where = _build_where(category, document_ids)
     emb = get_embeddings()
 
+    count = _collection().count()
+    if count == 0:
+        return []
+
     use_hybrid = settings.search_hybrid
     use_rerank = settings.search_rerank
     n_candidates = max(top_k, settings.retrieval_candidates) if (use_hybrid or use_rerank) else top_k
+    # Chroma падает (RuntimeError "ef or M is too small"), если запросить
+    # больше элементов, чем есть в индексе, — ограничиваем пул размером базы.
+    n_candidates = min(n_candidates, count)
 
     qvec = emb.embed_query(text)
     res = _collection().query(
