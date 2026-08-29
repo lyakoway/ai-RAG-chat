@@ -114,9 +114,15 @@ export default function App() {
     onTitle: handleTitle,
   })
 
+  // Бейдж «Документы» в шапке считает так же, как панель: с учётом языка
+  // интерфейса (непарные файлы видны всегда). Гейтинг чата — по всем готовым.
+  const visibleDocs = useMemo(
+    () => documents.filter((d) => !d.pair_key || !d.lang || d.lang === lang),
+    [documents, lang],
+  )
   const readyDocs = useMemo(
-    () => documents.filter((d) => d.status === 'ready').length,
-    [documents],
+    () => visibleDocs.filter((d) => d.status === 'ready').length,
+    [visibleDocs],
   )
 
   const resetChat = useCallback(() => {
