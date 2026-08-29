@@ -164,6 +164,22 @@ export default function App() {
     [conversationId, resetChat, refreshConversations],
   )
 
+  // Блокируем скролл страницы, когда на мобильном открыта шторка
+  // (сайдбар или документы) — иначе фон прокручивается под оверлеем.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1100px)')
+    const update = () => {
+      const overlay = (sidebarOpen || docsOpen) && mq.matches
+      document.body.classList.toggle('no-scroll', overlay)
+    }
+    update()
+    mq.addEventListener('change', update)
+    return () => {
+      mq.removeEventListener('change', update)
+      document.body.classList.remove('no-scroll')
+    }
+  }, [sidebarOpen, docsOpen])
+
   const handleSend = useCallback(
     (text: string) => {
       trackEvent(AnalyticsEvent.CHAT_MESSAGE_SEND, {
