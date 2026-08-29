@@ -59,7 +59,7 @@ const dict = {
     agentSuggestion2: 'Найди все сроки и суммы, затем кратко сведи',
     agentSuggestion3: 'Какие документы есть и о чём каждый?',
 
-    composerPlaceholder: 'Спросите что-нибудь о ваших документах…',
+    composerPlaceholder: 'Спросите что-нибудь…',
     composerHint: 'Enter — отправить · Shift+Enter — новая строка. Ответы основаны на загруженных документах.',
     agentSteps: 'Шаги агента',
     agentThinking: 'думает…',
@@ -167,7 +167,7 @@ const dict = {
     agentSuggestion2: 'Find all deadlines and amounts, then summarize',
     agentSuggestion3: 'What documents are there and what is each about?',
 
-    composerPlaceholder: 'Ask anything about your documents…',
+    composerPlaceholder: 'Ask anything…',
     composerHint: 'Enter to send · Shift+Enter for a new line. Answers are grounded in your uploaded documents.',
     agentSteps: 'Agent steps',
     agentThinking: 'thinking…',
