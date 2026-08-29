@@ -6,6 +6,10 @@
      get a bounded height and actually scroll (instead of being clipped). */
   grid-template-rows: minmax(0, 1fr);
   height: 100vh;
+  /* dvh — фактический видимый вьюпорт: на мобильном 100vh больше экрана
+     (адресная строка + панель браузера), из-за этого body скроллил страницу
+     и композер уезжал за нижний край. */
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -291,7 +295,13 @@
 
 /* ================= Responsive (≤1100px): drawers ================= */
 @media (max-width: 1100px) {
-  .app { grid-template-columns: 1fr; } /* main takes full width */
+  .app {
+    grid-template-columns: 1fr; /* main takes full width */
+    height: 100dvh;
+  }
+
+  /* Приложение — единственный скроллер: шапка и композер всегда на месте. */
+  body { overflow: hidden; }
 
   .menu-btn { display: inline-grid; }
 
