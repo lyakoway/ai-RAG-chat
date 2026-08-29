@@ -79,3 +79,6 @@ export const IconThumbUp = (p: SVGProps<SVGSVGElement>) => (
 export const IconThumbDown = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M17 13V4M17 13l-4 7c-1.5 0-2.5-1-2.5-2.5L11 14H5.5c-1 0-1.7-1-1.4-2l1.6-6c.2-.9 1-1.5 1.9-1.5H17M17 13h3l0-9h-3" /></svg>
 )
+export const IconMic = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0014 0M12 18v3M8.5 21h7" /></svg>
+)

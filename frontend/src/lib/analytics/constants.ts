@@ -24,6 +24,8 @@ export const AnalyticsEvent = {
   ANSWER_FEEDBACK: 'answer_feedback',
   /** Клик по follow-up подсказке под ответом */
   FOLLOWUP_CLICK: 'followup_click',
+  /** Старт голосового ввода (context: chat | search) */
+  VOICE_INPUT: 'voice_input',
   DOCUMENT_DELETE: 'document_delete',
   DOCUMENT_DELETE_ERROR: 'document_delete_error',
   DOCS_PANEL_TOGGLE: 'docs_panel_toggle',

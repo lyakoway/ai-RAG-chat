@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 import { buildDocumentSuggestions } from '../lib/suggestions'
 import { useI18n } from '../lib/i18n'
-import { IconExternal, IconLayers, IconSearch } from '../lib/icons'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { IconExternal, IconLayers, IconMic, IconSearch } from '../lib/icons'
 import type { DocumentItem, Source } from '../lib/types'
 
 interface Props {
@@ -17,6 +18,8 @@ interface Props {
 export function SearchView({ documents, category, onOpenSource }: Props) {
   const { t, lang } = useI18n()
   const [query, setQuery] = useState('')
+  const speech = useSpeechRecognition(lang)
+  const voiceBaseRef = useRef('')
   const [results, setResults] = useState<Source[] | null>(null)
   const [tookMs, setTookMs] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -55,6 +58,23 @@ export function SearchView({ documents, category, onOpenSource }: Props) {
   const empty = results !== null && results.length === 0
   const hasDocuments = documents.some((d) => d.status === 'ready')
   const suggestions = buildDocumentSuggestions(documents, lang)
+
+  const toggleVoice = () => {
+    if (speech.listening) {
+      speech.stop()
+      return
+    }
+    trackEvent(AnalyticsEvent.VOICE_INPUT, { context: 'search' })
+    voiceBaseRef.current = query
+    speech.start()
+  }
+
+  // Распознанный голосом текст дописывается к содержимому поля поиска.
+  useEffect(() => {
+    if (!speech.listening) return
+    const combined = [voiceBaseRef.current, speech.text].filter(Boolean).join(' ')
+    setQuery(combined)
+  }, [speech.listening, speech.text])
 
   return (
     <div className="chat">
@@ -159,6 +179,14 @@ export function SearchView({ documents, category, onOpenSource }: Props) {
               }
             }}
           />
+          <button
+            className={`composer-btn mic ${speech.listening ? 'listening' : ''}`}
+            onClick={toggleVoice}
+            disabled={!hasDocuments || loading}
+            title={t('voiceInput')}
+          >
+            <IconMic />
+          </button>
           <button
             className="composer-btn send"
             onClick={() => runSearch(query)}

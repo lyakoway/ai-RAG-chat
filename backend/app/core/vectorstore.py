@@ -89,12 +89,19 @@ def query(
     n_candidates = min(n_candidates, count)
 
     qvec = emb.embed_query(text)
-    res = _collection().query(
-        query_embeddings=[qvec],
-        n_results=n_candidates,
-        where=where or None,
-        include=["documents", "metadatas", "distances"],
-    )
+    try:
+        res = _collection().query(
+            query_embeddings=[qvec],
+            n_results=n_candidates,
+            where=where or None,
+            include=["documents", "metadatas", "distances"],
+        )
+    except RuntimeError:
+        # chromadb 0.5.x: после удалений HNSW-индекс может перейти в состояние,
+        # где любой запрос падает («ef or M is too small»). Не роняем чат —
+        # считаем ближайшие соседей сами по эмбеддингам коллекции (brute-force).
+        res = _brute_force_query(qvec, n_candidates, where)
+
     ids = res.get("ids", [[]])[0]
     docs = res.get("documents", [[]])[0]
     metas = res.get("metadatas", [[]])[0]
@@ -135,6 +142,42 @@ def query(
     else:
         hits = hits[:top_k]
     return hits
+
+
+def _brute_force_query(
+    qvec: list[float], n_results: int, where: dict | None
+) -> dict:
+    """Запасной поиск numpy-косинусом по всем эмбеддингам коллекции.
+
+    Включается, когда HNSW-индекс повреждён (RuntimeError). Для демо-объёмов
+    (сотни фрагментов) работает за миллисекунды.
+    """
+    import numpy as np
+
+    data = _collection().get(
+        where=where or None,
+        include=["embeddings", "documents", "metadatas"],
+    )
+    embeddings = data.get("embeddings") or []
+    docs = data.get("documents") or []
+    metas = data.get("metadatas") or []
+    ids = data.get("ids") or []
+    if not embeddings:
+        return {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+
+    q = np.array(qvec, dtype=np.float32)
+    matrix = np.array(embeddings, dtype=np.float32)
+    norms = np.linalg.norm(matrix, axis=1) * np.linalg.norm(q)
+    norms[norms == 0] = 1e-9
+    similarities = (matrix @ q) / norms
+    order = np.argsort(-similarities)[:n_results]
+
+    return {
+        "ids": [[ids[i] for i in order]],
+        "documents": [[docs[i] for i in order]],
+        "metadatas": [[metas[i] for i in order]],
+        "distances": [[float(1.0 - similarities[i]) for i in order]],
+    }
 
 
 def _fuse_with_bm25(
