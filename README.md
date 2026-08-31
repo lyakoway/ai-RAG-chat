@@ -8,25 +8,17 @@ app_port: 7860
 pinned: false
 ---
 
-🌍 [English](README.en.md) | Русский
+English | [Русский](README.ru.md)
 
-# 📚 AI RAG Chat — чат с внутренними документами
+# 📚 AI RAG Chat — chat with your internal documents
 
-> Чат-ассистент с **Retrieval-Augmented Generation** по вашим документам
-> (PDF, Word, Excel). Отвечает **только по загруженным файлам** и показывает
-> **источники со ссылками на страницы**.
+> A **Retrieval-Augmented Generation** assistant over your own documents
+> (PDF, Word, Excel). It answers **only from the uploaded files** and shows
+> **sources with page-level links**.
 
-### 🔗 Живое демо → **https://lyakoway-rag-chat.hf.space**
+### 🔗 Live demo → **https://lyakoway-rag-chat.hf.space**
 
-## Задача и целевые ограничения
-
-Ответы по внутренним документам **с цитатами на страницу-источник** — вместо
-ручного перебора PDF, Word и Excel. Пайплайн строился под три ограничения,
-и каждое ниже подтверждено замером:
-
-- **качество** — правильный документ в топе выдачи, каждый факт — с цитатой на страницу;
-- **скорость** — первый токен за секунды (уложились: ~2,5–3 с на GLM-5.3-flash);
-- **доступность** — полный цикл работает без API-ключей (локальные эмбеддинги + демо-режим).
+**Open pre-configured:** [English · Light](https://lyakoway-rag-chat.hf.space/?lang=en&theme=light) · [English · Dark](https://lyakoway-rag-chat.hf.space/?lang=en&theme=dark) · [Русский · Тёмная](https://lyakoway-rag-chat.hf.space/?lang=ru&theme=dark)
 
 [![CI](https://github.com/lyakoway/ai-RAG-chat/actions/workflows/ci.yml/badge.svg)](https://github.com/lyakoway/ai-RAG-chat/actions/workflows/ci.yml)
 [![Demo](https://img.shields.io/badge/demo-🤗%20Hugging%20Face%20Spaces-ff9d00)](https://lyakoway-rag-chat.hf.space)
@@ -35,45 +27,58 @@ pinned: false
 ![vector](https://img.shields.io/badge/vector-ChromaDB-5c2d91)
 ![license](https://img.shields.io/badge/license-MIT-black)
 
-<sub>Демо на бесплатном тарифе может «засыпать» — первый заход после простоя
-поднимается ~50 сек.</sub>
+<sub>On the free tier the demo Space may fall asleep — the first visit after
+idle takes ~50 s to wake up.</sub>
 
-## Скриншоты
+## Task and target constraints
 
-| Чат с цитатами и фидбеком                                 | Векторный поиск с score                                   |
-| --------------------------------------------------------- | --------------------------------------------------------- |
-| ![Чат с цитатами](docs/screenshots/chat-citations-ru.png) | ![Векторный поиск](docs/screenshots/vector-search-ru.png) |
+Answers over internal documents **with citations pointing to the exact page** —
+instead of manually digging through PDF, Word and Excel files. The pipeline was
+built against three constraints, each verified by a measurement below:
 
-Источники с оценками релевантности и кнопки 👍/👎 на ответах:
+- **quality** — the right document at the top of retrieval, every fact backed
+  by a page-level citation;
+- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash);
+- **accessibility** — the full loop works without API keys (local embeddings +
+  offline demo mode).
 
-![Источники и фидбек](docs/screenshots/sources-feedback-ru.png)
+## Screenshots
 
-## Возможности
+| Chat with citations and feedback                        | Vector search with scores                                |
+| ------------------------------------------------------- | -------------------------------------------------------- |
+| ![Chat with citations](docs/screenshots/chat-citations-ru.png) | ![Vector search](docs/screenshots/vector-search-ru.png) |
 
-- 🔀 **Три режима** — **RAG Chat** (один поиск → ответ), **AI Агент** (цикл инструментов
-  со видимыми шагами: список файлов → поиск → ответ) и **Векторный поиск** (семантический
-  поиск по фрагментам без LLM, с оценкой релевантности). Переключатель в панели фильтров.
-- 📄 **Поиск по документам** — PDF, Word (.docx), Excel (.xlsx)
-- 📚 **Несколько документов одновременно** — загружайте пачкой, ищите по всей базе
-- 🎙️ **Голосовой ввод** — вопрос голосом в чате и в векторном поиске
-  (Web Speech API: Chrome, Edge, Safari 14.5+, Android, в Firefox кнопка скрыта)
-- 🔗 **Цитаты и источники** — каждый ответ ссылается на файл и **номер страницы**.
-  Маркеры `[1]`, `[2]` в тексте **кликабельны** и подсвечивают нужный фрагмент
-- 👁️ **Встроенный просмотр** — PDF / DOCX / Excel в модалке. Клик по источнику открывает
-  фрагмент (для PDF — сразу на странице цитаты)
-- 💬 **История диалогов** — все чаты сохраняются, к ним можно вернуться
-- 🏷️ **Фильтрация по категориям** — ограничьте поиск нужной категорией (HR, Финансы, …)
-- 🤖 **Выбор модели** — Z.ai (GLM, есть **бесплатная**), OpenAI (GPT),
-  Anthropic (Claude), локальная (Ollama) или офлайн демо-режим без ключей
-- ⚡ **Стриминг ответов** — токены приходят в реальном времени (SSE)
-- 🎨 **Аккуратный UI** — светлая/тёмная тема, адаптивная вёрстка
+Sources with relevance scores and 👍/👎 feedback on answers:
 
-## Архитектура
+![Sources and feedback](docs/screenshots/sources-feedback-ru.png)
+
+## Features
+
+- 🔀 **Three modes** — **RAG Chat** (one retrieval → answer), **AI Agent** (a tool
+  loop with visible steps: list files → search → answer) and **Vector Search**
+  (semantic search over chunks without an LLM, with relevance scores). Mode
+  switcher in the filter panel.
+- 📄 **Search across documents** — PDF, Word (.docx), Excel (.xlsx)
+- 📚 **Multiple documents at once** — upload in batches, search across the base
+- 🎙️ **Voice input** — ask by voice in chat and in vector search
+  (Web Speech API: Chrome, Edge, Safari 14.5+, Android; hidden in Firefox)
+- 🔗 **Citations and sources** — every answer references a file and a **page
+  number**. The `[1]`, `[2]` markers are **clickable** and highlight the fragment
+- 👁️ **Built-in preview** — PDF / DOCX / Excel in a modal. Clicking a source opens
+  the fragment (for PDF — right at the cited page)
+- 💬 **Conversation history** — all chats are stored, return to any of them
+- 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …)
+- 🤖 **Model switcher** — Z.ai (GLM, a **free** tier included), OpenAI (GPT),
+  Anthropic (Claude), local (Ollama), or an offline demo mode without keys
+- ⚡ **Streaming answers** — tokens arrive in real time (SSE)
+- 🎨 **Clean UI** — light/dark theme, responsive layout
+
+## Architecture
 
 ```
 ┌─────────────────┐     /api (SSE + REST)    ┌──────────────────────────┐
 │  React + Vite   │ ◀──────────────────────▶ │         FastAPI          │
-│ (стриминг UI)   │                          │                          │
+│ (streaming UI)  │                          │                          │
 └─────────────────┘                          │  ┌────────────────────┐  │
                                              │  │ Parsers (pdf/docx/ │  │
                                              │  │        xlsx)       │  │
@@ -92,25 +97,25 @@ pinned: false
                                              │  │ (mock/gpt/claude/  │  │
                                              │  │  ollama)           │  │
                                              │  └────────────────────┘  │
-                                             │   История → SQLite       │
+                                             │   History → SQLite       │
                                              └──────────────────────────┘
 ```
 
-**Чистая архитектура бэкенда** (`backend/app/`):
+**Clean backend architecture** (`backend/app/`):
 
-| Слой          | Модуль                                            | Ответственность                     |
-| ------------- | ------------------------------------------------- | ----------------------------------- |
-| `api/routes/` | documents, chat, conversations, models, search    | HTTP-эндпоинты, SSE                 |
-| `core/`       | ingestion, chunking, embeddings, vectorstore, rag | доменная логика RAG                 |
-| `parsers/`    | pdf/docx/xlsx                                     | извлечение текста + номеров страниц |
-| `llm/`        | base, providers, registry                         | абстракция провайдеров LLM          |
-| `db/`         | models, session                                   | история диалогов (SQLite)           |
-| `schemas/`    | dto                                               | контракты API (Pydantic)            |
+| Layer         | Module                                            | Responsibility                       |
+| ------------- | ------------------------------------------------- | ------------------------------------ |
+| `api/routes/` | documents, chat, conversations, models, search    | HTTP endpoints, SSE                  |
+| `core/`       | ingestion, chunking, embeddings, vectorstore, rag | RAG domain logic                     |
+| `parsers/`    | pdf/docx/xlsx                                     | text + page-number extraction        |
+| `llm/`        | base, providers, registry                         | LLM provider abstraction             |
+| `db/`         | models, session                                   | conversation history (SQLite)        |
+| `schemas/`    | dto                                               | API contracts (Pydantic)             |
 
-## Быстрый старт
+## Quick start
 
-Приложение работает **без ключей** — в демо-режиме (mock LLM) и с локальными
-эмбеддингами. Для реальных ответов добавьте ключи в `backend/.env`.
+The app runs **without keys** — in demo mode (mock LLM) with local embeddings.
+For real answers add keys to `backend/.env`.
 
 ### 1. Backend
 
@@ -119,12 +124,12 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env         # опционально: впишите ключи
+cp .env.example .env         # optional: add your keys
 uvicorn app.main:app --reload --port 8000
 ```
 
-> Первый запуск скачает локальную модель эмбеддингов (~120 МБ) при первой
-> загрузке документа.
+> The first run downloads a local embedding model (~120 MB) on the first
+> document upload.
 
 ### 2. Frontend
 
@@ -134,246 +139,257 @@ npm install
 npm run dev
 ```
 
-Откройте <http://localhost:5173>.
+Open <http://localhost:5173>.
 
-### Одной командой (локально)
+### One command (local)
 
 ```bash
-./dev.sh        # поднимает backend (:8000) и frontend (:5173)
+./dev.sh        # starts backend (:8000) and frontend (:5173)
 ```
 
-### Через Docker
+### Via Docker
 
 ```bash
 docker compose up --build
-# frontend: http://localhost:5173   (nginx проксирует /api на backend)
+# frontend: http://localhost:5173   (nginx proxies /api to the backend)
 ```
 
-Ключи можно передать через переменные окружения:
+Keys can be passed through environment variables:
 
 ```bash
 OPENAI_API_KEY=sk-... docker compose up --build
 ```
 
-### Демо-документы
+### Demo documents
 
-В папке [`backend/samples/`](backend/samples) лежат готовые файлы (PDF на 3 страницы, Word, Excel).
-На пустой панели «Документы» есть кнопка **«Загрузить демо-документы»** — один клик,
-и можно сразу пробовать поиск и цитаты (повторное нажатие ничего не дублирует).
-Загрузить пачку можно и через API: `POST /api/documents/demo`.
-Пересоздать файлы можно так:
+Ready-made files live in [`backend/samples/`](backend/samples) (a 3-page PDF,
+Word, Excel). The empty Documents panel has a **“Load demo documents”** button —
+one click and you can try search and citations right away (clicking again does
+not duplicate anything). The batch can also be uploaded via API:
+`POST /api/documents/demo`. To regenerate the files:
 
 ```bash
 cd backend && .venv/bin/python scripts/make_samples.py
 ```
 
-## Подключение моделей
+## Connecting models
 
-| Провайдер              | Как включить                                                                                                                                                                                        |
+| Provider               | How to enable                                                                                                                                                                                       |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Demo (offline)**     | работает всегда, без настройки                                                                                                                                                                      |
-| **Z.ai (GLM)**         | `ZAI_API_KEY=...` в `backend/.env`. Ключ — на [z.ai/model-api](https://z.ai/model-api). В списке моделей — новейшие `glm-5.3`, `glm-5.3-flash`, `glm-5.2`, а также `glm-4.5-flash` (**бесплатная**) |
-| **OpenAI (GPT)**       | `OPENAI_API_KEY=sk-...` в `backend/.env`                                                                                                                                                            |
-| **Anthropic (Claude)** | `ANTHROPIC_API_KEY=sk-ant-...` в `backend/.env`                                                                                                                                                     |
-| **Ollama (локально)**  | установите [Ollama](https://ollama.com), `ollama pull llama3.2:3b` (см. ниже)                                                                                                                       |
+| **Demo (offline)**     | always works, no setup                                                                                                                                                                              |
+| **Z.ai (GLM)**         | `ZAI_API_KEY=...` in `backend/.env`. Key: [z.ai/model-api](https://z.ai/model-api). Model list includes the latest `glm-5.3`, `glm-5.3-flash`, `glm-5.2`, plus `glm-4.5-flash` (**free**)             |
+| **OpenAI (GPT)**       | `OPENAI_API_KEY=sk-...` in `backend/.env`                                                                                                                                                           |
+| **Anthropic (Claude)** | `ANTHROPIC_API_KEY=sk-ant-...` in `backend/.env`                                                                                                                                                    |
+| **Ollama (local)**     | install [Ollama](https://ollama.com), `ollama pull llama3.2:3b` (see below)                                                                                                                         |
 
-Недоступные модели помечены в выпадающем списке серой точкой (нет ключа / модель
-не скачана / сервер не запущен).
+Unavailable models are marked with a grey dot in the dropdown (no key / model
+not pulled / server not running).
 
-> **Z.ai** — OpenAI-совместимый эндпоинт (`https://api.z.ai/api/paas/v4`),
-> доступен без VPN. Провайдер поддерживает настраиваемый `base_url`, поэтому
-> так же можно подключить любой OpenAI-совместимый шлюз.
+> **Z.ai** — an OpenAI-compatible endpoint (`https://api.z.ai/api/paas/v4`),
+> reachable without a VPN. The provider supports a custom `base_url`, so any
+> OpenAI-compatible gateway can be connected the same way.
 
-### Векторный поиск (fastembed)
+### Vector search (fastembed)
 
-Третий режим — поиск по фрагментам **без LLM**: запрос кодируется локальной
-моделью fastembed (ONNX, мультиязычная, ~120 МБ, без API-ключа), затем ChromaDB
-возвращает ближайшие фрагменты по косинусной близости с оценкой релевантности.
-Клик по результату открывает документ на нужной странице. Тот же механизм
-работает «под капотом» у RAG Chat и AI Агента — режим полезен, чтобы видеть,
-что именно находится в базе и с какими score (удобно для отладки качества
-поиска). API: `GET /api/search?q=...&category=...&top_k=10`.
+The third mode — search over chunks **without an LLM**: the query is encoded by
+a local fastembed model (ONNX, multilingual, ~120 MB, no API key), then ChromaDB
+returns the nearest chunks by cosine similarity with relevance scores. Clicking
+a result opens the document at the right page. The same mechanism powers RAG
+Chat and the AI Agent under the hood — this mode is useful to see exactly what
+is in the database and with which scores (handy for debugging retrieval
+quality). API: `GET /api/search?q=...&category=...&top_k=10`.
 
-### Локальные модели через Ollama
+### Local models via Ollama
 
-Бесплатный вариант без ключей и оплаты — ответы генерируются на вашем компьютере.
+A free option with no keys and no billing — answers are generated on your
+machine.
 
 ```bash
-# 1. Установите Ollama: https://ollama.com/download  (или `brew install ollama`)
-# 2. Запустите сервер (держите терминал открытым):
+# 1. Install Ollama: https://ollama.com/download  (or `brew install ollama`)
+# 2. Start the server (keep the terminal open):
 ollama serve
-# 3. В другом терминале скачайте модель:
-ollama pull llama3.2:3b     # 2 ГБ, быстрая, хороша для демо
-#   при желании умнее:
-ollama pull llama3.1        # 8B, 4.7 ГБ
+# 3. In another terminal, pull a model:
+ollama pull llama3.2:3b     # 2 GB, fast, good for a demo
+#   a smarter option:
+ollama pull llama3.1        # 8B, 4.7 GB
 ```
 
-Проверка: `curl http://localhost:11434/api/tags` вернёт список моделей.
-После этого обновите страницу — модель станет активной в списке «Модель»
-(перезапуск бэкенда не требуется, доступность проверяется на каждом запросе).
+Check: `curl http://localhost:11434/api/tags` returns the model list. Then
+refresh the page — the model becomes active in the “Model” list (no backend
+restart needed, availability is checked on every request).
 
-Реестр моделей — [`backend/app/llm/registry.py`](backend/app/llm/registry.py).
-Скачали модель с другим тегом — добавьте туда строку.
+The model registry lives in
+[`backend/app/llm/registry.py`](backend/app/llm/registry.py). Pulled a model
+with a different tag — add a line there.
 
-#### ⚠️ macOS 13 (Ventura) и старше
+#### ⚠️ macOS 13 (Ventura) and older
 
-Официальная сборка Ollama таргетирует **macOS 14+** и использует Metal, который
-на Ventura падает с `GGML_ASSERT(buf_dst) failed`. Сам сервер при этом работает —
-нужно лишь считать на **CPU**. Включается одной строкой в `backend/.env`:
+The official Ollama build targets **macOS 14+** and uses Metal, which crashes
+on Ventura with `GGML_ASSERT(buf_dst) failed`. The server itself works — it
+just needs to compute on **CPU**. One line in `backend/.env`:
 
 ```bash
-OLLAMA_NUM_GPU=0      # форсировать CPU (обход Metal-бага на macOS 13)
+OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 ```
 
-> На Ventura запускайте `ollama serve` из терминала — GUI-приложение Ollama.app
-> не стартует (требует macOS 14). `brew install ollama` там тоже нежелателен:
-> нет готового бинарника, brew собирает из исходников (долго). Проще скачать
-> готовый бинарник с ollama.com и запускать CLI напрямую.
+> On Ventura run `ollama serve` from a terminal — the Ollama.app GUI does not
+> start (requires macOS 14). `brew install ollama` is also discouraged there:
+> no ready binary, brew builds from source (slow). Easier to grab a ready
+> binary from ollama.com and run the CLI directly.
 
-## Качество поиска (evaluation)
+## Retrieval quality (evaluation)
 
-Ретрив измеряется скриптом [`backend/scripts/evaluate.py`](backend/scripts/evaluate.py):
-24 золотых вопроса (RU + EN) по двуязычным демо-документам, метрики Recall@k
-и MRR на том же пайплайне, что использует чат. Индекс собирается с нуля при
-каждом запуске — числа воспроизводимы:
+Retrieval is measured by
+[`backend/scripts/evaluate.py`](backend/scripts/evaluate.py): 24 golden
+questions (RU + EN) over the bilingual demo documents, Recall@k and MRR metrics
+on the same pipeline the chat uses. The index is rebuilt from scratch on every
+run — the numbers are reproducible:
 
 ```bash
 cd backend
-.venv/bin/python scripts/evaluate.py             # конфиг по умолчанию (гибрид)
-.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder реранк
-SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # чистый векторный поиск
+.venv/bin/python scripts/evaluate.py             # default config (hybrid)
+.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder rerank
+SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # pure vector search
 ```
 
-Результаты на двуязычном корпусе (Recall@1 / MRR@5 / задержка на запрос, CPU,
-прогон 28.08.2026):
+Results on the bilingual corpus (Recall@1 / MRR@5 / latency per query, CPU,
+run on Aug 28, 2026):
 
-| Конфигурация                         | Recall@1  | Recall@3 | MRR@5     | Латентность |
-| ------------------------------------ | --------- | -------- | --------- | ----------- |
-| Векторный поиск                      | 50.0%     | 95.8%    | 0.733     | 13 мс       |
-| **Гибрид BM25 + RRF (по умолчанию)** | **91.7%** | 100%     | **0.958** | 15 мс       |
-| Векторный + реранкер                 | 41.7%     | 100%     | 0.694     | ~1.5–3 с    |
-| Гибрид + реранкер                    | 41.7%     | 100%     | 0.694     | ~1.5–3 с    |
+| Configuration                        | Recall@1  | Recall@3 | MRR@5     | Latency    |
+| ------------------------------------ | --------- | -------- | --------- | ---------- |
+| Vector search                        | 50.0%     | 95.8%    | 0.733     | 13 ms      |
+| **Hybrid BM25 + RRF (default)**      | **91.7%** | 100%     | **0.958** | 15 ms      |
+| Vector + reranker                    | 41.7%     | 100%     | 0.694     | ~1.5–3 s   |
+| Hybrid + reranker                    | 41.7%     | 100%     | 0.694     | ~1.5–3 s   |
 
-**Интересная находка.** На двуязычном корпусе у каждого документа есть языковой
-«двойник» (RU и EN версии с одинаковым смыслом). Векторный поиск путает их:
-эмбеддинги мультиязычной модели выравнивают языки, и русский вопрос поднимает
-английский документ (Recall@1 падает до 50%). BM25 различает лексику и вытягивает
-правильный документ — гибрид даёт 91.7%. Реранкер же здесь **вредит**: cross-encoder
-оценивает семантическую релевантность, а «двойник» семантически так же релевантен.
-Вывод: на мультиязычных корпусах лексический сигнал в fusion — не опция, а необходимость.
+**Interesting finding.** In the bilingual corpus every document has a language
+“twin” (RU and EN versions with identical meaning). Vector search confuses
+them: the multilingual model's embeddings align the languages, so a Russian
+question surfaces the English document (Recall@1 drops to 50%). BM25
+distinguishes the vocabulary and pulls up the right document — hybrid reaches
+91.7%. The reranker, on the contrary, **hurts** here: the cross-encoder scores
+semantic relevance, and the “twin” is just as semantically relevant. Takeaway:
+on multilingual corpora the lexical signal in fusion is not optional — it is a
+necessity.
 
-Режимы управляются env: `SEARCH_HYBRID` (по умолчанию `1`), `SEARCH_RERANK=1`
-включает реранкер (доп. ~1 ГБ модели при первом запуске).
+Modes are controlled via env: `SEARCH_HYBRID` (default `1`),
+`SEARCH_RERANK=1` enables the reranker (an extra ~1 GB model on first run).
 
-### Латентность ответа (замер)
+### Answer latency (benchmark)
 
-Тот же подход для LLM: живой прогон через реальный API (SSE-стрим RAG-ответа,
-один и тот же вопрос, локальный CPU-клиент). Замер 28.08.2026:
+The same approach for the LLM: a live run against the real API (SSE stream of a
+RAG answer, the same question, local CPU client). Measured Aug 28, 2026:
 
-| Модель                               |                Первый токен (TTFT) | Полный ответ |
-| ------------------------------------ | ---------------------------------: | -----------: |
-| GLM-5.3-flash (Z.ai)                 |                          2,5–3,0 с |    3,3–3,9 с |
-| GLM-5.3 (Z.ai)                       |                              2,6 с |        3,0 с |
-| Llama 3.2 3B (Ollama, локально, CPU) | 1,2–3,6 с (холодный старт +13,7 с) |    2,5–5,4 с |
-| GLM-4.5-flash (Z.ai, бесплатно)      |                            25–50 с |      39–51 с |
-| Демо-режим (mock, без сети)          |                              87 мс |        0,5 с |
+| Model                                |           First token (TTFT) | Full answer |
+| ------------------------------------ | ---------------------------: | ----------: |
+| GLM-5.3-flash (Z.ai)                 |                    2.5–3.0 s |   3.3–3.9 s |
+| GLM-5.3 (Z.ai)                       |                        2.6 s |       3.0 s |
+| Llama 3.2 3B (Ollama, local, CPU)    | 1.2–3.6 s (cold start +13.7 s) |   2.5–5.4 s |
+| GLM-4.5-flash (Z.ai, free)           |                       25–50 s |    39–51 s  |
+| Demo mode (mock, no network)         |                        87 ms |       0.5 s |
 
-Дополнительно:
+Additionally:
 
-- агент-режим (tool-шаги + два вызова LLM) — 9,2 с на GLM-5.3-flash
-- индексация демо-пака (6 файлов → 12 чанков) — 0,7 с
-- векторный поиск через API — p50 18 мс по серверу
+- agent mode (tool steps + two LLM calls) — 9.2 s on GLM-5.3-flash
+- demo pack indexing (6 files → 12 chunks) — 0.7 s
+- vector search via API — p50 18 ms server-side
 
-**Вывод замера:** латентность определяет _поколение_ модели, а не настройки:
-GLM-4.5-flash (старшее «думающее» поколение, даже с `thinking=disabled`) отвечает
-25–50 с, тогда как GLM-5.3-flash на том же пайплайне — ~3 с. Поэтому бесплатная
-модель — не в рекомендациях по умолчанию.
+**Takeaway:** latency is defined by the model _generation_, not by settings:
+GLM-4.5-flash (the older “thinking” generation, even with `thinking=disabled`)
+answers in 25–50 s, while GLM-5.3-flash on the same pipeline — ~3 s. That is
+why the free model is not recommended by default.
 
-**Проверенная гипотеза: срезание контекста не ускоряет первый токен.** `top_k`
-5 → 4 при неизменном Recall (91,7% / 100%) экономит ~20% токенов префилла, но на
-живом API выигрыш не читается: в чередующихся прогонах разброс латентности
-провайдера (2,1–7,2 с) перекрывает экономию в 100–300 мс. Размер чанка 800 → 400
-(Recall тоже идентичен) на демо-корпусе вообще ничего не меняет: страницы короче
-400 токенов, чанки не пересобираются. Вывод: TTFT ~2,5–3 с — «пол» GLM-5.3-flash
-на стороне провайдера. Наш пайплайн добавляет ~20 мс (<1%), резать нечего —
-дефолты `top_k=5` и `chunk 800/120` оставлены.
+**Tested hypothesis: trimming the context does not speed up the first token.**
+`top_k` 5 → 4 at unchanged Recall (91.7% / 100%) saves ~20% of prefill tokens,
+but the gain is not readable on the live API: in alternating runs the
+provider's latency spread (2.1–7.2 s) dwarfs the 100–300 ms saving. Chunk size
+800 → 400 (Recall also identical) changes nothing at all on the demo corpus:
+pages are shorter than 400 tokens, chunks are not re-split. Conclusion: TTFT
+~2.5–3 s is the GLM-5.3-flash floor on the provider side. Our pipeline adds
+~20 ms (<1%) — there is nothing left to trim; the `top_k=5` and
+`chunk 800/120` defaults stay.
 
-**Про локальную модель** (Llama 3.2 3B, Q4_K_M, `OLLAMA_NUM_GPU=0` — CPU на
-macOS 13): тёплые ответы быстрее всех облачных (первый токен 1,2–3,6 с, полный
-ответ 2,5–5,4 с), полностью бесплатно и приватно. Но: первый запрос после
-простоя грузит 2 ГБ модели в RAM (+13,7 с), под нагрузкой бывают всплески
-до 8–15 с, а 3B-модель чаще теряет цитаты и короче отвечает — аккуратность
-формата остаётся за флагманскими моделями.
+**On the local model** (Llama 3.2 3B, Q4_K_M, `OLLAMA_NUM_GPU=0` — CPU on
+macOS 13): warm answers are faster than every cloud option (first token
+1.2–3.6 s, full answer 2.5–5.4 s), completely free and private. But: the first
+request after idle loads 2 GB of model into RAM (+13.7 s), spikes up to 8–15 s
+happen under load, and the 3B model drops citations more often and answers
+shorter — format accuracy remains with the flagship models.
 
-### Стоимость запроса
+### Query cost
 
-Контекст одного RAG-ответа — ~2–3 тыс. токенов (5 чанков демо-корпуса) плюс
-~100 токенов ответа. По прайсу Z.ai для GLM-5.3-flash ($0,15 / $0,50 за 1 млн
-токенов input/output) это **≈ $0,0005 на вопрос — порядка 20 000 вопросов на $1**.
-Нулевая стоимость — на бесплатной `glm-4.5-flash` и на локальной Llama через
-Ollama (считается на вашей машине). Треугольник «качество — скорость — стоимость»
-таким образом замкнут: качество — judge 5.0/5, скорость — TTFT ~2,5–3 с,
-цена — доли цента.
+The context of one RAG answer is ~2–3 thousand tokens (5 chunks of the demo
+corpus) plus ~100 tokens of the answer. At Z.ai's list price for GLM-5.3-flash
+($0.15 / $0.50 per 1M input/output tokens) that is **≈ $0.0005 per question —
+about 20,000 questions per $1**. Zero-cost options: the free `glm-4.5-flash`
+and a local Llama via Ollama (computed on your machine). The
+quality–speed–cost triangle is thus closed: quality — judge 5.0/5, speed —
+TTFT ~2.5–3 s, cost — a fraction of a cent.
 
-### Оценка качества ответов (LLM-as-judge)
+## Answer quality (LLM-as-judge)
 
-Поиск — необходимое, но не достаточное: отвечает ли модель **правильно** на найденном
-контексте? Для этого в скрипте есть judge-режим: на каждый golden-вопрос модель
-генерирует реальный ответ (тот же RAG-пайплайн, что в чате), затем вторая LLM-проходка —
-«судья» — оценивает ответ по трём осям (1–5): верность контексту (faithfulness),
-релевантность вопросу, корректность цитат:
+Retrieval is necessary but not sufficient: does the model answer **correctly**
+given the retrieved context? The script has a judge mode: for every golden
+question the model generates a real answer (the same RAG pipeline as the
+chat), then a second LLM pass — the “judge” — scores the answer on three axes
+(1–5): faithfulness to the context, relevance to the question, citation
+correctness:
 
 ```bash
-.venv/bin/python scripts/evaluate.py --judge   # + judge-оценка ответов
+.venv/bin/python scripts/evaluate.py --judge   # + judge scoring of answers
 ```
 
-Результат на 24 вопросах (ответы и судья: glm-4.5-flash, поиск — гибрид):
+Result on 24 questions (answers and judge: glm-4.5-flash, hybrid retrieval):
 
-| Ось                             | Средний балл |
-| ------------------------------- | ------------ |
-| Faithfulness (нет галлюцинаций) | 5.0 / 5      |
-| Relevance (отвечает на вопрос)  | 5.0 / 5      |
-| Citations (цитаты корректны)    | 5.0 / 5      |
+| Axis                            | Average score |
+| ------------------------------- | ------------- |
+| Faithfulness (no hallucinations)| 5.0 / 5       |
+| Relevance (answers the question)| 5.0 / 5       |
+| Citations (citations correct)   | 5.0 / 5       |
 
-Ответов с оценкой ≤3 хотя бы по одной оси: 0 из 24 (на демо-корпусе).
+Answers scored ≤3 on at least one axis: 0 of 24 (on the demo corpus).
 
-## Ограничения
+## Limitations
 
-Что я знаю о границах проекта — чтобы вопросы не ждали:
+What I know about the project's boundaries — so the questions don't have to
+wait:
 
-- **Корпус.** Цифры evaluation получены на самодельном демо-корпусе (6 файлов,
-  12 чанков) — это верхняя граница; для продакшена нужен golden set из реальных
-  запросов (100–300).
-- **Судья.** В judge-режиме судья той же GLM-семьи, что и отвечающая модель, —
-  самосуд снисходителен. Строгая оценка — судьёй другой семьи: скрипт уже
-  поддерживает `--judge-model`.
-- **Безопасность.** Демо работает без аутентификации и rate-limit — для
-  продакшена нужны auth, лимиты запросов и учёт токенов.
-- **Нагрузка.** Нагрузочное тестирование не проводилось — цифры латентности
-  однопользовательские.
-- **Промпты.** Автоматической регрессионной проверки промптов нет: контракты
-  вывода зафиксированы, A/B моделей — в judge-скрипте (`--answer-model` /
+- **Corpus.** The evaluation numbers come from a self-made demo corpus
+  (6 files, 12 chunks) — this is an upper bound; production needs a golden set
+  from real queries (100–300).
+- **Judge.** In judge mode the judge is from the same GLM family as the
+  answering model — self-judging is lenient. A strict evaluation needs a judge
+  from another family: the script already supports `--judge-model`.
+- **Security.** The demo runs without authentication and rate limits —
+  production needs auth, request limits and token accounting.
+- **Load.** No load testing was done — the latency numbers are
+  single-user.
+- **Prompts.** No automated prompt regression yet: output contracts are fixed,
+  model A/B is available in the judge script (`--answer-model` /
   `--judge-model`).
 
-## 🚀 Деплой
+## 🚀 Deploy
 
-Живая версия развёрнута на **Hugging Face Spaces** (Docker) — один контейнер, в
-котором **FastAPI отдаёт и API, и собранный фронтенд** с одного домена (без CORS
-и межсервисной сети). Сборку описывает корневой [`Dockerfile`](Dockerfile):
-многостадийный образ — сначала `vite build`, затем Python-бэкенд, который
-раздаёт статику из `/app/static`.
+The live version is hosted on **Hugging Face Spaces** (Docker) — one container
+where **FastAPI serves both the API and the built frontend** from a single
+domain (no CORS, no inter-service network). The build is described by the root
+[`Dockerfile`](Dockerfile): a multi-stage image — `vite build` first, then the
+Python backend serving the static files from `/app/static`.
 
-- Метаданные Space (SDK, порт `7860`) — в YAML-блоке в начале этого README.
-- Ключи задаются как **секреты Space** (`ZAI_API_KEY` и т.п.), в код не попадают.
-- Для локального запуска двумя сервисами есть [`docker-compose.yml`](docker-compose.yml)
-  (nginx проксирует `/api` на бэкенд) — см. [Через Docker](#через-docker).
+- Space metadata (SDK, port `7860`) — in the YAML block at the top of
+  [README.md](README.md).
+- Keys are set as **Space secrets** (`ZAI_API_KEY` etc.) and never enter the
+  code.
+- For a local two-service setup there is
+  [`docker-compose.yml`](docker-compose.yml) (nginx proxies `/api` to the
+  backend) — see [Via Docker](#via-docker).
 
-## Тесты
+## Tests
 
-Бэкенд покрыт pytest: парсеры (PDF/DOCX/XLSX), чанкинг, определение языка
-(RU/EN/中文/日本語/한국어), API (демо-пак, поиск, чат с мок-моделью, фидбек 👍/👎).
-Тесты гоняются в изолированном хранилище `backend/data/test/` — рабочие данные
-не затрагиваются:
+The backend is covered with pytest: parsers (PDF/DOCX/XLSX), chunking,
+language detection (RU/EN/中文/日本語/한국어), API (demo pack, search, chat with a
+mock model, 👍/👎 feedback). Tests run in an isolated `backend/data/test/`
+store — working data is untouched:
 
 ```bash
 cd backend
@@ -381,24 +397,25 @@ pip install -r requirements-dev.txt
 pytest -q
 ```
 
-CI (GitHub Actions) прогоняет тесты бэкенда и сборку фронтенда на каждый push.
+CI (GitHub Actions) runs the backend tests and the frontend build on every
+push.
 
-## Стек
+## Stack
 
 - **Backend:** FastAPI, SQLAlchemy (SQLite), ChromaDB, fastembed, pypdf,
   python-docx, openpyxl, tiktoken
 - **Frontend:** React 19, TypeScript, Vite, react-markdown
-- **LLM:** Z.ai (GLM) / OpenAI / Anthropic / Ollama / mock (настраиваемый `base_url`)
+- **LLM:** Z.ai (GLM) / OpenAI / Anthropic / Ollama / mock (custom `base_url`)
 
-## Примечания
+## Notes
 
-- Порт бэкенда по умолчанию — `8000` (проксируется из Vite через `/api`).
-  Если порт занят, освободите его или измените `target` в
+- The backend defaults to port `8000` (proxied from Vite via `/api`). If the
+  port is busy, free it or change `target` in
   [`frontend/vite.config.ts`](frontend/vite.config.ts).
-- Данные (загруженные файлы, векторный индекс, история) хранятся в
-  `backend/data/` и не коммитятся.
-- **Настройка по ссылке.** Начальные язык и тему можно задать query-параметрами:
-  `http://localhost:5173/?lang=en&theme=light` (`lang` = `ru`|`en`, `theme` =
-  `light`|`dark`). Параметры применяются один раз, сохраняются и затем убираются
-  из адреса — дальше переключатели в интерфейсе главнее. Удобно давать
-  преднастроенную ссылку тем, кто открывает проект.
+- Data (uploaded files, vector index, history) lives in `backend/data/` and is
+  not committed.
+- **Settings via link.** Initial language and theme can be set with query
+  parameters: `http://localhost:5173/?lang=en&theme=light` (`lang` = `ru`|`en`,
+  `theme` = `light`|`dark`). The parameters apply once, get saved and are then
+  removed from the URL — the in-app switchers take over. Handy for sharing a
+  pre-configured link.
