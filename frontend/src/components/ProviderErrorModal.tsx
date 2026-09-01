@@ -1,6 +1,7 @@
 const CONTACTS_URL = 'https://lyakoway.vercel.app/contacts'
 
 import { useI18n } from '../lib/i18n'
+import { AnalyticsEvent, trackEvent } from '../lib/analytics'
 
 /** Detects provider-side failures worth explaining in a friendly modal:
  *  exhausted balance (429), quota, invalid/missing API key (401/403). */
@@ -45,6 +46,7 @@ export function ProviderErrorModal({
             href={CONTACTS_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent(AnalyticsEvent.PROVIDER_ERROR_CONTACT)}
           >
             {t('providerErrorContact')}
           </a>
