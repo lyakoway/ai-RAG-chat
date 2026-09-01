@@ -113,7 +113,13 @@ export default function App() {
     setConversationId,
     onFinished: onFinishedWithTitle,
     onError: (msg) => {
-      if (isProviderError(msg)) setProviderError(msg)
+      if (isProviderError(msg)) {
+        setProviderError(msg)
+        trackEvent(AnalyticsEvent.PROVIDER_ERROR_MODAL, {
+          model,
+          message: msg.slice(0, 120),
+        })
+      }
     },
     onTitle: handleTitle,
   })
