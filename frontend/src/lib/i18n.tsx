@@ -237,7 +237,8 @@ interface I18nValue {
 const I18nContext = createContext<I18nValue | null>(null)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(() => initialPref('lang', LANGS, 'ru'))
+  // Язык по умолчанию — английский (URL ?lang= и localStorage перекрывают).
+  const [lang, setLang] = useState<Lang>(() => initialPref('lang', LANGS, 'en'))
 
   useEffect(() => {
     localStorage.setItem('lang', lang)

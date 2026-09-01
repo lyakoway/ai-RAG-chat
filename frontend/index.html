@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="ru" data-theme="dark">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI RAG Chat — поиск по документам</title>
+    <script>
+      // Тема и язык ДО первой отрисовки — та же лестница, что в prefs.ts:
+      // URL ?theme=/&lang= → localStorage → системная тема / английский.
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search)
+          var t = q.get('theme') || localStorage.getItem('theme')
+          if (t !== 'light' && t !== 'dark') {
+            t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
+          document.documentElement.dataset.theme = t
+          var l = q.get('lang') || localStorage.getItem('lang')
+          document.documentElement.lang = l === 'ru' ? 'ru' : 'en'
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

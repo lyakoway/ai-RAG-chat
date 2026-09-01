@@ -27,7 +27,11 @@ export default function App() {
 
   // ---- Theme ----
   // Initial value may come from ?theme= in the URL (see lib/prefs).
-  const [theme, setTheme] = useState<Theme>(() => initialPref('theme', THEMES, 'dark'))
+  // Фолбэк темы — системная (prefers-color-scheme); URL ?theme= и
+  // localStorage перекрывают (см. lib/prefs).
+  const systemTheme = (): Theme =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  const [theme, setTheme] = useState<Theme>(() => initialPref('theme', THEMES, systemTheme()))
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('theme', theme)
