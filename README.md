@@ -416,6 +416,9 @@ push.
   not committed.
 - **Settings via link.** Initial language and theme can be set with query
   parameters: `http://localhost:5173/?lang=en&theme=light` (`lang` = `ru`|`en`,
-  `theme` = `light`|`dark`). The parameters apply once, get saved and are then
-  removed from the URL — the in-app switchers take over. Handy for sharing a
-  pre-configured link.
+  `theme` = `light`|`dark`). Resolution ladder: URL → `localStorage` → defaults
+  (English language, system theme via `prefers-color-scheme`). Theme and
+  language are applied pre-paint (script in `index.html`) — no wrong-theme
+  flash. The parameters apply once, get saved and are then removed from the
+  URL — the in-app switchers take over. Handy for sharing a pre-configured
+  link.
