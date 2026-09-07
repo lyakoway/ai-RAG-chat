@@ -240,8 +240,11 @@ OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 ## Retrieval quality (evaluation)
 
 Retrieval is measured by
-[`backend/scripts/evaluate.py`](backend/scripts/evaluate.py): 24 golden
-questions (RU + EN) over the bilingual demo documents, Recall@k and MRR metrics
+[`backend/scripts/evaluate.py`](backend/scripts/evaluate.py): 47 golden
+scenarios (RU + EN) over the bilingual demo documents, grouped into four
+categories — `fact` (direct fact), `numeric` (numbers, limits, deadlines),
+`paraphrase` (reworded, no verbatim keywords) and `cross-lingual` (mixed
+language / question language ≠ document language). Recall@k and MRR metrics run
 on the same pipeline the chat uses. The index is rebuilt from scratch on every
 run — the numbers are reproducible:
 
@@ -252,25 +255,39 @@ cd backend
 SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # pure vector search
 ```
 
-Results on the bilingual corpus (Recall@1 / MRR@5 / latency per query, CPU,
-run on Aug 28, 2026):
+Results on the bilingual corpus (Recall@1 / Recall@3 / MRR@5 / latency per
+query, CPU, run on Sep 7, 2026):
 
 | Configuration                        | Recall@1  | Recall@3 | MRR@5     | Latency    |
 | ------------------------------------ | --------- | -------- | --------- | ---------- |
-| Vector search                        | 50.0%     | 95.8%    | 0.733     | 13 ms      |
-| **Hybrid BM25 + RRF (default)**      | **91.7%** | 100%     | **0.958** | 15 ms      |
-| Vector + reranker                    | 41.7%     | 100%     | 0.694     | ~1.5–3 s   |
-| Hybrid + reranker                    | 41.7%     | 100%     | 0.694     | ~1.5–3 s   |
+| Vector search                        | 53.2%     | 91.5%    | 0.727     | 11 ms      |
+| **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 17 ms      |
+| Vector + reranker                    | TBD       | TBD      | TBD       | TBD        |
+| Hybrid + reranker                    | TBD       | TBD      | TBD       | TBD        |
 
-**Interesting finding.** In the bilingual corpus every document has a language
+Per-category breakdown (hybrid, default):
+
+| Category      | Questions | Recall@1 | Recall@3 |
+| ------------- | --------- | -------- | -------- |
+| fact          | 15        | 100%     | 100%     |
+| numeric       | 15        | 86.7%    | 100%     |
+| paraphrase    | 9         | 88.9%    | 100%     |
+| cross-lingual | 8         | 62.5%    | 87.5%    |
+
+**Interesting findings.** In the bilingual corpus every document has a language
 “twin” (RU and EN versions with identical meaning). Vector search confuses
 them: the multilingual model's embeddings align the languages, so a Russian
-question surfaces the English document (Recall@1 drops to 50%). BM25
+question surfaces the English document (Recall@1 drops to 53.2%). BM25
 distinguishes the vocabulary and pulls up the right document — hybrid reaches
-91.7%. The reranker, on the contrary, **hurts** here: the cross-encoder scores
+87.2%. The reranker, on the contrary, **hurts** here: the cross-encoder scores
 semantic relevance, and the “twin” is just as semantically relevant. Takeaway:
 on multilingual corpora the lexical signal in fusion is not optional — it is a
 necessity.
+
+The expanded set also **exposed the weak spot**: mixed-language queries
+(cross-lingual) score 62.5% Recall@1 versus 100% for plain facts — BM25 does
+not help when the keywords are in the other language. Next step: a RU/EN
+synonym dictionary and a multilingual reranker.
 
 Modes are controlled via env: `SEARCH_HYBRID` (default `1`),
 `SEARCH_RERANK=1` enables the reranker (an extra ~1 GB model on first run).
@@ -339,7 +356,8 @@ correctness:
 .venv/bin/python scripts/evaluate.py --judge   # + judge scoring of answers
 ```
 
-Result on 24 questions (answers and judge: glm-4.5-flash, hybrid retrieval):
+Result on the first 24-question version of the golden set (answers and judge:
+glm-4.5-flash, hybrid retrieval):
 
 | Axis                            | Average score |
 | ------------------------------- | ------------- |
