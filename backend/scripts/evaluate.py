@@ -63,32 +63,64 @@ from app.llm.registry import get_provider  # noqa: E402
 settings = get_settings()
 
 # Золотой набор: вопрос → документ-источник (по демо-файлам из samples/).
+# Категории сценариев:
+#   fact          — прямой факт из документа (дословные термины вопроса);
+#   numeric       — цифры, лимиты, сроки, цены;
+#   paraphrase    — перефраз без дословных ключевых слов документа;
+#   cross-lingual — смешанный язык запроса или язык вопроса ≠ языка документа
+#                   (ловушка языковых «двойников»).
 GOLDEN: list[dict] = [
-    {"q": "Сколько дней в неделю можно работать удалённо?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "В какие часы сотрудник должен быть на связи онлайн?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "Какая компенсация за интернет положена удалённым сотрудникам?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "До какого числа подаётся заявка на компенсацию интернета?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "За сколько дней до отпуска нужно подать заявление?", "doc": "Политика_удалённой_работы.docx"},
-    {"q": "Сколько стоит тариф Старт?", "doc": "Тарифы_и_скидки.xlsx"},
-    {"q": "Какой самый дорогой тариф и что в него входит?", "doc": "Тарифы_и_скидки.xlsx"},
-    {"q": "Какая скидка даётся при оплате за год?", "doc": "Тарифы_и_скидки.xlsx"},
-    {"q": "Есть ли скидка для некоммерческих организаций?", "doc": "Тарифы_и_скидки.xlsx"},
-    {"q": "Сколько пользователей включено в тариф Бизнес?", "doc": "Тарифы_и_скидки.xlsx"},
-    {"q": "Какие форматы файлов поддерживает импорт данных?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Какой максимальный размер файла для импорта?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Где в интерфейсе запускается импорт данных?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Как включить двухфакторную аутентификацию?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Через сколько минут простоя завершается сессия?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Какие требования к паролю при регистрации?", "doc": "Руководство_пользователя.pdf"},
-    {"q": "Кому доступен экспорт данных?", "doc": "Руководство_пользователя.pdf"},
-    # --- English (bilingual demo pack) ---
-    {"q": "How many days per week can employees work remotely?", "doc": "Remote_Work_Policy.docx", "lang": "en"},
-    {"q": "What is the annual paid leave entitlement?", "doc": "Remote_Work_Policy.docx", "lang": "en"},
-    {"q": "How much does the Business plan cost per month?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en"},
-    {"q": "What discount is offered for annual payment?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en"},
-    {"q": "What file formats does data import support?", "doc": "User_Guide.pdf", "lang": "en"},
-    {"q": "After how many minutes of inactivity does the session end?", "doc": "User_Guide.pdf", "lang": "en"},
+    # --- fact: прямой факт ---
+    {"q": "Сколько дней в неделю можно работать удалённо?", "doc": "Политика_удалённой_работы.docx", "category": "fact"},
+    {"q": "Кто согласовывает полностью удалённый формат работы?", "doc": "Политика_удалённой_работы.docx", "category": "fact"},
+    {"q": "Сколько стоит тариф Старт?", "doc": "Тарифы_и_скидки.xlsx", "category": "fact"},
+    {"q": "Какой самый дорогой тариф и что в него входит?", "doc": "Тарифы_и_скидки.xlsx", "category": "fact"},
+    {"q": "Какая поддержка предусмотрена для корпоративного тарифа?", "doc": "Тарифы_и_скидки.xlsx", "category": "fact"},
+    {"q": "Какие форматы файлов поддерживает импорт данных?", "doc": "Руководство_пользователя.pdf", "category": "fact"},
+    {"q": "Где в интерфейсе запускается импорт данных?", "doc": "Руководство_пользователя.pdf", "category": "fact"},
+    {"q": "Как включить двухфакторную аутентификацию?", "doc": "Руководство_пользователя.pdf", "category": "fact"},
+    {"q": "Кому доступен экспорт данных?", "doc": "Руководство_пользователя.pdf", "category": "fact"},
+    {"q": "How many days per week can employees work remotely?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "fact"},
+    {"q": "Who approves a fully remote arrangement?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "fact"},
+    {"q": "How much does the Business plan cost per month?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en", "category": "fact"},
+    {"q": "Which plan includes no user limit?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en", "category": "fact"},
+    {"q": "What file formats does data import support?", "doc": "User_Guide.pdf", "lang": "en", "category": "fact"},
+    {"q": "Where are import errors shown?", "doc": "User_Guide.pdf", "lang": "en", "category": "fact"},
+    # --- numeric: цифры, лимиты, сроки ---
+    {"q": "В какие часы сотрудник должен быть на связи онлайн?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "Сколько часов длится рабочий день?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "Какая компенсация за интернет положена удалённым сотрудникам?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "До какого числа подаётся заявка на компенсацию интернета?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "За сколько дней до отпуска нужно подать заявление?", "doc": "Политика_удалённой_работы.docx", "category": "numeric"},
+    {"q": "Сколько пользователей включено в тариф Бизнес?", "doc": "Тарифы_и_скидки.xlsx", "category": "numeric"},
+    {"q": "Какая скидка даётся при оплате за год?", "doc": "Тарифы_и_скидки.xlsx", "category": "numeric"},
+    {"q": "Какой максимальный размер файла для импорта?", "doc": "Руководство_пользователя.pdf", "category": "numeric"},
+    {"q": "Через сколько минут простоя завершается сессия?", "doc": "Руководство_пользователя.pdf", "category": "numeric"},
+    {"q": "What are the mandatory online availability hours?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "numeric"},
+    {"q": "How much does the company reimburse for internet?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "numeric"},
+    {"q": "What is the annual paid leave entitlement?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "numeric"},
+    {"q": "How many users are included in the Start plan?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en", "category": "numeric"},
+    {"q": "After how many minutes of inactivity does the session end?", "doc": "User_Guide.pdf", "lang": "en", "category": "numeric"},
+    # --- paraphrase: перефраз без дословных ключей ---
+    {"q": "Могу ли я работать из дома всю неделю, если договорюсь с руководителем?", "doc": "Политика_удалённой_работы.docx", "category": "paraphrase"},
+    {"q": "Что компания предоставляет для работы из дома?", "doc": "Политика_удалённой_работы.docx", "category": "paraphrase"},
+    {"q": "Какие требования к паролю при регистрации?", "doc": "Руководство_пользователя.pdf", "category": "paraphrase"},
+    {"q": "Планирую оплатить сразу за год — есть ли выгода?", "doc": "Тарифы_и_скидки.xlsx", "category": "paraphrase"},
+    {"q": "Мы некоммерческая организация — есть ли для нас скидка?", "doc": "Тарифы_и_скидки.xlsx", "category": "paraphrase"},
+    {"q": "Do I need to stay online during working hours, and when exactly?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "paraphrase"},
+    {"q": "How far in advance should I request my vacation?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "paraphrase"},
+    {"q": "We are a non-profit organisation — do we get better pricing?", "doc": "Pricing_and_Discounts.xlsx", "lang": "en", "category": "paraphrase"},
+    {"q": "Is there a limit on how big my upload can be?", "doc": "User_Guide.pdf", "lang": "en", "category": "paraphrase"},
+    # --- cross-lingual: смешанный язык / язык вопроса ≠ языка документа ---
+    {"q": "Какая цена у тарифа Business?", "doc": "Тарифы_и_скидки.xlsx", "category": "cross-lingual"},
+    {"q": "Сколько стоит Enterprise и что в него входит?", "doc": "Тарифы_и_скидки.xlsx", "category": "cross-lingual"},
+    {"q": "Как настроить two-factor authentication?", "doc": "Руководство_пользователя.pdf", "category": "cross-lingual"},
+    {"q": "Что политика говорит про reimbursement интернета?", "doc": "Политика_удалённой_работы.docx", "category": "cross-lingual"},
+    {"q": "According to the Russian pricing sheet, what does Старт cost?", "doc": "Тарифы_и_скидки.xlsx", "lang": "en", "category": "cross-lingual"},
+    {"q": "How many vacation days does Политика удалённой работы grant?", "doc": "Политика_удалённой_работы.docx", "lang": "en", "category": "cross-lingual"},
+    {"q": "Какие требования к паролю в User Guide?", "doc": "User_Guide.pdf", "category": "cross-lingual"},
+    {"q": "Что Remote Work Policy говорит про рабочие часы?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "cross-lingual"},
 ]
 # RU-вопросам проставляем язык ответа по умолчанию.
 for _item in GOLDEN:
@@ -259,11 +291,23 @@ def evaluate(top_k: int = 5) -> None:
     print(f"Avg retrieval latency: {sum(latencies) / len(latencies):.0f} ms")
     print(f"Model: {active_model_name()}  |  Queries: {len(rows)}\n")
 
-    print("| # | Вопрос | Источник | Rank |")
-    print("|---|--------|----------|------|")
+    # Пер-категорийная разбивка: где пайплайн силён, а где проваливается.
+    print("| Категория | Вопросов | Recall@1 | Recall@3 |")
+    print("|-----------|----------|----------|----------|")
+    for cat in sorted({r["category"] for r in rows}):
+        subset = [r for r in rows if r["category"] == cat]
+        r1 = sum(1 for r in subset if r["rank"] == 1) / len(subset)
+        r3 = sum(1 for r in subset if r["rank"] is not None and r["rank"] <= 3) / len(subset)
+        print(f"| {cat} | {len(subset)} | {r1:.1%} | {r3:.1%} |")
+    print()
+
+    print("| # | Категория | Вопрос | Источник | Rank |")
+    print("|---|-----------|--------|----------|------|")
     for i, r in enumerate(rows, 1):
         mark = "✅" if r["rank"] else "❌"
-        print(f"| {i} | {r['q']} | {r['doc']} | {mark} {r['rank'] or '—'} |")
+        print(
+            f"| {i} | {r['category']} | {r['q']} | {r['doc']} | {mark} {r['rank'] or '—'} |"
+        )
 
     misses = [r for r in rows if r["rank"] is None or r["rank"] > 1]
     if misses:
