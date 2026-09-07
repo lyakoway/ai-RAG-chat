@@ -404,9 +404,11 @@ Python backend serving the static files from `/app/static`.
 
 ## Tests
 
-The backend is covered with pytest: parsers (PDF/DOCX/XLSX), chunking,
-language detection (RU/EN/中文/日本語/한국어), API (demo pack, search, chat with a
-mock model, 👍/👎 feedback). Tests run in an isolated `backend/data/test/`
+The backend is covered with **63 pytest tests**: parsers (PDF/DOCX/XLSX),
+chunking, language detection (RU/EN/中文/日本語/한국어), RAG pipeline and hybrid
+retrieval, citations / source mapping, the agent tool loop (fake providers),
+API/SSE flows and error handling (corrupted files, empty documents, wrong
+filters, honest no-context answers). Tests run in an isolated `backend/data/test/`
 store — working data is untouched:
 
 ```bash
