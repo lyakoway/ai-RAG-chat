@@ -356,7 +356,7 @@ correctness:
 .venv/bin/python scripts/evaluate.py --judge   # + judge scoring of answers
 ```
 
-Result on the first 24-question version of the golden set (answers and judge:
+Result on the full 47-scenario golden set (answers and judge:
 glm-4.5-flash, hybrid retrieval):
 
 | Axis                            | Average score |
@@ -365,7 +365,7 @@ glm-4.5-flash, hybrid retrieval):
 | Relevance (answers the question)| 5.0 / 5       |
 | Citations (citations correct)   | 5.0 / 5       |
 
-Answers scored ≤3 on at least one axis: 0 of 24 (on the demo corpus).
+Answers scored ≤3 on at least one axis: 0 of 47 (on the demo corpus).
 
 ## Limitations
 
