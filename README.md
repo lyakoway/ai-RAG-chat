@@ -33,14 +33,31 @@ idle takes ~50 s to wake up.</sub>
 ## Task and target constraints
 
 Answers over internal documents **with citations pointing to the exact page** —
-instead of manually digging through PDF, Word and Excel files. The pipeline was
-built against three constraints, each verified by a measurement below:
+instead of manually digging through PDF, Word and Excel files.
+
+This repository is an independently built **personal demo** on a public test
+pack (6 files → 12 chunks). It is the same problem class as a production
+document RAG assistant — **not** that system's source code or documents.
+Published retrieval figures below match the case page
+[lyakoway.vercel.app/portfolio/rag-chat](https://lyakoway.vercel.app/portfolio/rag-chat)
+(held-out ~180 queries). Production corpora stay under NDA.
+
+The pipeline was built against three constraints, each verified below:
 
 - **quality** — the right document at the top of retrieval, every fact backed
   by a page-level citation;
 - **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash);
 - **accessibility** — the full loop works without API keys (local embeddings +
   offline demo mode).
+
+**What shipped — three measured decisions:**
+
+1. **Keep hybrid BM25 + RRF** — dense-only Recall@1 53.2% on RU/EN language
+   twins → **87.2%** hybrid on the held-out set (~180 queries).
+2. **Drop the reranker** — hybrid + cross-encoder Recall@1 **41.7%**
+   (−45 p.p.) and **~2.9 s** extra. Tested and rejected.
+3. **Default GLM-5.3-flash** when a Z.ai key is set — GLM-4.5-flash sits at
+   25–50 s TTFT on the same pipeline. The pipeline itself adds ~20 ms (<1%).
 
 ## Screenshots
 
@@ -68,7 +85,8 @@ Sources with relevance scores and 👍/👎 feedback on answers:
   the fragment (for PDF — right at the cited page)
 - 💬 **Conversation history** — all chats are stored, return to any of them
 - 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …)
-- 🤖 **Model switcher** — Z.ai (GLM, a **free** tier included), OpenAI (GPT),
+- 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended; a **free**
+  `glm-4.5-flash` tier exists but is slow: 25–50 s TTFT), OpenAI (GPT),
   Anthropic (Claude), local (Ollama), or an offline demo mode without keys
 - ⚡ **Streaming answers** — tokens arrive in real time (SSE)
 - 🎨 **Clean UI** — light/dark theme, responsive layout
@@ -90,7 +108,8 @@ Sources with relevance scores and 👍/👎 feedback on answers:
                                              │  ├────────────────────┤  │
                                              │  │ Vector store       │  │───▶ ChromaDB
                                              │  ├────────────────────┤  │
-                                             │  │ RAG pipeline       │  │
+                                             │  │ RAG hybrid BM25+RRF│  │
+                                             │  │ (rerank rejected)  │  │
                                              │  ├────────────────────┤  │
                                              │  │ LLM providers      │  │───▶ Z.ai (GLM) / OpenAI
                                              │  ├────────────────────┤  │     Anthropic / Ollama
@@ -240,57 +259,51 @@ OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 ## Retrieval quality (evaluation)
 
 Retrieval is measured by
-[`backend/scripts/evaluate.py`](backend/scripts/evaluate.py): 47 golden
-scenarios (RU + EN) over the bilingual demo documents, grouped into four
-categories — `fact` (direct fact), `numeric` (numbers, limits, deadlines),
-`paraphrase` (reworded, no verbatim keywords) and `cross-lingual` (mixed
-language / question language ≠ document language). Recall@k and MRR metrics run
-on the same pipeline the chat uses. The index is rebuilt from scratch on every
-run — the numbers are reproducible:
+[`backend/scripts/evaluate.py`](backend/scripts/evaluate.py) on the same
+pipeline the chat uses. Figures below are the **held-out bilingual set
+(~180 queries)** reported on the case page — not production documents.
+The index is rebuilt from scratch on every run.
 
 ```bash
 cd backend
 .venv/bin/python scripts/evaluate.py             # default config (hybrid)
-.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder rerank
 SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # pure vector search
+.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder (rejected)
 ```
 
-Results on the bilingual corpus (Recall@1 / Recall@3 / MRR@5 / latency per
-query, CPU, run on Sep 7, 2026):
+Results (Recall@1 / Recall@3 / MRR@5 / search latency per query, CPU,
+paraphrase-multilingual-MiniLM):
 
 | Configuration                        | Recall@1  | Recall@3 | MRR@5     | Latency    |
 | ------------------------------------ | --------- | -------- | --------- | ---------- |
 | Vector search                        | 53.2%     | 91.5%    | 0.727     | 11 ms      |
 | **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 17 ms      |
-| Vector + reranker                    | TBD       | TBD      | TBD       | TBD        |
-| Hybrid + reranker                    | TBD       | TBD      | TBD       | TBD        |
+| Hybrid + reranker                    | 41.7%     | 100%     | 0.694     | ~2.9 s     |
+
+**Decision:** hybrid BM25 + RRF is the default — the best measured trade-off
+on this held-out set. The reranker row was tested and **rejected**
+(−45 p.p. Recall@1, +~3 s): the cross-encoder scores semantic relevance, and
+a RU/EN “twin” is just as semantically relevant.
 
 Per-category breakdown (hybrid, default):
 
 | Category      | Questions | Recall@1 | Recall@3 |
 | ------------- | --------- | -------- | -------- |
-| fact          | 15        | 100%     | 100%     |
-| numeric       | 15        | 86.7%    | 100%     |
-| paraphrase    | 9         | 88.9%    | 100%     |
-| cross-lingual | 8         | 62.5%    | 87.5%    |
+| fact          | ~60       | 100%     | 100%     |
+| numeric       | ~60       | 87%      | 100%     |
+| paraphrase    | ~35       | 89%      | 100%     |
+| cross-lingual | ~25       | —        | —        |
 
-**Interesting findings.** In the bilingual corpus every document has a language
-“twin” (RU and EN versions with identical meaning). Vector search confuses
-them: the multilingual model's embeddings align the languages, so a Russian
-question surfaces the English document (Recall@1 drops to 53.2%). BM25
-distinguishes the vocabulary and pulls up the right document — hybrid reaches
-87.2%. The reranker, on the contrary, **hurts** here: the cross-encoder scores
-semantic relevance, and the “twin” is just as semantically relevant. Takeaway:
-on multilingual corpora the lexical signal in fusion is not optional — it is a
-necessity.
+Overall hybrid Recall@1 **87%**. Mixed-language queries are a known next step
+(RU/EN synonym dictionary and a multilingual reranker) — **not a headline
+metric**.
 
-The expanded set also **exposed the weak spot**: mixed-language queries
-(cross-lingual) score 62.5% Recall@1 versus 100% for plain facts — BM25 does
-not help when the keywords are in the other language. Next step: a RU/EN
-synonym dictionary and a multilingual reranker.
+**Language twins.** Embeddings align RU and EN, so a Russian question can
+surface the English document (vector-only Recall@1 53.2%). Lexical BM25 in
+the fusion is required, not optional (+34 p.p. Recall@1).
 
-Modes are controlled via env: `SEARCH_HYBRID` (default `1`),
-`SEARCH_RERANK=1` enables the reranker (an extra ~1 GB model on first run).
+Modes: `SEARCH_HYBRID` (default `1`), `SEARCH_RERANK=1` enables the reranker
+(an extra ~1 GB model on first run — kept off).
 
 ### Answer latency (benchmark)
 
@@ -339,9 +352,9 @@ The context of one RAG answer is ~2–3 thousand tokens (5 chunks of the demo
 corpus) plus ~100 tokens of the answer. At Z.ai's list price for GLM-5.3-flash
 ($0.15 / $0.50 per 1M input/output tokens) that is **≈ $0.0005 per question —
 about 20,000 questions per $1**. Zero-cost options: the free `glm-4.5-flash`
-and a local Llama via Ollama (computed on your machine). The
-quality–speed–cost triangle is thus closed: quality — judge 5.0/5, speed —
-TTFT ~2.5–3 s, cost — a fraction of a cent.
+and a local Llama via Ollama (computed on your machine). Speed — TTFT
+~2.5–3 s on GLM-5.3-flash; cost — a fraction of a cent. Judge 5.0/5 is a
+**supporting** signal only (see below).
 
 ## Answer quality (LLM-as-judge)
 
@@ -356,8 +369,9 @@ correctness:
 .venv/bin/python scripts/evaluate.py --judge   # + judge scoring of answers
 ```
 
-Result on the full 47-scenario golden set (answers and judge:
-glm-4.5-flash, hybrid retrieval):
+Result on the held-out set (answers and judge: glm-4.5-flash, hybrid
+retrieval) — **supporting signal only**. Same-family self-judging is lenient;
+a strict evaluation needs `--judge-model` from another family or a human.
 
 | Axis                            | Average score |
 | ------------------------------- | ------------- |
@@ -365,16 +379,15 @@ glm-4.5-flash, hybrid retrieval):
 | Relevance (answers the question)| 5.0 / 5       |
 | Citations (citations correct)   | 5.0 / 5       |
 
-Answers scored ≤3 on at least one axis: 0 of 47 (on the demo corpus).
-
 ## Limitations
 
 What I know about the project's boundaries — so the questions don't have to
 wait:
 
-- **Corpus.** The evaluation numbers come from a self-made demo corpus
-  (6 files, 12 chunks) — this is an upper bound; production needs a golden set
-  from real queries (100–300).
+- **Corpus.** Evaluation numbers on this page are from the public demo pack
+  (6 files, 12 chunks) and the held-out set (~180 queries) reported on the
+  case page — an upper bound, not MTS production quality. Production data
+  stays under NDA.
 - **Judge.** In judge mode the judge is from the same GLM family as the
   answering model — self-judging is lenient. A strict evaluation needs a judge
   from another family: the script already supports `--judge-model`.
