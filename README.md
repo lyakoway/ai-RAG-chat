@@ -45,8 +45,8 @@ Published retrieval figures below match the case page
 The pipeline was built against three constraints, each verified below:
 
 - **quality** — the right document at the top of retrieval, every fact backed
-  by a page-level citation;
-- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash);
+  by a page-level citation.
+- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash).
 - **accessibility** — the full loop works without API keys (local embeddings +
   offline demo mode).
 
@@ -76,16 +76,16 @@ Sources with relevance scores and 👍/👎 feedback on answers:
   (semantic search over chunks without an LLM, with relevance scores). Mode
   switcher in the filter panel.
 - 📄 **Search across documents** — PDF, Word (.docx), Excel (.xlsx)
-- 📚 **Multiple documents at once** — upload in batches, search across the base
+- 📚 **Multiple documents at once** — upload in batches, search across the collection
 - 🎙️ **Voice input** — ask by voice in chat and in vector search
-  (Web Speech API: Chrome, Edge, Safari 14.5+, Android; hidden in Firefox)
+  (Web Speech API: Chrome, Edge, Safari 14.5+, Android, hidden in Firefox)
 - 🔗 **Citations and sources** — every answer references a file and a **page
   number**. The `[1]`, `[2]` markers are **clickable** and highlight the fragment
 - 👁️ **Built-in preview** — PDF / DOCX / Excel in a modal. Clicking a source opens
   the fragment (for PDF — right at the cited page)
-- 💬 **Conversation history** — all chats are stored, return to any of them
+- 💬 **Conversation history** — all chats are stored. You can return to any of them
 - 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …)
-- 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended; a **free**
+- 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended — a **free**
   `glm-4.5-flash` tier exists but is slow: 25–50 s TTFT), OpenAI (GPT),
   Anthropic (Claude), local (Ollama), or an offline demo mode without keys
 - ⚡ **Streaming answers** — tokens arrive in real time (SSE)
@@ -336,15 +336,15 @@ provider's latency spread (2.1–7.2 s) dwarfs the 100–300 ms saving. Chunk si
 800 → 400 (Recall also identical) changes nothing at all on the demo corpus:
 pages are shorter than 400 tokens, chunks are not re-split. Conclusion: TTFT
 ~2.5–3 s is the GLM-5.3-flash floor on the provider side. Our pipeline adds
-~20 ms (<1%) — there is nothing left to trim; the `top_k=5` and
+~20 ms (<1%) — there is nothing left to trim. The `top_k=5` and
 `chunk 800/120` defaults stay.
 
 **On the local model** (Llama 3.2 3B, Q4_K_M, `OLLAMA_NUM_GPU=0` — CPU on
 macOS 13): warm answers are faster than every cloud option (first token
 1.2–3.6 s, full answer 2.5–5.4 s), completely free and private. But: the first
 request after idle loads 2 GB of model into RAM (+13.7 s), spikes up to 8–15 s
-happen under load, and the 3B model drops citations more often and answers
-shorter — format accuracy remains with the flagship models.
+happen under load, and the 3B model drops citations more often and gives
+shorter answers — format accuracy remains with the flagship models.
 
 ### Query cost
 
@@ -353,7 +353,7 @@ corpus) plus ~100 tokens of the answer. At Z.ai's list price for GLM-5.3-flash
 ($0.15 / $0.50 per 1M input/output tokens) that is **≈ $0.0005 per question —
 about 20,000 questions per $1**. Zero-cost options: the free `glm-4.5-flash`
 and a local Llama via Ollama (computed on your machine). Speed — TTFT
-~2.5–3 s on GLM-5.3-flash; cost — a fraction of a cent. Judge 5.0/5 is a
+~2.5–3 s on GLM-5.3-flash. Cost — a fraction of a cent. Judge 5.0/5 is a
 **supporting** signal only (see below).
 
 ## Answer quality (LLM-as-judge)
@@ -370,8 +370,8 @@ correctness:
 ```
 
 Result on the held-out set (answers and judge: glm-4.5-flash, hybrid
-retrieval) — **supporting signal only**. Same-family self-judging is lenient;
-a strict evaluation needs `--judge-model` from another family or a human.
+retrieval) — **supporting signal only**. Same-family self-judging is lenient.
+A strict evaluation needs `--judge-model` from another family or a human.
 
 | Axis                            | Average score |
 | ------------------------------- | ------------- |
@@ -381,8 +381,7 @@ a strict evaluation needs `--judge-model` from another family or a human.
 
 ## Limitations
 
-What I know about the project's boundaries — so the questions don't have to
-wait:
+What I know about the project's boundaries, stated up front:
 
 - **Corpus.** Evaluation numbers on this page are from the public demo pack
   (6 files, 12 chunks) and the held-out set (~180 queries) reported on the
@@ -394,7 +393,7 @@ wait:
 - **Security.** The demo runs without authentication and rate limits —
   production needs auth, request limits and token accounting.
 - **Load.** No load testing was done — the latency numbers are
-  single-user.
+  from single-user runs.
 - **Prompts.** No automated prompt regression yet: output contracts are fixed,
   model A/B is available in the judge script (`--answer-model` /
   `--judge-model`).
