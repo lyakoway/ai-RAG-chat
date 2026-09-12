@@ -107,7 +107,8 @@ async def chat(
                 buffer.append(delta)
                 yield _sse("token", {"delta": delta})
         except Exception as exc:  # noqa: BLE001
-            yield _sse("error", {"message": f"Ошибка модели: {exc}"})
+            prefix = "Model error" if req.lang == "en" else "Ошибка модели"
+            yield _sse("error", {"message": f"{prefix}: {exc}"})
 
         answer = "".join(buffer)
         message_id = _persist_assistant(
@@ -171,7 +172,8 @@ async def _gen_agent(
                 elif event == "agent_meta":
                     steps = data.get("steps") or steps
         except Exception as exc:  # noqa: BLE001
-            yield _sse("error", {"message": f"Ошибка агента: {exc}"})
+            prefix = "Agent error" if req.lang == "en" else "Ошибка агента"
+            yield _sse("error", {"message": f"{prefix}: {exc}"})
     finally:
         db_agent.close()
 

@@ -9,7 +9,7 @@ import {
 
 type Edge = 'left' | 'right'
 
-const MOBILE_MQ = '(max-width: 1100px)'
+const MOBILE_MQ = '(max-width: 1160px)'
 const THRESHOLD_PX = 72
 const AXIS_LOCK_PX = 10
 
