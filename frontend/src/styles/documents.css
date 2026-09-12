@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 64px;
   padding: 16px 18px;
   border-bottom: 1px solid var(--border);
   animation: enterUp 0.4s var(--ease) both;
@@ -194,7 +195,7 @@
 .doc-del:hover { color: #ef4444; background: var(--bg-soft); }
 
 /* On tablet/mobile the docs panel floats above content as a right drawer. */
-@media (max-width: 1100px) {
+@media (max-width: 1160px) {
   .docs-panel {
     position: fixed;
     right: 0;
@@ -203,5 +204,13 @@
     width: min(340px, 88vw);
     z-index: 130;
     box-shadow: var(--shadow-lg);
+  }
+}
+
+/* Телефон (<480px): панель открывается на всю ширину экрана. */
+@media (max-width: 480px) {
+  .docs-panel {
+    width: 100%;
+    box-shadow: none;
   }
 }

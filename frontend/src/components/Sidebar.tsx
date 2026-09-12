@@ -79,6 +79,9 @@ export function Sidebar({
           <div className="brand-title">RAG Chat</div>
           <div className="brand-sub">{t('brandSub')}</div>
         </div>
+        {/* Крестик шторки: как в панели документов — всегда виден, пока
+            сайдбар открыт (на десктопе сайдбар доками и скрыт CSS-ом). */}
+        <button className="sidebar-close" onClick={onClose} title={t('hidePanel')}>✕</button>
       </div>
 
       <button className="btn-new" onClick={onNew}>

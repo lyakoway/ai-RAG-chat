@@ -66,7 +66,7 @@ export default function App() {
   const [category, setCategory] = useState('All')
   // On wide screens the docs panel is docked open; on mobile it starts closed
   // (it becomes an overlay drawer there).
-  const isWide = typeof window !== 'undefined' && window.innerWidth > 1100
+  const isWide = typeof window !== 'undefined' && window.innerWidth > 1160
   const [docsOpen, setDocsOpen] = useState(isWide)
   const [sidebarOpen, setSidebarOpen] = useState(false) // mobile drawer only
   const [viewerSource, setViewerSource] = useState<Source | null>(null)
@@ -183,7 +183,7 @@ export default function App() {
   // Блокируем скролл страницы, когда на мобильном открыта шторка
   // (сайдбар или документы) — иначе фон прокручивается под оверлеем.
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1100px)')
+    const mq = window.matchMedia('(max-width: 1160px)')
     const update = () => {
       const overlay = (sidebarOpen || docsOpen) && mq.matches
       document.body.classList.toggle('no-scroll', overlay)

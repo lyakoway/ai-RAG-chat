@@ -54,6 +54,20 @@
   gap: 12px;
   padding: 6px 8px;
 }
+/* Крестик шторки сайдбара: виден только в drawer-режиме (≤1160px),
+   на десктопе сайдбар доками и кнопка не нужна. */
+.sidebar-close {
+  display: none;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  margin-left: auto;
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-size: 15px;
+  transition: background 0.15s;
+}
+.sidebar-close:hover { background: var(--bg-soft); color: var(--text); }
 .brand-logo {
   width: 38px;
   height: 38px;
@@ -178,6 +192,7 @@
 
 /* ================= Top bar ================= */
 .topbar {
+  min-height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -293,8 +308,8 @@
 /* Backdrop behind mobile drawers. */
 .drawer-backdrop { display: none; }
 
-/* ================= Responsive (≤1100px): drawers ================= */
-@media (max-width: 1100px) {
+/* ================= Responsive (≤1160px): drawers ================= */
+@media (max-width: 1160px) {
   .app {
     grid-template-columns: 1fr; /* main takes full width */
     height: 100dvh;
@@ -304,6 +319,9 @@
   body { overflow: hidden; }
 
   .menu-btn { display: inline-grid; }
+
+  /* Крестик сайдбара — всегда виден, пока открыта шторка. */
+  .sidebar-close { display: inline-grid; place-items: center; }
 
   /* Header collapses to [☰ menu] .......... [Документы].
      Model/category selectors move into the drawer. */
@@ -362,6 +380,15 @@
 
 /* Страница под шторками не скроллится (мобильные оверлеи). */
 body.no-scroll { overflow: hidden; }
+
+/* Телефон (<480px): шторки открываются на всю ширину экрана. */
+@media (max-width: 480px) {
+  .sidebar,
+  .docs-panel {
+    width: 100%;
+    box-shadow: none;
+  }
+}
 
 @media (max-width: 620px) {
   .topbar { padding: 10px 14px; }
