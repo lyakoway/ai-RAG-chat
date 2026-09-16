@@ -1,1 +1,2 @@
 docs/screenshots/*.png filter=lfs diff=lfs encode=lfs -text
+frontend/public/og-image.png filter=lfs diff=lfs encode=lfs -text
