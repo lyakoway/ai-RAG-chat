@@ -12,9 +12,11 @@ English | [Русский](README.ru.md)
 
 # 📚 AI RAG Chat — chat with your internal documents
 
-> A **Retrieval-Augmented Generation** assistant over your own documents
-> (PDF, Word, Excel). It answers **only from the uploaded files** and shows
-> **sources with page-level links**.
+> Document Q&A **with source citations** over your own files (PDF, Word,
+> Excel). Three modes side by side — **RAG Chat**, **AI Agent** and
+> **Vector Search** — so the difference is visible on the same question.
+> Answers are grounded **only in the uploaded documents** and cite the
+> **exact page**.
 
 ### 🔗 Live demo → **https://lyakoway-rag-chat.hf.space**
 
@@ -30,27 +32,33 @@ English | [Русский](README.ru.md)
 <sub>On the free tier the demo Space may fall asleep — the first visit after
 idle takes ~50 s to wake up.</sub>
 
-## Task and target constraints
+## Key numbers
+
+| Metric                                   | Value                      |
+| ---------------------------------------- | -------------------------- |
+| Recall@1 · held-out set (~180 queries)   | **87%**                    |
+| First token (TTFT) · GLM-5.3-flash       | ~2.5–3 s                   |
+| Cost per question · GLM-5.3-flash        | ≈ $0.0005 (~20k per $1)    |
+| Vector search via API · p50              | 18 ms                      |
+| Demo pack indexing · 6 files → 12 chunks | 0.7 s                      |
+| pytest tests + CI                        | 63                         |
+
+## What the project is for
 
 Answers over internal documents **with citations pointing to the exact page** —
-instead of manually digging through PDF, Word and Excel files.
+instead of manually digging through PDF, Word and Excel files. The live demo
+runs on a public test pack (6 files → 12 chunks). Several scenarios where it
+already works:
 
-The pipeline was built against three constraints, each verified below:
-
-- **quality** — the right document at the top of retrieval, every fact backed
-  by a page-level citation.
-- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash).
-- **accessibility** — the full loop works without API keys (local embeddings +
-  offline demo mode).
-
-**What shipped — three measured decisions:**
-
-1. **Keep hybrid BM25 + RRF** — dense-only Recall@1 53.2% on RU/EN language
-   twins → **87.2%** hybrid on the held-out set (~180 queries).
-2. **Drop the reranker** — hybrid + cross-encoder Recall@1 **41.7%**
-   (−45 p.p.) and **~2.9 s** extra. Tested and rejected.
-3. **Default GLM-5.3-flash** when a Z.ai key is set — GLM-4.5-flash sits at
-   25–50 s TTFT on the same pipeline. The pipeline itself adds ~20 ms (<1%).
+- **Company knowledge base.** HR policies, regulations and handbooks: "how many
+  vacation days", "how is internet reimbursed" — an answer in seconds instead
+  of digging through folders. This is exactly what the app's demo pack shows.
+- **Customer support over product docs.** Product manuals, pricing and FAQ — a
+  customer asks in their own words and gets an answer linked to the manual
+  section. Support sees fewer repetitive tickets.
+- **Legal and financial documents.** Find a clause, deadline or figure in
+  contracts and reports: the citation points to the exact page, so verifying an
+  answer takes seconds rather than a separate investigation.
 
 ## Screenshots
 
@@ -83,6 +91,53 @@ Sources with relevance scores and 👍/👎 feedback on answers:
   Anthropic (Claude), local (Ollama), or an offline demo mode without keys
 - ⚡ **Streaming answers** — tokens arrive in real time (SSE)
 - 🎨 **Clean UI** — light/dark theme, responsive layout
+
+## Engineering approach
+
+The pipeline was built against three constraints, each verified in the
+measurements below:
+
+- **quality** — the right document at the top of retrieval, every fact backed
+  by a page-level citation.
+- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash).
+- **accessibility** — the full loop works without API keys (local embeddings +
+  offline demo mode).
+
+I compare retrieval, models and pipeline tweaks on a held-out set, then keep or
+reject. This repo ships three such decisions — hybrid vs dense, a reranker that
+lost, and a model default set by latency — not by a tutorial.
+
+**What shipped — decisions from the loop:**
+
+| Decision           | Measurement                                     | Why it shipped                                                                              |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Retrieval**      | Hybrid BM25 + RRF · +34 p.p. Recall@1 vs dense  | **Kept:** dense-only hit 53% on RU/EN twins, lexical fusion is required, not optional        |
+| **Reranker**       | −45 p.p. Recall@1 · +~3 s                       | **Rejected:** the cross-encoder promotes language twins and adds latency                     |
+| **Default model**  | GLM-5.3-flash · TTFT ~2.5–3.0 s                 | **Shipped:** GLM-4.5-flash sits at 25–50 s on the same pipeline, the pipeline itself adds <1% |
+| Held-out retrieval | Recall@1 87.2% · Recall@3 97.9%                 | Supporting number on the public pack. Mixed-language queries are still open                  |
+| Answer judge       | 5.0/5 on three axes, same model family          | Supporting only. A strict eval needs an independent judge or a human                         |
+| Reliability        | 63 pytest tests + CI                            | Critical paths (errors, empty docs, agent loops) are under automated tests                   |
+
+Highlighted rows are keep / reject decisions; the absolute scores under them
+are supporting measurements, not the claim.
+
+**AI engineer's checklist:**
+
+1. **Metrics before code** — define quality, latency, cost and reliability
+   before swapping models. Recall@1, TTFT, $/question and pytest coverage are
+   measured in this README, not claimed.
+2. **Evaluation before optimization** — golden set → Recall@K → experiment →
+   keep or reject. Held-out ~180 queries: hybrid became the default, the
+   reranker was rejected (−45 p.p., +~3 s).
+3. **Data-driven architecture** — compare retrieval, models and pipeline
+   config on the same eval set. GLM-5.3-flash is the default: GLM-4.5-flash
+   sits at 25–50 s TTFT on the same pipeline.
+4. **Observable AI systems** — tool calls, steps, errors, feedback and latency
+   must be visible: SSE done/error events, agent step timeline, 👍/👎 in the
+   DB, latency in logs.
+5. **Reproducible quality** — tests, CI, isolated eval environment and
+   regression control: the eval index is rebuilt from scratch on every run;
+   63 pytest tests + GitHub Actions.
 
 ## Architecture
 
@@ -123,6 +178,24 @@ Sources with relevance scores and 👍/👎 feedback on answers:
 | `llm/`        | base, providers, registry                         | LLM provider abstraction             |
 | `db/`         | models, session                                   | conversation history (SQLite)        |
 | `schemas/`    | dto                                               | API contracts (Pydantic)             |
+
+**Pipelines:**
+
+- **RAG pipeline:** Documents → Parsing → Chunking → Embeddings → BM25 + Vector
+  Search → RRF → Context → LLM → Grounded Answer → Citations
+- **Agent pipeline:** User → Agent Loop → List Documents → Search → Refine →
+  Answer
+
+## Production and reliability
+
+- **Streaming** — SSE with explicit done / error events.
+- **Failure handling** — provider timeout, tool-step errors and graceful
+  recovery.
+- **Observability** — model, sources, latency, errors and user feedback.
+- **Testing** — 63 pytest tests: RAG pipeline · hybrid retrieval · document
+  parsing · citations · API/SSE · error handling. CI on GitHub Actions.
+- **Reproducibility** — the evaluation index is rebuilt from scratch on every
+  run.
 
 ## Quick start
 
@@ -249,13 +322,15 @@ OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 > no ready binary, brew builds from source (slow). Easier to grab a ready
 > binary from ollama.com and run the CLI directly.
 
-## Retrieval quality (evaluation)
+## Measurements
 
 Retrieval is measured by
 [`backend/scripts/evaluate.py`](backend/scripts/evaluate.py) on the same
 pipeline the chat uses. Figures below are the **held-out bilingual set
-(~180 queries)** reported on the case page — not production documents.
-The index is rebuilt from scratch on every run.
+(~180 queries)** on the public demo pack. The index is rebuilt from scratch on
+every run.
+
+### Retrieval quality (evaluation)
 
 ```bash
 cd backend
@@ -349,7 +424,7 @@ and a local Llama via Ollama (computed on your machine). Speed — TTFT
 ~2.5–3 s on GLM-5.3-flash. Cost — a fraction of a cent. Judge 5.0/5 is a
 **supporting** signal only (see below).
 
-## Answer quality (LLM-as-judge)
+### Answer quality (LLM-as-judge)
 
 Retrieval is necessary but not sufficient: does the model answer **correctly**
 given the retrieved context? The script has a judge mode: for every golden
