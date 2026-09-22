@@ -12,11 +12,10 @@ English | [Русский](README.ru.md)
 
 # 📚 AI RAG Chat — chat with your internal documents
 
-> Document Q&A **with source citations** over your own files (PDF, Word,
-> Excel). Three modes side by side — **RAG Chat**, **AI Agent** and
-> **Vector Search** — so the difference is visible on the same question.
-> Answers are grounded **only in the uploaded documents** and cite the
-> **exact page**.
+> Document Q&A over your own files (PDF, Word, Excel) **with citations to the
+> exact source page**. Three modes side by side: **RAG Chat**, **AI Agent**
+> and **Vector Search** — so the difference is visible on the same question.
+> Answers are grounded **only in the uploaded documents**.
 
 ### 🔗 Live demo → **https://lyakoway-rag-chat.hf.space**
 
@@ -38,7 +37,7 @@ idle takes ~50 s to wake up.</sub>
 | ---------------------------------------- | -------------------------- |
 | Recall@1 · held-out set (~180 queries)   | **87%**                    |
 | First token (TTFT) · GLM-5.3-flash       | ~2.5–3 s                   |
-| Cost per question · GLM-5.3-flash        | ≈ $0.0005 (~20k per $1)    |
+| Cost per question · GLM-5.3-flash        | ≈ $0.0005 (~20,000 questions per $1) |
 | Vector search via API · p50              | 18 ms                      |
 | Demo pack indexing · 6 files → 12 chunks | 0.7 s                      |
 | pytest tests + CI                        | 63                         |
@@ -50,8 +49,8 @@ instead of manually digging through PDF, Word and Excel files. The live demo
 runs on a public test pack (6 files → 12 chunks). Several scenarios where it
 already works:
 
-- **Company knowledge base.** HR policies, regulations and handbooks: "how many
-  vacation days", "how is internet reimbursed" — an answer in seconds instead
+- **Company knowledge base.** HR policies, regulations and handbooks: “how many
+  vacation days”, “how is internet reimbursed” — an answer in seconds instead
   of digging through folders. This is exactly what the app's demo pack shows.
 - **Customer support over product docs.** Product manuals, pricing and FAQ — a
   customer asks in their own words and gets an answer linked to the manual
@@ -76,21 +75,21 @@ Sources with relevance scores and 👍/👎 feedback on answers:
   loop with visible steps: list files → search → answer) and **Vector Search**
   (semantic search over chunks without an LLM, with relevance scores). Mode
   switcher in the filter panel.
-- 📄 **Search across documents** — PDF, Word (.docx), Excel (.xlsx)
-- 📚 **Multiple documents at once** — upload in batches, search across the collection
+- 📄 **Search across documents** — PDF, Word (.docx), Excel (.xlsx).
+- 📚 **Multiple documents at once** — upload in batches, search across the collection.
 - 🎙️ **Voice input** — ask by voice in chat and in vector search
-  (Web Speech API: Chrome, Edge, Safari 14.5+, Android, hidden in Firefox)
+  (Web Speech API: Chrome, Edge, Safari 14.5+, Android, hidden in Firefox).
 - 🔗 **Citations and sources** — every answer references a file and a **page
-  number**. The `[1]`, `[2]` markers are **clickable** and highlight the fragment
+  number**. The `[1]`, `[2]` markers are **clickable** and highlight the fragment.
 - 👁️ **Built-in preview** — PDF / DOCX / Excel in a modal. Clicking a source opens
-  the fragment (for PDF — right at the cited page)
-- 💬 **Conversation history** — all chats are stored. You can return to any of them
-- 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …)
+  the fragment (for PDF — right at the cited page).
+- 💬 **Conversation history** — all chats are stored. You can return to any of them.
+- 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …).
 - 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended — a **free**
   `glm-4.5-flash` tier exists but is slow: 25–50 s TTFT), OpenAI (GPT),
-  Anthropic (Claude), local (Ollama), or an offline demo mode without keys
-- ⚡ **Streaming answers** — tokens arrive in real time (SSE)
-- 🎨 **Clean UI** — light/dark theme, responsive layout
+  Anthropic (Claude), local (Ollama), or an offline demo mode without keys.
+- ⚡ **Streaming answers** — tokens arrive in real time (SSE).
+- 🎨 **Clean UI** — light/dark theme, responsive layout.
 
 ## Engineering approach
 
@@ -118,8 +117,8 @@ lost, and a model default set by latency — not by a tutorial.
 | Answer judge       | 5.0/5 on three axes, same model family          | Supporting only. A strict eval needs an independent judge or a human                         |
 | Reliability        | 63 pytest tests + CI                            | Critical paths (errors, empty docs, agent loops) are under automated tests                   |
 
-Highlighted rows are keep / reject decisions; the absolute scores under them
-are supporting measurements, not the claim.
+Bold rows are keep / reject decisions. The absolute scores below them are
+supporting measurements, not headline claims.
 
 **AI engineer's checklist:**
 
@@ -136,7 +135,7 @@ are supporting measurements, not the claim.
    must be visible: SSE done/error events, agent step timeline, 👍/👎 in the
    DB, latency in logs.
 5. **Reproducible quality** — tests, CI, isolated eval environment and
-   regression control: the eval index is rebuilt from scratch on every run;
+   regression control: the eval index is rebuilt from scratch on every run.
    63 pytest tests + GitHub Actions.
 
 ## Architecture
@@ -326,9 +325,9 @@ OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 
 Retrieval is measured by
 [`backend/scripts/evaluate.py`](backend/scripts/evaluate.py) on the same
-pipeline the chat uses. Figures below are the **held-out bilingual set
-(~180 queries)** on the public demo pack. The index is rebuilt from scratch on
-every run.
+pipeline the chat uses. Figures below are from the **held-out bilingual set
+(~180 queries)**, measured on the public demo pack. The index is rebuilt from
+scratch on every run.
 
 ### Retrieval quality (evaluation)
 
