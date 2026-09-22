@@ -372,25 +372,6 @@ A strict evaluation needs `--judge-model` from another family or a human.
 | Relevance (answers the question)| 5.0 / 5       |
 | Citations (citations correct)   | 5.0 / 5       |
 
-## Limitations
-
-What I know about the project's boundaries, stated up front:
-
-- **Corpus.** Evaluation numbers on this page are from the public demo pack
-  (6 files, 12 chunks) and the held-out set (~180 queries) reported on the
-  case page — an upper bound, not production quality. Production data
-  stays under NDA.
-- **Judge.** In judge mode the judge is from the same GLM family as the
-  answering model — self-judging is lenient. A strict evaluation needs a judge
-  from another family: the script already supports `--judge-model`.
-- **Security.** The demo runs without authentication and rate limits —
-  production needs auth, request limits and token accounting.
-- **Load.** No load testing was done — the latency numbers are
-  from single-user runs.
-- **Prompts.** No automated prompt regression yet: output contracts are fixed,
-  model A/B is available in the judge script (`--answer-model` /
-  `--judge-model`).
-
 ## 🚀 Deploy
 
 The live version is hosted on **Hugging Face Spaces** (Docker) — one container
