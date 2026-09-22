@@ -35,13 +35,6 @@ idle takes ~50 s to wake up.</sub>
 Answers over internal documents **with citations pointing to the exact page** —
 instead of manually digging through PDF, Word and Excel files.
 
-This repository is an independently built **personal demo** on a public test
-pack (6 files → 12 chunks). It is the same problem class as a production
-document RAG assistant — **not** that system's source code or documents.
-Published retrieval figures below match the case page
-[lyakoway.vercel.app/portfolio/rag-chat](https://lyakoway.vercel.app/portfolio/rag-chat)
-(held-out ~180 queries). Production corpora stay under NDA.
-
 The pipeline was built against three constraints, each verified below:
 
 - **quality** — the right document at the top of retrieval, every fact backed
