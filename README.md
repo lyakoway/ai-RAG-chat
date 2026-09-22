@@ -385,7 +385,7 @@ What I know about the project's boundaries, stated up front:
 
 - **Corpus.** Evaluation numbers on this page are from the public demo pack
   (6 files, 12 chunks) and the held-out set (~180 queries) reported on the
-  case page — an upper bound, not MTS production quality. Production data
+  case page — an upper bound, not production quality. Production data
   stays under NDA.
 - **Judge.** In judge mode the judge is from the same GLM family as the
   answering model — self-judging is lenient. A strict evaluation needs a judge
