@@ -35,11 +35,11 @@ idle takes ~50 s to wake up.</sub>
 
 | Metric                                   | Value                      |
 | ---------------------------------------- | -------------------------- |
-| Recall@1 · held-out set (~180 queries)   | **87%**                    |
-| First token (TTFT) · GLM-5.3-flash       | ~2.5–3 s                   |
+| Recall@1 · held-out set (47 queries)     | **87%**                    |
+| First token (TTFT) · GLM-5.3-flash       | ~3–4.5 s                   |
 | Cost per question · GLM-5.3-flash        | ≈ $0.0005 (~20,000 questions per $1) |
-| Vector search via API · p50              | 18 ms                      |
-| Demo pack indexing · 6 files → 12 chunks | 0.7 s                      |
+| Vector search via API · p50              | 17 ms                      |
+| Demo pack indexing · 6 files → 12 chunks | ~0.6 s (warm)              |
 | pytest tests + CI                        | 63                         |
 
 ## What the project is for
@@ -85,9 +85,10 @@ Sources with relevance scores and 👍/👎 feedback on answers:
   the fragment (for PDF — right at the cited page).
 - 💬 **Conversation history** — all chats are stored. You can return to any of them.
 - 🏷️ **Category filtering** — narrow the search to a category (HR, Finance, …).
-- 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended — a **free**
-  `glm-4.5-flash` tier exists but is slow: 25–50 s TTFT), OpenAI (GPT),
-  Anthropic (Claude), local (Ollama), or an offline demo mode without keys.
+- 🤖 **Model switcher** — Z.ai (**GLM-5.3-flash** recommended — the **free**
+  `glm-4.5-flash` tier has erratic latency: 3–21 s TTFT run-to-run), OpenAI
+  (GPT), Anthropic (Claude), local (Ollama), or an offline demo mode without
+  keys.
 - ⚡ **Streaming answers** — tokens arrive in real time (SSE).
 - 🎨 **Clean UI** — light/dark theme, responsive layout.
 
@@ -98,22 +99,22 @@ measurements below:
 
 - **quality** — the right document at the top of retrieval, every fact backed
   by a page-level citation.
-- **speed** — first token within seconds (met: ~2.5–3 s on GLM-5.3-flash).
+- **speed** — first token within seconds (met: ~3–4.5 s on GLM-5.3-flash).
 - **accessibility** — the full loop works without API keys (local embeddings +
   offline demo mode).
 
 I compare retrieval, models and pipeline tweaks on a held-out set, then keep or
 reject. This repo ships three such decisions — hybrid vs dense, a reranker that
-lost, and a model default set by latency — not by a tutorial.
+lost, and a model default set by measured latency — not by a tutorial.
 
 **What shipped — decisions from the loop:**
 
 | Decision           | Measurement                                     | Why it shipped                                                                              |
 | ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | **Retrieval**      | Hybrid BM25 + RRF · +34 p.p. Recall@1 vs dense  | **Kept:** dense-only hit 53% on RU/EN twins, lexical fusion is required, not optional        |
-| **Reranker**       | −45 p.p. Recall@1 · +~3 s                       | **Rejected:** the cross-encoder promotes language twins and adds latency                     |
-| **Default model**  | GLM-5.3-flash · TTFT ~2.5–3.0 s                 | **Shipped:** GLM-4.5-flash sits at 25–50 s on the same pipeline, the pipeline itself adds <1% |
-| Held-out retrieval | Recall@1 87.2% · Recall@3 97.9%                 | Supporting number on the public pack. Mixed-language queries are still open                  |
+| **Reranker**       | −25 p.p. Recall@1 · +~6 s                       | **Rejected:** the cross-encoder promotes language twins and adds latency                     |
+| **Default model**  | GLM-5.3-flash · TTFT ~3–4.5 s                   | **Shipped:** the only model with stable latency — free GLM-4.5-flash swings 3–21 s, GLM-5.3 measured 43–57 s the same day; the pipeline itself adds <1% |
+| Held-out retrieval | Recall@1 87.2% · Recall@3 97.9%                 | Supporting number on the public pack (47 queries). Weakest category — cross-lingual, 62.5%    |
 | Answer judge       | 5.0/5 on three axes, same model family          | Supporting only. A strict eval needs an independent judge or a human                         |
 | Reliability        | 63 pytest tests + CI                            | Critical paths (errors, empty docs, agent loops) are under automated tests                   |
 
@@ -126,11 +127,12 @@ supporting measurements, not headline claims.
    before swapping models. Recall@1, TTFT, $/question and pytest coverage are
    measured in this README, not claimed.
 2. **Evaluation before optimization** — golden set → Recall@K → experiment →
-   keep or reject. Held-out ~180 queries: hybrid became the default, the
-   reranker was rejected (−45 p.p., +~3 s).
+   keep or reject. Held-out 47 queries: hybrid became the default, the
+   reranker was rejected (−25 p.p., +~6 s).
 3. **Data-driven architecture** — compare retrieval, models and pipeline
-   config on the same eval set. GLM-5.3-flash is the default: GLM-4.5-flash
-   sits at 25–50 s TTFT on the same pipeline.
+   config on the same eval set. GLM-5.3-flash is the default: the only model
+   with a stable first token — the free GLM-4.5-flash swings 3–21 s within a
+   day, the flagship GLM-5.3 measured 43–57 s the same day.
 4. **Observable AI systems** — tool calls, steps, errors, feedback and latency
    must be visible: SSE done/error events, agent step timeline, 👍/👎 in the
    DB, latency in logs.
@@ -326,8 +328,8 @@ OLLAMA_NUM_GPU=0      # force CPU (workaround for the macOS 13 Metal bug)
 Retrieval is measured by
 [`backend/scripts/evaluate.py`](backend/scripts/evaluate.py) on the same
 pipeline the chat uses. Figures below are from the **held-out bilingual set
-(~180 queries)**, measured on the public demo pack. The index is rebuilt from
-scratch on every run.
+(47 queries)**, re-measured Sep 27, 2026 on the public demo pack. The index is
+rebuilt from scratch on every run.
 
 ### Retrieval quality (evaluation)
 
@@ -343,27 +345,27 @@ paraphrase-multilingual-MiniLM):
 
 | Configuration                        | Recall@1  | Recall@3 | MRR@5     | Latency    |
 | ------------------------------------ | --------- | -------- | --------- | ---------- |
-| Vector search                        | 53.2%     | 91.5%    | 0.727     | 11 ms      |
-| **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 17 ms      |
-| Hybrid + reranker                    | 41.7%     | 100%     | 0.694     | ~2.9 s     |
+| Vector search                        | 53.2%     | 91.5%    | 0.727     | 15 ms      |
+| **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 20 ms      |
+| Hybrid + reranker                    | 61.7%     | 95.7%    | 0.777     | ~6.0 s     |
 
 **Decision:** hybrid BM25 + RRF is the default — the best measured trade-off
 on this held-out set. The reranker row was tested and **rejected**
-(−45 p.p. Recall@1, +~3 s): the cross-encoder scores semantic relevance, and
+(−25 p.p. Recall@1, +~6 s): the cross-encoder scores semantic relevance, and
 a RU/EN “twin” is just as semantically relevant.
 
 Per-category breakdown (hybrid, default):
 
 | Category      | Questions | Recall@1 | Recall@3 |
 | ------------- | --------- | -------- | -------- |
-| fact          | ~60       | 100%     | 100%     |
-| numeric       | ~60       | 87%      | 100%     |
-| paraphrase    | ~35       | 89%      | 100%     |
-| cross-lingual | ~25       | —        | —        |
+| fact          | 15        | 100%     | 100%     |
+| numeric       | 15        | 87%      | 100%     |
+| paraphrase    | 9         | 89%      | 100%     |
+| cross-lingual | 8         | 62.5%    | 87.5%    |
 
-Overall hybrid Recall@1 **87%**. Mixed-language queries are a known next step
-(RU/EN synonym dictionary and a multilingual reranker) — **not a headline
-metric**.
+Overall hybrid Recall@1 **87%**. The cross-lingual category is the weakest
+(62.5% Recall@1): mixed-language queries remain a known next step (RU/EN
+synonym dictionary and a multilingual reranker) — **not a headline metric**.
 
 **Language twins.** Embeddings align RU and EN, so a Russian question can
 surface the English document (vector-only Recall@1 53.2%). Lexical BM25 in
@@ -375,34 +377,39 @@ Modes: `SEARCH_HYBRID` (default `1`), `SEARCH_RERANK=1` enables the reranker
 ### Answer latency (benchmark)
 
 The same approach for the LLM: a live run against the real API (SSE stream of a
-RAG answer, the same question, local CPU client). Measured Aug 28, 2026:
+RAG answer, the same question, local CPU client). GLM rows re-measured
+Sep 27, 2026; Llama measured Aug 28, 2026 (Ollama):
 
 | Model                                |           First token (TTFT) | Full answer |
 | ------------------------------------ | ---------------------------: | ----------: |
-| GLM-5.3-flash (Z.ai)                 |                    2.5–3.0 s |   3.3–3.9 s |
-| GLM-5.3 (Z.ai)                       |                        2.6 s |       3.0 s |
+| GLM-5.3-flash (Z.ai)                 |                    2.9–4.3 s |   2.9–5.0 s |
+| GLM-5.3 (Z.ai)                       |                     43–57 s  |    48–61 s  |
 | Llama 3.2 3B (Ollama, local, CPU)    | 1.2–3.6 s (cold start +13.7 s) |   2.5–5.4 s |
-| GLM-4.5-flash (Z.ai, free)           |                       25–50 s |    39–51 s  |
-| Demo mode (mock, no network)         |                        87 ms |       0.5 s |
+| GLM-4.5-flash (Z.ai, free)           |        2.9–21.3 s (erratic)  |   ≈ TTFT    |
+| Demo mode (mock, no network)         |                        13 ms |      0.3 s  |
 
 Additionally:
 
-- agent mode (tool steps + two LLM calls) — 9.2 s on GLM-5.3-flash
-- demo pack indexing (6 files → 12 chunks) — 0.7 s
-- vector search via API — p50 18 ms server-side
+- agent mode (tool steps + two LLM calls) — ≈ 11–12 s on GLM-5.3-flash
+- demo pack indexing (6 files → 12 chunks) — ~0.6 s warm (+~7 s on the very
+  first run, embedding model load)
+- vector search via API — p50 17 ms / p95 25 ms server-side
 
-**Takeaway:** latency is defined by the model _generation_, not by settings:
-GLM-4.5-flash (the older “thinking” generation, even with `thinking=disabled`)
-answers in 25–50 s, while GLM-5.3-flash on the same pipeline — ~3 s. That is
-why the free model is not recommended by default.
+**Takeaway:** answer latency is set on the provider side and varies from day
+to day — our pipeline adds ~20 ms. On Sep 27, 2026 GLM-5.3-flash was the only
+model with a stable first token (~3–4.5 s); the flagship GLM-5.3 measured
+43–57 s, and the free GLM-4.5-flash swung between 2.9 and 21.3 s within a
+single day (25–50 s in August). That instability — not the price tag — is why
+GLM-5.3-flash is the default.
 
 **Tested hypothesis: trimming the context does not speed up the first token.**
 `top_k` 5 → 4 at unchanged Recall (91.7% / 100%) saves ~20% of prefill tokens,
 but the gain is not readable on the live API: in alternating runs the
 provider's latency spread (2.1–7.2 s) dwarfs the 100–300 ms saving. Chunk size
 800 → 400 (Recall also identical) changes nothing at all on the demo corpus:
-pages are shorter than 400 tokens, chunks are not re-split. Conclusion: TTFT
-~2.5–3 s is the GLM-5.3-flash floor on the provider side. Our pipeline adds
+pages are shorter than 400 tokens, chunks are not re-split. Conclusion: the
+first-token latency is a provider-side floor (measured ~2.9 s best case for
+GLM-5.3-flash). Our pipeline adds
 ~20 ms (<1%) — there is nothing left to trim. The `top_k=5` and
 `chunk 800/120` defaults stay.
 
@@ -420,7 +427,7 @@ corpus) plus ~100 tokens of the answer. At Z.ai's list price for GLM-5.3-flash
 ($0.15 / $0.50 per 1M input/output tokens) that is **≈ $0.0005 per question —
 about 20,000 questions per $1**. Zero-cost options: the free `glm-4.5-flash`
 and a local Llama via Ollama (computed on your machine). Speed — TTFT
-~2.5–3 s on GLM-5.3-flash. Cost — a fraction of a cent. Judge 5.0/5 is a
+~3–4.5 s on GLM-5.3-flash. Cost — a fraction of a cent. Judge 5.0/5 is a
 **supporting** signal only (see below).
 
 ### Answer quality (LLM-as-judge)
@@ -437,7 +444,8 @@ correctness:
 ```
 
 Result on the held-out set (answers and judge: glm-4.5-flash, hybrid
-retrieval) — **supporting signal only**. Same-family self-judging is lenient.
+retrieval; measured Aug 28, 2026) — **supporting signal only**. Same-family
+self-judging is lenient.
 A strict evaluation needs `--judge-model` from another family or a human.
 
 | Axis                            | Average score |
