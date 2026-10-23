@@ -1,0 +1,65 @@
+{
+  "benchmark": "prefix_cache_llamacpp",
+  "date_utc": "2026-10-23T04:48:09+00:00",
+  "git_commit": "af22c4b",
+  "command": "benchmarks/local_llamacpp.py --variants Q4_K_M --bench --quality --prefix-cache --ngl 0 --repeats 3 --label q4_cpu_v2",
+  "runtime": "llama.cpp b11826, ngl=0, ctx=4096",
+  "model_file": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "definition": "unique_prefix — новый system-контекст в каждом слоте; shared_prefix_again — третий подряд запрос с тем же system (префикс уже в кэше, пересчёт только нового вопроса)",
+  "rows": [
+    {
+      "repeat": 0,
+      "kind": "unique_prefix",
+      "prefill_ms": 207.41,
+      "error": null
+    },
+    {
+      "repeat": 0,
+      "kind": "shared_prefix",
+      "prefill_ms": 173.29,
+      "error": null
+    },
+    {
+      "repeat": 0,
+      "kind": "shared_prefix_again",
+      "prefill_ms": 499.847,
+      "error": null
+    },
+    {
+      "repeat": 1,
+      "kind": "unique_prefix",
+      "prefill_ms": 416.689,
+      "error": null
+    },
+    {
+      "repeat": 1,
+      "kind": "shared_prefix",
+      "prefill_ms": 318.738,
+      "error": null
+    },
+    {
+      "repeat": 1,
+      "kind": "shared_prefix_again",
+      "prefill_ms": 508.775,
+      "error": null
+    },
+    {
+      "repeat": 2,
+      "kind": "unique_prefix",
+      "prefill_ms": 231.437,
+      "error": null
+    },
+    {
+      "repeat": 2,
+      "kind": "shared_prefix",
+      "prefill_ms": 202.975,
+      "error": null
+    },
+    {
+      "repeat": 2,
+      "kind": "shared_prefix_again",
+      "prefill_ms": 238.669,
+      "error": null
+    }
+  ]
+}

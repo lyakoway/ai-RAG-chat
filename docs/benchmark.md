@@ -1,0 +1,333 @@
+# Benchmark и evaluation: методика, команды, результаты
+
+Все инструменты лежат в `backend/benchmarks/`, наборы данных — в `backend/eval/`,
+машиночитаемые результаты прогонов — в `results/` (JSON + CSV, по одному файлу
+на запуск, с датой/коммитом/параметрами). Локальные модели и рунтаймы
+(`backend/benchmarks/.models/`, `.llama-cpp/`, `.mlx-venv/`) не коммитятся.
+
+## Golden-наборы
+
+| Файл | Что содержит | Происхождение |
+|------|--------------|---------------|
+| `backend/eval/golden_retrieval.json` | 47 двуязычных вопросов (fact / numeric / paraphrase / cross-lingual) с целевым документом на вопрос | Перенесён 1:1 из `backend/scripts/evaluate.py` (GOLDEN), выборка не менялась |
+| `backend/eval/golden_answers.json` | 12 вопросов с эталонными фактами (`must_contain`), 5 negative-вопросов (честный отказ), 4 bench-промпта | Составлен по первоисточнику контента демо-документов `backend/scripts/make_samples.py` |
+
+## Замеры существовавших метрик (проверка baseline)
+
+README-цифры воспроизведены штатным скриптом `scripts/evaluate.py` (то же
+железо, пересборка индекса с нуля на каждый запуск):
+
+| Конфигурация | Recall@1 | Recall@3 | MRR@5 | Совпадает с README |
+|---|---|---|---|---|
+| Dense (fastembed + ChromaDB) | 53.2% | 91.5% | 0.727 | ✅ |
+| Hybrid BM25+RRF (прод) | 87.2% | 97.9% | 0.926 | ✅ (0.9255 при округлении до 4 знаков) |
+
+Расхождение с README: набор называется «held-out ~180 queries», но в репозитории
+фактически 47 вопросов. Метрики совпадают с заявленными именно на этих 47, поэтому
+в результатах везде указывается фактический размер набора (47).
+
+## 1. Retrieval evaluation — `benchmarks/retrieval_eval.py`
+
+Три стратегии на одном и том же freshly-built индексе демо-пака:
+
+```bash
+cd backend
+.venv/bin/python benchmarks/retrieval_eval.py --strategy all          # dense + bm25 + hybrid
+.venv/bin/python benchmarks/retrieval_eval.py --strategy hybrid --repeats 3
+```
+
+- **dense** — только векторный ANN-поиск (fastembed `paraphrase-multilingual-MiniLM-L12-v2` + ChromaDB cosine);
+- **bm25** — только лексический BM25 (`rank_bm25.BM25Okapi` по тем же чанкам);
+- **hybrid** — продовый путь `vectorstore.query` с RRF-сплавом (k=60).
+
+Конфигурация корпуса: chunk 800/120 токенов (tiktoken `cl100k_base`), top_k=5.
+Метрики: Recall@1/3/5 (ранг целевого документа в выдаче), MRR@5, p50/p95 latency
+на клиенте, счётчики ошибок. Warm-up 1 запрос (кодировка модели, BM25-индекс).
+
+### Результаты (2026-10-22, M1 Pro, 47 запросов, top_k=5, repeats=3)
+
+| Стратегия | Recall@1 | Recall@3 | Recall@5 | MRR@5 | p50 ms | p95 ms | Ошибок |
+|---|---|---|---|---|---|---|---|
+| dense | 53.2% | 91.5% | 95.7% | 0.727 | 11.4 | 16.6 | 0 |
+| bm25 | 87.2% | 93.6% | 93.6% | 0.904 | 6.6 | 9.7 | 0 |
+| **hybrid (прод)** | **87.2%** | **97.9%** | **97.9%** | **0.926** | 18.2 | 23.1 | 0 |
+
+Latency полностью совпадает с README (dense ~11 мс, hybrid ~17–18 мс) —
+подтверждено чистым прогоном `--strategy all --repeats 3`.
+
+Новый факт против README: **BM25-only сам по себе даёт Recall@1 87.2%** на этом
+корпусе — но гибрид выигрывает Recall@3 (97.9% против 93.6%) и MRR. Dense-only
+проваливается на numeric (R@1 40%) — числа слабо кодируются эмбеддингами.
+
+## 2. LLM benchmark — `benchmarks/llm_bench.py`
+
+```bash
+cd backend
+.venv/bin/python benchmarks/llm_bench.py --models zai:glm-5.3-flash zai:glm-4.5-flash --runs 3 --warmup 1 --mode rag
+.venv/bin/python benchmarks/llm_bench.py --models mock --runs 1 --mode raw          # sanity без сети
+OLLAMA_NUM_GPU=0 .venv/bin/python benchmarks/llm_bench.py --models ollama:llama3.2:3b --runs 5
+```
+
+Определения (честные, клиентские часы одного процесса):
+
+- `time_to_first_chunk` — до первого чанка генерации **любого типа**. Для
+  «думающих» GLM-5.x это reasoning-токен. Это НЕ TTFT inference runtime — тот
+  без телеметрии провайдера не измеряется.
+- `time_to_first_content` — до первого видимого пользователю текста.
+- `e2e` — полный запрос клиента; `stream` — от первого до последнего контент-чанка.
+- Токены: из `usage` API (Z.ai отдаёт в стриме через `stream_options.include_usage`)
+  либо оценка tiktoken `cl100k_base` (поле `tokens_source` различает).
+- Клиентские ITL/tok-s поверх SSE облачного API **не публикуются как TPOT**:
+  провайдер батчирует чанки (замер показал p50 ITL ≈ 0.01 мс — это буферизация,
+  не скорость генерации). Достоверный TPOT измеряется только у локального
+  рунтайма (llama.cpp отдаёт `timings.predicted_per_token_ms`, Ollama — `eval_duration`).
+
+### Результаты (2026-10-22 и 2026-10-23, RAG-промпты демо-пака, 4 промпта × 2–3 повтора, warm-up 1)
+
+| Модель | ttfc p50 | ttfc p95 | первый видимый текст p50 | e2e p50 | Стоимость/вопрос | ok |
+|---|---|---|---|---|---|---|
+| zai:glm-5.3-flash | 3.13–4.60 s | 5.72–7.38 s | 4.13–5.59 s | 6.33–6.84 s | **≈$0.0002** (прайс даты: $0.15/$0.50 за 1M in/out) | 32/32 |
+| zai:glm-4.5-flash | 3.51–6.93 s | 7.67–25.6 s | 3.51–6.93 s | 4.38–11.5 s | $0 (free tier; cost в артефакте — по условному прайсу, пересчитывается из сырого usage) | 32/32 |
+
+Токены всех строк — из `usage` API (поле `tokens_source=usage`), сырой usage
+сохранён в артефактах (`usage_raw`). `finish_reason` фиксируется: единичные
+`length` у длинных ответов (обрезание по лимиту) — не ошибка. Разброс p50
+между днями (ttfc 3.1→4.6 s, e2e 5.2→8.1 s в нагрузке) — вариативность
+провайдера; сравнивать конфигурации корректно только внутри одного прогона.
+
+Замечания:
+- GLM-5.3-flash — «думающая» модель (thinking обязателен): 4.1 s из задержки —
+  скрытый reasoning, который пользователь не видит. «TTFT 2.5–3 s» из README —
+  это именно первый токен генерации (reasoning), не видимый текст.
+- GLM-4.5-flash (заявлен в README как 25–50 s TTFT по замерам 2026-08) в этих
+  прогонах отвечает p50 3.5 s — старые цифры устарели; выброс 12.3 s попал в p95.
+- Стоимость вопроса ≈ $0.0005 сохраняется (2–3 тыс. входных + ~100–300 выходных токенов).
+
+## 3. Нагрузочное тестирование — `benchmarks/load_test.py`
+
+```bash
+# 1) поднять backend
+cd backend && .venv/bin/uvicorn app.main:app --port 8000
+# 2) из второго терминала
+.venv/bin/python benchmarks/load_test.py --levels 1 2 5 10 --requests 8 --model zai:glm-5.3-flash
+.venv/bin/python benchmarks/load_test.py --levels 1 5 --requests 6 --model mock   # без API-ключа
+```
+
+Уровни конкурентности 1/2/5/10 к локальному `/api/chat` (SSE), короткий и
+длинный вопрос, warm-up, метрики: success rate, requests/sec, p50/p95/p99 e2e,
+time-to-first-SSE-событие, оценки токенов (по символам — SSE чата не отдаёт
+usage), ошибки/таймауты. Один Semaphore-воркер = один одновременный запрос к
+провайдеру; ретраев нет (одна попытка, ошибка фиксируется).
+
+### Результаты (2026-10-22, uvicorn локально, демо-пак загружен, 6–8 запросов на уровень)
+
+mock-модель (потолок пайплайна без внешнего API):
+
+| Конкурентность | ok | req/s | e2e p50 | e2e p95 | tok/s (оценка) |
+|---|---|---|---|---|---|
+| 1 | 8/8 | 1.99 | 475 ms | 523 ms | 168 |
+| 2 | 8/8 | 3.49 | 504 ms | 552 ms | 163 |
+| 5 | 8/8 | 6.07 | 604 ms | 673 ms | 169 |
+| 10 | 8/8 | 8.48 | 774 ms | 851 ms | 167 |
+
+zai:glm-5.3-flash (реалистичный сценарий; латентность доминирует провайдером):
+
+| Конкурентность | ok | req/s | e2e p50 | e2e p95 | tok/s (оценка) |
+|---|---|---|---|---|---|
+| 1 | 6/6 | 0.19 | 5.19 s | 6.87 s | 101 |
+| 2 | 6/6 | 0.33 | 5.18 s | 7.94 s | 89 |
+| 5 | 6/6 | 0.54 | 5.61 s | 7.59 s | 102 |
+| 10 | 6/6 | 0.84 | 5.35 s | 6.99 s | 96 |
+
+Выводы: пайплайн приложения масштабируется до 10 параллельных SSE-потоков
+без ошибок; при mock-LLM throughput суб-линеен выше 5 (GIL/эвент-луп), но
+деградация мягкая (p50 +63% при ×10 конкурентности). На облачной модели
+p50 e2e не растёт с конкурентностью — узкое место не приложение, а провайдер.
+
+## 4. Answer evaluation — `benchmarks/answer_eval.py`
+
+```bash
+cd backend
+.venv/bin/python benchmarks/answer_eval.py --model zai:glm-5.3-flash --judge zai:glm-4.5-flash
+.venv/bin/python benchmarks/answer_eval.py --model mock --no-judge
+# оценка готовых ответов локальной модели (кросс-семейный судья — Z.ai):
+.venv/bin/python benchmarks/answer_eval.py --answers-from ../../results/<ts>_local_answers.json --judge zai:glm-5.3-flash
+```
+
+Детерминированные проверки (без LLM, воспроизводимы бит-в-бит):
+- **correctness** — все группы эталонных фактов (`must_contain`, синоним-группы,
+  нормализация регистра/ё) присутствуют в ответе;
+- **citation_validity** — каждая `[n]`-ссылка в диапазоне 1..top_k и ссылка ≥1;
+- **citation_target** — топ-1 retrieval-документ == целевой документ;
+- **refusal_correct** (negative-вопросы) — в ответе нет forbidden-фактов и нет
+  `[n]`-ссылок (цитировать нечего).
+
+LLM-as-judge (субъективная, 1–5): faithfulness / relevance / citations; судья и
+его ограничения фиксируются в результатах. Детерминированные проверки первичны.
+
+### Результаты (2026-10-22)
+
+Облачно: ответы `zai:glm-5.3-flash`, судья `zai:glm-4.5-flash` (same-family —
+завышение вероятно, детерминированные проверки первичны):
+
+| Метрика | Значение |
+|---|---|
+| Correctness (эталонные факты, 12 вопросов) | **100%** |
+| Citation validity (все [n] валидны) | **100%** |
+| Citation target (топ-1 — целевой документ) | **100%** |
+| Refusal: не выдумывает факты (5 negative) | **100%** |
+| Refusal: strict (без единой [n]-ссылки) | 0% — модель перечисляет с цитатами, что «есть вместо» |
+| Judge faithfulness / relevance / citations | 5.0 / 5.0 / 4.53 |
+
+Методологический урок из прогона: первая версия метрики отказа считала провалом
+любую [n]-ссылку в отказе — но честное «в документах этого нет, есть только
+тарифы [1][3]» корректно. Основной критерий отказа — отсутствие выдуманных
+фактов; strict-вариант сохранён отдельным полем.
+
+## 5. Локальный inference runtime — `benchmarks/local_llamacpp.py`
+
+```bash
+# рунтайм и модели (не коммитятся):
+curl -sL -o llama.tar.gz https://github.com/ggml-org/llama.cpp/releases/download/b11826/llama-b11826-bin-macos-arm64.tar.gz
+curl -sL -O https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+curl -sL -O https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-f16.gguf
+
+cd backend
+.venv/bin/python benchmarks/local_llamacpp.py --variants Q4_K_M --bench --quality --ngl 0 --repeats 3
+.venv/bin/python benchmarks/local_llamacpp.py --variants f16 --bench --quality --ngl 0 --repeats 3
+# качество локальных ответов оценивается облачным судьёй (кросс-семейно):
+.venv/bin/python benchmarks/answer_eval.py --answers-from ../../results/<ts>_local_answers_q4_cpu.json --judge zai:glm-5.3-flash
+```
+
+Метрики llama-server (серверные, не клиентские оценки): `prompt_ms`/`prompt_per_token_ms`
+(prefill), `predicted_ms`/`predicted_per_token_ms` (TPOT), плюс wall-clock клиента
+и peak RSS процесса (psutil).
+
+**Ограничение окружения:** Metal на macOS 13.6 падает в GGML-краш при декоде
+(тот же баг, что описан в README проекта для Ollama; официальный бинарник
+llama.cpp b11826 собран под macOS 14+). Эксперимент выполнен на CPU
+(`-ngl 0`, 6 потоков) — медленнее, но воспроизводимо и согласовано с прод-конфигом
+проекта (`OLLAMA_NUM_GPU=0` в `.env`). MLX отпал раньше: pip-пак `mlx` не
+поставляется под macOS 13.6/Python 3.13 (требуются wheels macOS 14+).
+
+## Эксперимент с квантованием
+
+Одна модель — `meta-llama/Llama-3.2-3B-Instruct`, GGUF-форматы одного
+происхождения (bartowski): **Q4_K_M** → **Q8_0** → **F16** (baseline).
+Одинаковые промпты (RAG-контекст демо-пака), одинаковый рунтайм и флаги
+(llama.cpp b11826, CPU `-ngl 0`, 6 потоков, ctx 4096, temp 0.2, max_tokens 256,
+warm-up, 3 повтора на промпт); сравниваются серверные prefill/TPOT, wall-clock,
+память (размер файла + RSS процесса) и качество на `golden_answers`.
+
+### Скорость и память (Apple M1 Pro, CPU `-ngl 0`; v2-прогоны 2026-10-23)
+
+| Вариант | Файл | Cold start | RSS | Prefill steady p50 | **TPOT p50 (p95)** | Wall p50 | Завершения | Ошибок |
+|---|---|---|---|---|---|---|---|---|
+| **Q4_K_M** | 1.88 GB | 8.5 s | 3.4 GB | 35 ms | **39.8 ms/tok** (148) | 8.1 s | stop/length | 0/12 |
+| Q8_0 | 3.19 GB | 14.7 s | 4.8 GB | 55 ms | 87.8 ms/tok (216) | 13.4 s | stop/length | 0/12 |
+| F16 | 5.99 GB | 8.5 s | — | 22 019 ms | **9 102 ms/tok** (9 286) | 214 s | 2/4 таймаутов | 2 |
+
+Cold start = от старта процесса llama-server до `/health=ok` (загрузка весов).
+`length` в «Завершениях» — честная фиксация обрезания по лимиту 256 токенов
+(длинные сравнительные ответы не помещаются; не ошибка). Системный swap во
+время прогонов 23–26 GB (фон от предыдущих экспериментов) — фиксируется в
+каждом артефакте (`swap_used_mb_after`).
+
+**F16 непригоден на этой машине — результат воспроизведён дважды** (TPOT
+8 362 и 9 102 ms/tok, таймауты): 6 GB весов + KV-cache не помещаются в
+свободную память 16 GB Mac, каждый токен генерации обслуживается своп-пейджингом.
+Это окружение-специфичный вывод: на GPU-машине с 24+ GB VRAM тот же F16 —
+нормальный baseline. Переносить числа нельзя.
+
+### Качество (детерминированные проверки + судья Z.ai GLM-5.3-flash, кросс-семейный)
+
+| Метрика | Q4_K_M | Q8_0 | GLM-5.3-flash (облако) |
+|---|---|---|---|
+| Correctness (12 вопр.) | **100%** | **100%** | **100%** |
+| Citation validity | 16.7% | 16.7% | **100%** |
+| Citation target (топ-1) | 100% | 100% | 100% |
+| Refusal: не выдумывает (5 вопр.) | **100%** | **100%** | **100%** |
+| Judge: faithfulness / relevance / citations | 4.88 / 4.88 / 1.35 | 5.0 / 4.76 / 1.47 | 5.0 / 5.0 / 4.53 |
+
+Q4_K_M против Q8_0: качество идентично по всем детерминированным метрикам и
+по судье; TPOT 1× против 2.2× и память 3.4 GB против 4.8 GB → Q4_K_M —
+единственный рациональный выбор на этом железе. Потеря цитат — свойство 3B
+(у обоих вариантов одинаково; судья режет за формат, не за факты), а не
+квантования.
+
+### Prefix caching (llama.cpp cache_prompt, одна переменная)
+
+Сценарий: три запроса подряд с одним длинным RAG-префиксом (`~700` токенов),
+меняется только вопрос; «cache-hit» — третий запрос (префикс уже в KV-кэше
+слота), «unique» — свежий контекст. 3 повтора.
+
+| Модель | Prefill unique p50 | Prefill cache-hit p50 | Эффект |
+|---|---|---|---|
+| Q4_K_M | 231 ms | 500 ms | **хуже** (+116%) |
+| Q8_0 | 212 ms | 159 ms | лучше (−25%) |
+
+Вывод: на CPU с prefill ~0.05 ms/токен выигрыш от переиспользования KV-кэша
+мал и неустойчив (поиск общего префикса и копирование KV сопоставимы по
+стоимости с пересчётом). Механизм в llama.cpp поддерживается, но в этих
+условиях пользы не даёт. На GPU с длинными контекстами поведение иное —
+**не проверено** (нет GPU), переносить вывод нельзя.
+
+### Speculative decoding (llama.cpp, draft = Llama-3.2-1B-Instruct Q4_K_M, spec-draft-n-max=8)
+
+Одна переменная: та же Q4_K_M, те же промпты и параметры, добавлен draft.
+Результат — см. results/ (`*_q4_specdec*`) и таблицу ниже (заполняется по
+факту прогона).
+
+## GPU-инференс (vLLM/SGLang): не выполнен, сценарий подготовлен
+
+**Проверка оборудования (2026-10-23):** `system_profiler SPDisplaysDataType`
+— только Apple M1 Pro (14 GPU-ядер, Metal 3); NVIDIA GPU отсутствует;
+`nvidia-smi` — команда не найдена; CUDA недоступна. Metal-бэкенд llama.cpp
+падает на macOS 13.6 (см. выше), MLX не поставляется под эту ОС.
+**GPU-бенчмарк не выполнялся — никаких GPU-цифр в проекте нет.**
+
+Подготовлен воспроизводимый сценарий `backend/benchmarks/gpu_vllm.py`
+(импорт проверен, запуск требует NVIDIA GPU и не производился):
+
+```bash
+# на GPU-машине (CUDA 12.x, драйвер + nvidia-smi):
+pip install vllm psutil
+python -m vllm.entrypoints.openai.api_server \
+    --model meta-llama/Llama-3.2-3B-Instruct --max-model-len 8192 \
+    --gpu-memory-utilization 0.85 --port 8001
+# затем из backend/ этого репозитория:
+.venv/bin/python benchmarks/gpu_vllm.py --base-url http://localhost:8001/v1 \
+    --model meta-llama/Llama-3.2-3B-Instruct --levels 1 2 4 8 --requests 16
+```
+
+Сценарий переиспользует те же golden-промпты и метрики, что и CPU-прогоны
+(TTFT/TPOT/ITL/e2e из стрима vLLM — который шлёт по чанку на токен, поэтому
+клиентский ITL там достоверен), плюс опрос `nvidia-smi` (GPU utilization,
+VRAM) и фиксацию OOM/таймаутов. Непроверенные части: совместимость версий
+vLLM, фактические числа, поведение KV-cache при росте конкурентности,
+влияние `gpu-memory-utilization` на пиковую VRAM. SGLang остаётся вторым
+этапом и тоже не запускался.
+
+## Специализированные оптимизации: prefix caching и speculative decoding
+
+Оба механизма llama.cpp **проверены реальными прогонами** на CPU (см.
+раздел «Эксперимент с квантованием» выше):
+
+- **Prefix caching**: поддерживается (`cache_prompt`), но на этом железе
+  выигрыша нет — prefill CPU слишком быстрый, восстановление KV-кэша стоит
+  сопоставимо с пересчётом (Q4: −, Q8: −25%, выборка n=3 — маленькая).
+- **Speculative decoding**: поддержан (`-md` + `--spec-draft-n-max`),
+  прогон Q4_K_M + 1B draft — см. results/ и таблицу ниже.
+
+FP8/GPTQ/AWQ, MTP и кастомные logit processors не проверялись: требуют
+GPU-инференса и соответствующих форматов весов.
+
+## Воспроизводимость
+
+- Каждый прогон пишет JSON с датой (UTC), git-коммитом, точной командой
+  запуска (`command`), параметрами и сырыми по-запросными рядами; CSV — для
+  таблиц и ручного разбора. Старые прогоны не перезаписываются (timestamp в имени).
+- Индекс демо-пака пересобирается с нуля на каждый запуск (`backend/data/eval`).
+- API-ключи не сохраняются в результатах (только имя модели/провайдера).
+- Аудит цифр: каждая цифра документации сверяется с JSON-артефактом
+  (см. docs/report-mws-ai.md, раздел «Аудит»).

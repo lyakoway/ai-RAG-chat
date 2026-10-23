@@ -21,3 +21,8 @@ frontend/dist/
 # Editor
 .vscode/
 .idea/
+
+# Benchmark artifacts: локальные модели/рунтаймы (не коммитятся, см. docs/benchmark.md)
+backend/benchmarks/.models/
+backend/benchmarks/.llama-cpp/
+backend/benchmarks/.mlx-venv/

@@ -1,0 +1,50 @@
+{
+  "name": "golden-answers-v1",
+  "description": "Набор для evaluation конечных ответов RAG: reference facts (детерминированные проверки), negative queries (проверка честного отказа) и промпты для LLM benchmark. Составлен по первоисточникам backend/scripts/make_samples.py (содержимое демо-документов).",
+  "corpus": "backend/samples (6 files)",
+  "fact_source": "backend/scripts/make_samples.py — единственный источник содержимого демо-документов",
+  "answer_queries": [
+    {"id": "a1", "q": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?", "doc": "Политика_удалённой_работы.docx", "lang": "ru", "category": "numeric",
+     "must_contain": [["28"]], "should_contain": ["календар"], "context_size": "short"},
+    {"id": "a2", "q": "Какая компенсация за интернет положена удалённым сотрудникам?", "doc": "Политика_удалённой_работы.docx", "lang": "ru", "category": "numeric",
+     "must_contain": [["3000"], ["руб", "RUB", "₽"]], "should_contain": ["мес"], "context_size": "short"},
+    {"id": "a3", "q": "В какие часы сотрудник должен быть на связи онлайн?", "doc": "Политика_удалённой_работы.docx", "lang": "ru", "category": "numeric",
+     "must_contain": [["11:00"], ["16:00"]], "should_contain": [], "context_size": "short"},
+    {"id": "a4", "q": "Сколько стоит тариф Бизнес и сколько пользователей в него включено?", "doc": "Тарифы_и_скидки.xlsx", "lang": "ru", "category": "numeric",
+     "must_contain": [["2990"], ["25"]], "should_contain": [], "context_size": "short"},
+    {"id": "a5", "q": "Какая скидка даётся при оплате за год?", "doc": "Тарифы_и_скидки.xlsx", "lang": "ru", "category": "numeric",
+     "must_contain": [["20"]], "should_contain": ["%"], "context_size": "short"},
+    {"id": "a6", "q": "Какие форматы файлов поддерживает импорт данных и какой максимальный размер файла?", "doc": "Руководство_пользователя.pdf", "lang": "ru", "category": "fact",
+     "must_contain": [["CSV"], ["XLSX"], ["50"]], "should_contain": ["МБ", "MB"], "context_size": "short"},
+    {"id": "a7", "q": "How many vacation days does the Remote Work Policy grant, and how far in advance must the request be submitted?", "doc": "Remote_Work_Policy.docx", "lang": "en", "category": "numeric",
+     "must_contain": [["28"], ["14"]], "should_contain": ["day"], "context_size": "short"},
+    {"id": "a8", "q": "After how many minutes of inactivity does the session end, and who can export data?", "doc": "User_Guide.pdf", "lang": "en", "category": "numeric",
+     "must_contain": [["30"], ["administrator"]], "should_contain": [], "context_size": "short"},
+    {"id": "a9", "q": "Сравни тарифы Старт и Бизнес: цена, число пользователей и поддержка.", "doc": "Тарифы_и_скидки.xlsx", "lang": "ru", "category": "paraphrase",
+     "must_contain": [["990"], ["2990"], ["5"], ["25"]], "should_contain": ["Email"], "context_size": "short"},
+    {"id": "a10", "q": "Кто согласовывает полностью удалённый формат работы и что компания предоставляет для работы из дома?", "doc": "Политика_удалённой_работы.docx", "lang": "ru", "category": "paraphrase",
+     "must_contain": [["директор", "Директор"], ["ноутбук"]], "should_contain": [], "context_size": "short"},
+    {"id": "a11", "q": "Мы — некоммерческая организация из 40 человек, оплачиваем год сразу. Какие условия для нас доступны и сколько это будет стоить на тарифе Корпоративный до скидки?", "doc": "Тарифы_и_скидки.xlsx", "lang": "ru", "category": "paraphrase",
+     "must_contain": [["30"], ["9990"]], "should_contain": ["20%"], "context_size": "long"},
+    {"id": "a12", "q": "Как включить двухфакторную аутентификацию, какие требования к паролю и где увидеть ошибки импорта?", "doc": "Руководство_пользователя.pdf", "lang": "ru", "category": "long",
+     "must_contain": [["настройк"], ["8"]], "should_contain": ["журнал"], "context_size": "long"}
+  ],
+  "negative_queries": [
+    {"id": "n1", "q": "Как оформить больничный лист и в какой срок его нужно сдать в HR?", "lang": "ru", "category": "refusal",
+     "forbidden_terms": ["28", "3000", "2990", "990"]},
+    {"id": "n2", "q": "Какая у компании выручка за прошлый год?", "lang": "ru", "category": "refusal",
+     "forbidden_terms": ["990", "2990", "9990", "3000"]},
+    {"id": "n3", "q": "Does the company offer visa sponsorship for relocation to the Netherlands?", "lang": "en", "category": "refusal",
+     "forbidden_terms": ["28", "3000", "11:00"]},
+    {"id": "n4", "q": "Какой кофе-машиной оборудована кухня офиса?", "lang": "ru", "category": "refusal",
+     "forbidden_terms": ["990", "2990", "9990"]},
+    {"id": "n5", "q": "Что говорится в документах о страховании животных сотрудников?", "lang": "ru", "category": "refusal",
+     "forbidden_terms": ["28", "3000", "990"]}
+  ],
+  "benchmark_prompts": [
+    {"id": "p1", "name": "short-context-ru", "q": "Сколько дней отпуска положено сотруднику?", "doc_hint": "Политика_удалённой_работы.docx", "target_answer_tokens": 60},
+    {"id": "p2", "name": "short-context-en", "q": "What is the price of the Business plan?", "doc_hint": "Pricing_and_Discounts.xlsx", "target_answer_tokens": 60},
+    {"id": "p3", "name": "long-context-ru", "q": "Подробно: условия удалённой работы, оборудование, отпуск и компенсации.", "doc_hint": "Политика_удалённой_работы.docx", "target_answer_tokens": 200},
+    {"id": "p4", "name": "long-context-en", "q": "Describe in detail the pricing plans, discounts and support levels.", "doc_hint": "Pricing_and_Discounts.xlsx", "target_answer_tokens": 200}
+  ]
+}

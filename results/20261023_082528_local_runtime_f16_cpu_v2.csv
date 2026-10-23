@@ -1,0 +1,5 @@
+answer,finish_reason,server_prompt_ms,server_prompt_per_token_ms,server_predicted_ms,server_tpot_ms,prompt_tokens,completion_tokens,output_tokens_per_sec_gen,ok,error,wall_ms,variant,prompt_name,repeat,model_size_gb,peak_rss_mb,is_first_request
+Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.,stop,22615.321,30.234386363636364,223360.39,9306.682916666667,748,25,0.1,True,,246037.5,f16,short-context-ru,0,5.99,3569.6,True
+The price of the Business plan is 2990 RUB/mo. [1],stop,21422.373,39.09192153284671,160160.012,8897.778444444444,575,19,0.1,True,,181767.1,f16,short-context-en,0,5.99,3569.6,False
+,,,,,,,,,False,timed out,600070.7,f16,long-context-ru,0,5.99,3569.6,False
+,,,,,,,,,False,timed out,600131.5,f16,long-context-en,0,5.99,3569.6,False

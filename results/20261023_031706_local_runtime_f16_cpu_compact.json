@@ -1,0 +1,106 @@
+{
+  "benchmark": "local_runtime_llamacpp",
+  "date_utc": "2026-10-23T00:17:06+00:00",
+  "git_commit": "af22c4b",
+  "runtime": "llama.cpp b11826 (llama-server), ngl=0, ctx=2048, threads=6",
+  "model": "meta-llama/Llama-3.2-3B-Instruct (GGUF, bartowski)",
+  "hardware": "Apple M1 Pro 8-core, 16 GB unified, macOS 13.6",
+  "max_tokens": 96,
+  "repeats": 1,
+  "per_variant": {
+    "f16": {
+      "model_file": "Llama-3.2-3B-Instruct-f16.gguf",
+      "model_size_gb": 5.99,
+      "peak_rss_mb_after_warmup": 3179.0,
+      "prefill_ms": {
+        "n": 2,
+        "mean_ms": 20647.32,
+        "stdev_ms": 85.13,
+        "min_ms": 20587.12,
+        "p50_ms": 20647.32,
+        "p95_ms": 20701.5,
+        "p99_ms": 20706.31,
+        "max_ms": 20707.52
+      },
+      "tpot_ms": {
+        "n": 2,
+        "mean_ms": 8513.77,
+        "stdev_ms": 214.68,
+        "min_ms": 8361.97,
+        "p50_ms": 8513.77,
+        "p95_ms": 8650.4,
+        "p99_ms": 8662.54,
+        "max_ms": 8665.58
+      },
+      "wall_ms": {
+        "n": 2,
+        "mean_ms": 199977.55,
+        "stdev_ms": 40686.85,
+        "min_ms": 171207.6,
+        "p50_ms": 199977.55,
+        "p95_ms": 225870.51,
+        "p99_ms": 228172.1,
+        "max_ms": 228747.5
+      },
+      "n_errors": 2
+    }
+  },
+  "rows": [
+    {
+      "answer": "Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.",
+      "server_prompt_ms": 20707.517,
+      "server_prompt_per_token_ms": 27.683846256684493,
+      "server_predicted_ms": 207973.867,
+      "server_tpot_ms": 8665.577791666667,
+      "prompt_tokens": 748,
+      "completion_tokens": 25,
+      "ok": true,
+      "error": null,
+      "wall_ms": 228747.5,
+      "variant": "f16",
+      "prompt_name": "short-context-ru",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3179.0
+    },
+    {
+      "answer": "The price of the Business plan is 2990 RUB/mo. [1]",
+      "server_prompt_ms": 20587.118,
+      "server_prompt_per_token_ms": 37.56773357664233,
+      "server_predicted_ms": 150515.495,
+      "server_tpot_ms": 8361.971944444444,
+      "prompt_tokens": 575,
+      "completion_tokens": 19,
+      "ok": true,
+      "error": null,
+      "wall_ms": 171207.6,
+      "variant": "f16",
+      "prompt_name": "short-context-en",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3179.0
+    },
+    {
+      "ok": false,
+      "error": "timed out",
+      "answer": "",
+      "wall_ms": 600044.9,
+      "variant": "f16",
+      "prompt_name": "long-context-ru",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3179.0
+    },
+    {
+      "ok": false,
+      "error": "timed out",
+      "answer": "",
+      "wall_ms": 600055.4,
+      "variant": "f16",
+      "prompt_name": "long-context-en",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3179.0
+    }
+  ]
+}

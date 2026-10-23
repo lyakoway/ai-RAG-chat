@@ -1,0 +1,279 @@
+{
+  "benchmark": "local_answers_for_eval",
+  "date_utc": "2026-10-22T20:32:48+00:00",
+  "runtime": "llama.cpp b11826, ngl=0, ctx=4096",
+  "rows": [
+    {
+      "question_id": "a1",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "Ежегодный оплачиваемый отпуск длится 28 календарных дней.",
+      "gen_ms": 7079.6
+    },
+    {
+      "question_id": "a2",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Какая компенсация за интернет положена удалённым сотрудникам?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "Компания компенсирует до 3000 руб./мес. на интернет. Заявка на компенсацию подаётся через портал до 5 числа месяца.",
+      "gen_ms": 14099.1
+    },
+    {
+      "question_id": "a3",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "В какие часы сотрудник должен быть на связи онлайн?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf"
+      ],
+      "answer": "Сотрудник должен быть доступен в корпоративном мессенджере с 11:00 до 16:00.",
+      "gen_ms": 11203.6
+    },
+    {
+      "question_id": "a4",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Сколько стоит тариф Бизнес и сколько пользователей в него включено?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "answer": "Тариф Бизнес стоит 2990 руб/мес, а в него включено 25 пользователей.",
+      "gen_ms": 8477.7
+    },
+    {
+      "question_id": "a5",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Какая скидка даётся при оплате за год?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "Скидка 20%.",
+      "gen_ms": 5510.1
+    },
+    {
+      "question_id": "a6",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Какие форматы файлов поддерживает импорт данных и какой максимальный размер файла?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf"
+      ],
+      "answer": "Форматы файлов, поддерживаемые импортом данных, — это CSV и XLSX. Максимальный размер файла до 50 МБ.",
+      "gen_ms": 8422.8
+    },
+    {
+      "question_id": "a7",
+      "kind": "answer",
+      "lang": "en",
+      "question": "How many vacation days does the Remote Work Policy grant, and how far in advance must the request be submitted?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "answer": "According to the Remote Work Policy [1], the company grants 28 calendar days of annual paid leave. The request must be submitted at least 14 days before the vacation starts.",
+      "gen_ms": 7935.4
+    },
+    {
+      "question_id": "a8",
+      "kind": "answer",
+      "lang": "en",
+      "question": "After how many minutes of inactivity does the session end, and who can export data?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "answer": "According to the provided documents, the session ends automatically after 30 minutes of inactivity. Data export is available to administrators only. [1], [5]",
+      "gen_ms": 8593.0
+    },
+    {
+      "question_id": "a9",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Сравни тарифы Старт и Бизнес: цена, число пользователей и поддержка.",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "Цена: \n- Старт: 990 руб/мес\n- Бизнес: 2990 руб/мес\n\nЧисло пользователей: \n- Старт: 5\n- Бизнес: 25\n\nСоответствующая поддержка: \n- Старт: Email\n- Бизнес: Email + чат",
+      "gen_ms": 12238.4
+    },
+    {
+      "question_id": "a10",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Кто согласовывает полностью удалённый формат работы и что компания предоставляет для работы из дома?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "Согласовывать полностью удалённый формат работы согласуется с директором департамента. \n\nКомпания предоставляет ноутбук и компенсирует до 3000 руб./мес. на интернет.",
+      "gen_ms": 6319.7
+    },
+    {
+      "question_id": "a11",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Мы — некоммерческая организация из 40 человек, оплачиваем год сразу. Какие условия для нас доступны и сколько это будет стоить на тарифе Корпоративный до скидки?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "answer": "По предоставленной информации, как некоммерческая организация, у вас доступен тариф \"Корпоративный\" с скидкой 30%. \n\nЦена тарифа \"Корпоративный\" составляет 9990 руб/мес. Скидка 30% составляет 2997 руб. (9990 * 0,3). \n\nИтак, стоимость тарифа \"Корпоративный\" для вас составит 6993 руб/мес.",
+      "gen_ms": 13189.4
+    },
+    {
+      "question_id": "a12",
+      "kind": "answer",
+      "lang": "ru",
+      "question": "Как включить двухфакторную аутентификацию, какие требования к паролю и где увидеть ошибки импорта?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf"
+      ],
+      "answer": "Чтобы включить двухфакторную аутентификацию, необходимо выполнить следующие действия:\n\n- Включите двухфакторную аутентификацию в настройках.\n\nТребования к паролю: пароль должен содержать не менее 8 символов.\n\nОшибки импорта отображаются в журнале операций.",
+      "gen_ms": 14964.9
+    },
+    {
+      "question_id": "n1",
+      "kind": "refusal",
+      "lang": "ru",
+      "question": "Как оформить больничный лист и в какой срок его нужно сдать в HR?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "По предоставленной информации не указано, как оформить больничный лист, но указано, что заявление на отпуск подаётся не позднее чем за 14 дней до начала отпуска.",
+      "gen_ms": 9783.7
+    },
+    {
+      "question_id": "n2",
+      "kind": "refusal",
+      "lang": "ru",
+      "question": "Какая у компании выручка за прошлый год?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "Из предоставленной информации не получается информации о выручке компании за прошлый год.",
+      "gen_ms": 7898.5
+    },
+    {
+      "question_id": "n3",
+      "kind": "refusal",
+      "lang": "en",
+      "question": "Does the company offer visa sponsorship for relocation to the Netherlands?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "I couldn't find any information in the provided documents about the company offering visa sponsorship for relocation to the Netherlands.",
+      "gen_ms": 6152.2
+    },
+    {
+      "question_id": "n4",
+      "kind": "refusal",
+      "lang": "ru",
+      "question": "Какой кофе-машиной оборудована кухня офиса?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "В предоставленной информации нет информации о оборудовании кухни офиса.",
+      "gen_ms": 7024.7
+    },
+    {
+      "question_id": "n5",
+      "kind": "refusal",
+      "lang": "ru",
+      "question": "Что говорится в документах о страховании животных сотрудников?",
+      "variant": "Q8_0",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "В предоставленных документах нет информации о страховании животных сотрудников.",
+      "gen_ms": 9449.3
+    }
+  ]
+}

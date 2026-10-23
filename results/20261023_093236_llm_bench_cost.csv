@@ -1,0 +1,152 @@
+retries,finish_reason,time_to_first_chunk_ms,time_to_first_content_ms,stream_ms,total_ms,chunks,reasoning,itl_ms_p50,itl_ms_p95,in_tokens,out_tokens,tokens_source,output_tokens_per_sec_stream,answer,answer_chars,ok,error,model_id,provider,model,prompt_name,prompt_id,mode,max_tokens,temperature,context_size,prompt_tokens_client_est,cost_usd,is_warmup,retrieval_ms,e2e_with_retrieval_ms
+0,stop,2105.3,2105.3,0.1,2105.7,8,,0.01,0.01,686,9,usage,140809.8,28 календарных дней [1].,24,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,short-context-ru,p1,rag,512,0.2,short,866,,False,27.61,2133.3
+0,stop,1727.0,1727.0,0.1,1727.9,8,,0.01,0.02,686,9,usage,97781.4,28 календарных дней [1].,24,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,short-context-ru,p1,rag,512,0.2,short,866,,False,105.75,1833.7
+0,stop,2822.9,2822.9,0.8,2825.0,18,,0.01,0.15,553,19,usage,23229.8,"The price of the Business plan is 2,990 RUB/month [1].",54,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,short-context-en,p2,rag,512,0.2,short,541,,False,21.98,2847.0
+0,stop,2020.3,2020.3,0.7,2021.6,18,,0.01,0.12,553,19,usage,26294.5,The price of the Business plan is 2990 RUB/mo [1].,50,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,short-context-en,p2,rag,512,0.2,short,541,,False,31.19,2052.8
+0,stop,8484.5,8484.5,4802.9,13288.5,231,,0.01,0.07,697,232,usage,48.3,"Условия удалённой работы, оборудование, отпуск и компенсации описаны в документе ""Политика удалённой работы.docx"" [1]:
+
+1. **Условия удалённой работы**:
+   - Сотрудники могут работать удалённо до 3 дней в неделю по согласованию с руководителем.
+   - Полностью удалённый формат работы согласуется с директором департамента [1].
+
+2. **Оборудование**:
+   - Компания предоставляет ноутбук.
+   - Компенсация интернета до 3000 руб./мес.
+   - Заявка на компенсацию подаётся через портал до 5 числа месяца [1].
+
+3. **Отпуск**:
+   - Ежегодный оплачиваемый отпуск — 28 календарных дней.
+   - Заявление подаётся не позднее чем за 14 дней до начала отпуска [1].
+
+4. **Компенсации**:
+   - Компенсация интернета до 3000 руб./мес. (подробности выше) [1].",739,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,long-context-ru,p3,rag,512,0.2,short,931,,False,66.64,13355.1
+0,stop,6632.9,6632.9,4687.8,11323.4,221,,0.01,0.38,697,222,usage,47.4,"Условия удалённой работы, оборудование, отпуск и компенсации описаны в документе «Политика удалённой работы» [1]:
+
+1. **Условия удалённой работы**:
+   - Сотрудники могут работать удалённо до 3 дней в неделю по согласованию с руководителем.
+   - Полностью удалённый формат работы согласуется с директором департамента [1].
+
+2. **Оборудование**:
+   - Компания предоставляет ноутбук.
+   - Компенсация интернета — до 3000 руб./мес. Заявка подаётся через портал до 5 числа месяца [1].
+
+3. **Отпуск**:
+   - Ежегодный оплачиваемый отпуск — 28 календарных дней.
+   - Заявление подаётся не позднее чем за 14 дней до начала отпуска [1].
+
+4. **Компенсации**:
+   - Указана компенсация интернета (до 3000 руб./мес.) [1].",707,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,long-context-ru,p3,rag,512,0.2,short,931,,False,34.17,11357.6
+0,stop,25986.1,25986.1,2055.4,28042.6,134,,0.01,0.09,556,135,usage,65.7,"Based on the provided context, here are the pricing plans, discounts, and support levels:
+
+**Pricing Plans:**
+- **Start Plan**: 990 RUB/month for 5 users [1].
+- **Business Plan**: 2990 RUB/month for 25 users [1].
+- **Enterprise Plan**: 9990 RUB/month for an unlimited number of users [1].
+
+**Discounts:**
+No information about discounts is provided in the context.
+
+**Support Levels:**
+- **Start Plan**: Email support [1].
+- **Business Plan**: Email and chat support [1].
+- **Enterprise Plan**: Dedicated manager support [1].",524,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,long-context-en,p4,rag,512,0.2,short,544,,False,94.65,28137.2
+0,stop,6793.4,6793.4,1804.1,8598.5,134,,0.01,0.16,556,135,usage,74.8,"Based on the provided documents, here are the pricing plans, discounts, and support levels:
+
+**Pricing Plans:**
+- **Start Plan**: 990 RUB/month for 5 users [1].
+- **Business Plan**: 2990 RUB/month for 25 users [1].
+- **Enterprise Plan**: 9990 RUB/month for an unlimited number of users [1].
+
+**Discounts:**
+No information about discounts is provided in the context.
+
+**Support Levels:**
+- **Start Plan**: Email support [1].
+- **Business Plan**: Email and chat support [1].
+- **Enterprise Plan**: Dedicated manager support [1].",526,True,,zai:glm-4.5-flash,zai,glm-4.5-flash,long-context-en,p4,rag,512,0.2,short,544,,False,135.3,8733.8
+0,stop,4655.3,5540.6,5.6,5547.1,44,"{'reasoning_chunks': 97, 'reasoning_ms_first_to_last': 885.3}",0.01,0.31,688,146,usage,25970.0,Сотруднику положено **28 календарных дней** ежегодного оплачиваемого отпуска [1]. Заявление на отпуск нужно подать не позднее чем за 14 дней до его начала [1].,159,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,short-context-ru,p1,rag,512,0.2,short,866,,False,44.22,5591.3
+0,stop,4176.1,4180.4,323.8,4518.3,49,"{'reasoning_chunks': 51, 'reasoning_ms_first_to_last': 4.3}",0.01,0.48,688,102,usage,315.1,Сотруднику положен ежегодный оплачиваемый отпуск — **28 календарных дней** [1][2]. Заявление на отпуск необходимо подать не позднее чем за 14 дней до его начала [1][2].,168,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,short-context-ru,p1,rag,512,0.2,short,866,,False,125.8,4644.1
+0,stop,4541.4,4541.6,0.1,4542.3,26,"{'reasoning_chunks': 26, 'reasoning_ms_first_to_last': 0.2}",0.01,0.01,555,55,usage,407407.5,"The Business plan costs **2,990 RUB/month**. It includes 25 users and Email + chat support [1].",95,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,short-context-en,p2,rag,512,0.2,short,541,,False,37.99,4580.3
+0,stop,3358.0,3361.4,3.4,3365.6,26,"{'reasoning_chunks': 28, 'reasoning_ms_first_to_last': 3.4}",0.01,0.01,555,57,usage,16810.4,"The Business plan costs **2,990 RUB/month**. It includes 25 users and Email + chat support [1].",95,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,short-context-en,p2,rag,512,0.2,short,541,,False,128.46,3494.1
+0,stop,3657.5,6186.3,2282.1,8469.9,217,"{'reasoning_chunks': 169, 'reasoning_ms_first_to_last': 2528.8}",0.01,0.16,699,388,usage,170.0,"По политике удалённой работы [1]:
+
+**Условия удалённой работы**
+- До 3 дней в неделю — по согласованию с непосредственным руководителем.
+- Полностью удалённый формат — по согласованию с директором департамента.
+- Рабочий день — 8 часов.
+- Обязательные часы присутствия онлайн — с 11:00 до 16:00; в это время сотрудник должен быть доступен в корпоративном мессенджере.
+
+**Оборудование**
+- Компания предоставляет ноутбук.
+
+**Компенсации**
+- Компенсация интернета — до 3000 руб./мес.
+- Заявка на компенсацию подаётся через портал до 5 числа месяца.
+
+**Отпуск**
+- Ежегодный оплачиваемый отпуск — 28 календарных дней.
+- Заявление подаётся не позднее чем за 14 дней до начала отпуска.
+
+Источник: Политика удалённой работы [1].",720,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,long-context-ru,p3,rag,512,0.2,short,931,,False,65.32,8535.2
+0,length,3690.9,6481.4,4676.5,11159.3,294,"{'reasoning_chunks': 215, 'reasoning_ms_first_to_last': 2790.4}",0.01,0.27,699,512,usage,109.5,"# Условия удалённой работы, оборудование, отпуск и компенсации
+
+Вся информация содержится в документе «Политика удалённой работы» [1].
+
+## 1. Условия удалённой работы
+
+- **Гибридный формат:** до **3 дней в неделю** удалённо — по согласованию с непосредственным руководителем.
+- **Полностью удалённая работа** — согласуется с директором департамента.
+- **Рабочее время:** рабочий день длится **8 часов**.
+- **Обязательные часы онлайн:** с **11:00 до 16:00** — в это время сотрудник должен быть доступен в корпоративном мессенджере [1].
+
+## 2. Оборудование
+
+- Компания предоставляет сотруднику **ноутбук** [1].
+
+## 3. Компенсации
+
+- Компенсация **интернета — до 3000 руб./мес.**
+- Заявка на компенсацию подаётся **через портал до 5 числа месяца** [1].
+
+## 4. Отпуск
+
+- Ежегодный оплачиваемый отпуск — **28 календарных дней**.
+- Заявление на отпуск подаётся **не позднее чем за 14 дней** до его начала [1].
+
+---
+
+*Источник: [1] Политика_удалён",940,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,long-context-ru,p3,rag,512,0.2,short,931,,False,30.2,11189.5
+0,stop,3259.5,6156.6,1975.1,8133.3,165,"{'reasoning_chunks': 179, 'reasoning_ms_first_to_last': 2897.1}",0.01,0.89,558,349,usage,176.7,"## Pricing Plans [1]
+
+| Plan | Price (RUB/mo) | Users | Support |
+|------|----------------|-------|---------|
+| **Start** | 990 | 5 | Email |
+| **Business** | 2,990 | 25 | Email + chat |
+| **Enterprise** | 9,990 | Unlimited | Dedicated manager |
+
+## Support Levels [1]
+
+- **Start** — basic support via email only.
+- **Business** — email plus chat support.
+- **Enterprise** — a dedicated manager is assigned to the customer.
+
+## Discounts
+
+Although the source file is named ""Pricing_and_Discounts,"" the provided fragment (page 1) contains only the pricing table — **no discount details are given in the available context**, so I cannot describe any discount terms.",663,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,long-context-en,p4,rag,512,0.2,short,544,,False,91.09,8224.4
+0,stop,4419.6,5932.9,2979.5,8914.0,186,"{'reasoning_chunks': 142, 'reasoning_ms_first_to_last': 1513.3}",0.01,0.25,558,330,usage,110.8,"## Pricing Plans and Support Levels
+
+Based on the available documents, here is the pricing information [1]:
+
+| Plan | Price (RUB/month) | Users | Support Level |
+|------|------------------|-------|---------------|
+| **Start** | 990 | 5 | Email |
+| **Business** | 2,990 | 25 | Email + chat |
+| **Enterprise** | 9,990 | Unlimited | Dedicated manager |
+
+### Support Levels
+- **Start plan:** Basic support via email only.
+- **Business plan:** Enhanced support via email and chat.
+- **Enterprise plan:** Premium support with a dedicated manager.
+
+### Discounts
+⚠️ Although the source file is named ""Pricing_and_Discounts.xlsx,"" the provided fragment contains **no information about discounts** — only plan prices, user limits, and support levels. I could not find any discount details in the provided documents.",806,True,,zai:glm-5.3-flash,zai,glm-5.3-flash,long-context-en,p4,rag,512,0.2,short,544,,False,102.74,9016.7

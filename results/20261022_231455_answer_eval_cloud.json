@@ -1,0 +1,615 @@
+{
+  "benchmark": "answer_eval",
+  "date_utc": "2026-10-22T20:14:54+00:00",
+  "git_commit": "af22c4b",
+  "answer_model": "zai:glm-5.3-flash",
+  "judge_model": "zai:glm-4.5-flash",
+  "judge_note": "LLM-as-judge субъективен; same-family судья склонен к завышению. Детерминированные проверки — первичны.",
+  "deterministic_definitions": {
+    "correctness": "все группы must_contain (хотя бы один синоним из группы) в ответе",
+    "citation_validity": "все [n] в диапазоне 1..top_k и их ≥1",
+    "citation_target": "топ-1 retrieval-документ == целевой документ",
+    "refusal_correct": "нет forbidden_terms и нет [n]-ссылок"
+  },
+  "aggregates": {
+    "n_answer_questions": 12,
+    "correctness_rate": 0.8333,
+    "citation_validity_rate": 1.0,
+    "citation_target_top1_rate": 1.0,
+    "n_refusal_questions": 5,
+    "refusal_correctness_rate": 0.2,
+    "n_judged": 17,
+    "judge_faithfulness_avg": 5.0,
+    "judge_relevance_avg": 5.0,
+    "judge_citations_avg": 4.29,
+    "judge_failed_or_skipped": 0
+  },
+  "rows": [
+    {
+      "question_id": "a1",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "Ежегодный оплачиваемый отпуск составляет **28 календарных дней**. Заявление нужно подать не позднее чем за 14 дней до начала отпуска [1].",
+      "answer_chars": 137,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a2",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Какая компенсация за интернет положена удалённым сотрудникам?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "Компания компенсирует удалённым сотрудникам расходы на интернет **до 3000 руб./мес.** Заявку на компенсацию нужно подать через портал не позднее 5 числа месяца [1].",
+      "answer_chars": 164,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a3",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "В какие часы сотрудник должен быть на связи онлайн?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf"
+      ],
+      "answer": "Обязательные часы присутствия онлайн — с **11:00 до 16:00**. В это время сотрудник должен быть доступен в корпоративном мессенджере [1].",
+      "answer_chars": 136,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a4",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Сколько стоит тариф Бизнес и сколько пользователей в него включено?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "answer": "По данным из прайса:\n\n**Тариф «Бизнес»:**\n- Цена: **2 990 руб/мес** [1]\n- Пользователей: **25** [1]\n- Поддержка: Email + чат [1]",
+      "answer_chars": 128,
+      "gen_error": null,
+      "correctness": {
+        "passed": false,
+        "missing": [
+          "2990"
+        ]
+      },
+      "citations": {
+        "n_citations": 3,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a5",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Какая скидка даётся при оплате за год?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "При оплате за год предоставляется скидка **20%** [1].",
+      "answer_chars": 53,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a6",
+      "kind": "answer",
+      "category": "fact",
+      "question": "Какие форматы файлов поддерживает импорт данных и какой максимальный размер файла?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf"
+      ],
+      "answer": "Импорт данных поддерживает форматы **CSV** и **XLSX**, максимальный размер файла — **50 МБ** [1][5].\n\nИмпорт запускается на вкладке «Данные» → «Загрузить» [1].",
+      "answer_chars": 159,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 3,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a7",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "How many vacation days does the Remote Work Policy grant, and how far in advance must the request be submitted?",
+      "lang": "en",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "answer": "According to the Remote Work Policy, employees receive **28 calendar days** of annual paid leave, and the request must be submitted **at least 14 days** before the vacation starts [1].",
+      "answer_chars": 184,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a8",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "After how many minutes of inactivity does the session end, and who can export data?",
+      "lang": "en",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "answer": "The session ends automatically after **30 minutes of inactivity**, and **data export is available to administrators only** [1].",
+      "answer_chars": 127,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a9",
+      "kind": "answer",
+      "category": "paraphrase",
+      "question": "Сравни тарифы Старт и Бизнес: цена, число пользователей и поддержка.",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "По данным тарифов [1]:\n\n| Параметр | Старт | Бизнес |\n|---|---|---|\n| Цена | 990 руб/мес | 2990 руб/мес |\n| Пользователей | 5 | 25 |\n| Поддержка | Email | Email + чат |\n\n**Итог:** тариф «Бизнес» дороже на 2000 руб/мес, но включает в 5 раз больше пользователей (25 против 5) и поддержку через чат в дополнение к email.",
+      "answer_chars": 317,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a10",
+      "kind": "answer",
+      "category": "paraphrase",
+      "question": "Кто согласовывает полностью удалённый формат работы и что компания предоставляет для работы из дома?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "**Согласование:** полностью удалённый формат работы согласуется с директором департамента [1].\n\n**Что предоставляет компания:**\n- Ноутбук;\n- Компенсацию до 3000 руб./мес. на интернет (заявка подаётся через портал до 5 числа месяца) [1].",
+      "answer_chars": 236,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 2,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a11",
+      "kind": "answer",
+      "category": "paraphrase",
+      "question": "Мы — некоммерческая организация из 40 человек, оплачиваем год сразу. Какие условия для нас доступны и сколько это будет стоить на тарифе Корпоративный до скидки?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "answer": "**Доступные вам условия:**\n\n- **Тариф «Корпоративный»**: 9 990 руб./мес, без лимита пользователей (подходит для 40 человек), поддержка — персональный менеджер [3].\n- **Скидки**, на которые вы можете претендовать [1]:\n  - Оплата за год — скидка 20%;\n  - Некоммерческие организации — скидка 30%.\n\n**Стоимость до скидки:**\n- 9 990 руб./мес;\n- при оплате за год: 9 990 × 12 = **119 880 руб./год** (расчёт на основе месячной цены из [3]).\n\n⚠️ Обратите внимание: в документах не указано, суммируются ли скидки 20% и 30% или применяется только одна из них — за уточнением итоговой цены со скидкой рекомендую обратиться к поставщику.",
+      "answer_chars": 625,
+      "gen_error": null,
+      "correctness": {
+        "passed": false,
+        "missing": [
+          "9990"
+        ]
+      },
+      "citations": {
+        "n_citations": 3,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a12",
+      "kind": "answer",
+      "category": "long",
+      "question": "Как включить двухфакторную аутентификацию, какие требования к паролю и где увидеть ошибки импорта?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf"
+      ],
+      "answer": "**1. Двухфакторная аутентификация:** включается в настройках [1].\n\n**2. Требования к паролю:** не менее 8 символов [2].\n\n**3. Ошибки импорта:** отображаются в журнале операций [3].",
+      "answer_chars": 180,
+      "gen_error": null,
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "citations": {
+        "n_citations": 3,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n1",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Как оформить больничный лист и в какой срок его нужно сдать в HR?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "В предоставленных документах информация о оформлении больничного листа и сроках его сдачи в HR **не найдена**.\n\nВ доступных материалах содержатся сведения о:\n- политике удалённой работы (удалённая работа, рабочее время, оборудование, отпуск) [1]\n- руководстве пользователя (регистрация, импорт данных, безопасность) [2]–[4]\n- тарифах и скидках [5]\n\nРекомендую обратиться в HR-отдел или поискать информацию во внутренних регламентах компании, не входящих в данный набор документов.",
+      "answer_chars": 480,
+      "gen_error": null,
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": false,
+        "passed": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 1,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n2",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Какая у компании выручка за прошлый год?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "В предоставленных документах информации о выручке компании за прошлый год нет. Контекст содержит только данные о тарифах и скидках [1][3][4][5] и политику удалённой работы [2].",
+      "answer_chars": 176,
+      "gen_error": null,
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": false,
+        "passed": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n3",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Does the company offer visa sponsorship for relocation to the Netherlands?",
+      "lang": "en",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "I couldn't find any information about visa sponsorship or relocation to the Netherlands in the provided documents. The available materials only cover the user guide (registration, data import, security), the remote work policy, and pricing/discounts [1–5]. You may want to contact HR or check other company documents for this information.",
+      "answer_chars": 338,
+      "gen_error": null,
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": true,
+        "explicit_refusal_marker": true,
+        "passed": true
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n4",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Какой кофе-машиной оборудована кухня офиса?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "В предоставленных документах информации о кофе-машине на кухне офиса не найдено.\n\nКонтекст содержит только следующие документы:\n- Политика удалённой работы [1]\n- Тарифы и скидки [2], [3], [5]\n- Руководство пользователя [4]\n\nРекомендую уточнить этот вопрос, например, у офис-менеджера или в другом внутреннем документе.",
+      "answer_chars": 318,
+      "gen_error": null,
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": false,
+        "passed": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 1,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n5",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Что говорится в документах о страховании животных сотрудников?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "В предоставленных документах информации о страховании животных сотрудников нет.\n\nВ контексте содержатся только следующие темы:\n- Политика удалённой работы (условия, рабочее время, оборудование, отпуск) [1]\n- Безопасность и импорт данных в руководстве пользователя [2], [3]\n- Тарифы и скидки (оплата за год, некоммерческие организации) [4], [5]\n\nЕсли у вас есть вопрос по этим темам — с удовольствием помогу.",
+      "answer_chars": 407,
+      "gen_error": null,
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": false,
+        "passed": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 1,
+        "issues": ""
+      }
+    }
+  ]
+}

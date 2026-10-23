@@ -1,0 +1,162 @@
+answer,server_prompt_ms,server_prompt_per_token_ms,server_predicted_ms,server_tpot_ms,prompt_tokens,completion_tokens,ok,error,wall_ms,variant,prompt_name,repeat,model_size_gb,peak_rss_mb
+Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.,7620.778,10.188205882352941,2254.674,93.94475,748,25,True,,9946.6,Q8_0,short-context-ru,0,3.19,4909.0
+Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.,159.651,159.651,2376.433,99.01804166666666,748,25,True,,2599.8,Q8_0,short-context-ru,1,3.19,4909.0
+Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.,59.428,59.428,2351.281,97.97004166666666,748,25,True,,2506.2,Q8_0,short-context-ru,2,3.19,4909.0
+The price of the Business plan is 2990 RUB/mo. [1],7550.057,13.777476277372262,1531.905,85.10583333333334,575,19,True,,9172.2,Q8_0,short-context-en,0,3.19,4909.0
+The price of the Business plan is 2990 RUB/mo. [1],83.598,83.598,2392.822,132.93455555555556,575,19,True,,2531.3,Q8_0,short-context-en,1,3.19,4909.0
+The price of the Business plan is 2990 RUB/mo. [1],143.865,143.865,1904.006,105.77811111111112,575,19,True,,2092.5,Q8_0,short-context-en,2,3.19,4909.0
+"Давайте разберемся в условиях удаленной работы, оборудовании, отпуска и компенсациях по предоставленным документам.
+
+**Удаленная работа:**
+
+- Сотрудники могут работать удалённо до 3 дней в неделю по согласованию с непосредственным руководителем.
+- Полностью удалённый формат согласуется с директором департамента.
+- Рабочий день длится 8 часов.
+- Обязательные часы присутствия онлайн — с 11:00 до 16:00.
+- В это время сотрудник должен быть доступен в корпоративном мессенджере.
+
+**Оборудование:**
+
+- Компания предоставляет ноутбук.
+- Компания компенсирует до 3000 руб./мес. на интернет.
+- Заявка на компенсацию подаётся через портал до 5 числа месяца.
+
+**Отпуск:**
+
+- Ежегодный оплачиваемый отпуск — 28 календарных дней.
+- Заявление подаётся не позднее чем за 14 дней до начала отпуска.
+
+**Компенсации:",4918.71,13.186890080428954,63710.268,249.8441882352941,769,256,True,,68753.5,Q8_0,long-context-ru,0,3.19,4909.0
+"Давайте разберем условия удалённой работы, оборудование, отпуск и компенсации по предоставленной информации:
+
+**Удалённая работа:**
+
+* Сотрудники могут работать удалённо до 3 дней в неделю по согласованию с непосредственным руководителем.
+* Полностью удалённый формат согласуется с директором департамента.
+* Рабочий день длится 8 часов.
+* Обязательные часы присутствия онлайн — с 11:00 до 16:00.
+* В это время сотрудник должен быть доступен в корпоративном мессенджере.
+
+**Оборудование:**
+
+* Компания предоставляет ноутбук.
+* Компания компенсирует до 3000 руб./мес. на интернет.
+* Заявка на компенсацию подаётся через портал до 5 числа месяца.
+
+**Отпуск:**
+
+* Ежегодный оплачиваемый отпуск — 28 календарных дней.
+* Заявление подаётся не позднее чем за 14 дней до начала отпуска.
+
+**Компенсации:**
+
+* У",86.081,86.081,112406.015,440.8079019607843,769,256,True,,112563.3,Q8_0,long-context-ru,1,3.19,4909.0
+"Давайте разберемся в Conditions удалённой работы, оборудование, отпуск и компенсации по предоставленным документам.
+
+**Условия удалённой работы:**
+
+* Сотрудники могут работать удалённо до 3 дней в неделю по согласованию с непосредственным руководителем.
+* Полностью удалённый формат согласуется с директором департамента.
+* Рабочий день длится 8 часов.
+* Обязательные часы присутствия онлайн — с 11:00 до 16:00.
+* В это время сотрудник должен быть доступен в корпоративном мессенджере.
+
+**Оборудование:**
+
+* Компания предоставляет ноутбук.
+* Компания компенсирует до 3000 руб./мес. на интернет.
+* Заявка на компенсацию подаётся через портал до 5 числа месяца.
+
+**Отпуск:**
+
+* Ежегодный оплачиваемый отпуск — 28 календарных дней.
+* Заявление подаётся не позднее чем за 14 дней до начала отпуска.
+
+**Компенс",71.461,71.461,18174.7,71.27333333333334,769,256,True,,18299.4,Q8_0,long-context-ru,2,3.19,4909.0
+"Based on the provided documents, here is a detailed description of the pricing plans, discounts, and support levels:
+
+**Pricing Plans:**
+
+There are three pricing plans: Start, Business, and Enterprise.
+
+1. **Start Plan:** This plan costs 990 RUB per month and is suitable for 5 users. It includes email support.
+2. **Business Plan:** This plan costs 2990 RUB per month and is suitable for 25 users. It includes email and chat support.
+3. **Enterprise Plan:** This plan costs 9990 RUB per month and is suitable for unlimited users. It includes dedicated manager support.
+
+**Discounts:**
+
+There is no information about discounts in the provided documents.
+
+**Support Levels:**
+
+The support levels vary depending on the pricing plan:
+
+1. **Start Plan:** Email support
+2. **Business Plan:** Email and chat support
+3. **Enterprise Plan:** Dedicated manager support
+
+[1] Pricing_and_Discounts.xlsx (стр. 1 · Pricing)
+[2] User_Guide.pdf (стр. 1)
+[3] User_Guide.pdf (стр. 2)
+[4] User_Guide.pdf (стр. 3)",3607.967,11.946910596026491,21347.233,87.13156326530613,578,246,True,,25234.5,Q8_0,long-context-en,0,3.19,4909.0
+"Based on the provided documents, here is a detailed description of the pricing plans, discounts, and support levels:
+
+**Pricing Plans:**
+
+There are three pricing plans: Start, Business, and Enterprise.
+
+1. **Start Plan:**
+	* Price: 990 RUB/mo
+	* Users: 5
+	* Support: Email
+2. **Business Plan:**
+	* Price: 2990 RUB/mo
+	* Users: 25
+	* Support: Email + chat
+3. **Enterprise Plan:**
+	* Price: 9990 RUB/mo
+	* Users: unlimited
+	* Support: Dedicated manager
+
+**Discounts:**
+
+There is no information about discounts in the provided documents.
+
+**Support Levels:**
+
+The support levels vary depending on the pricing plan:
+
+1. **Start Plan:**
+	* Support: Email (no additional support features)
+2. **Business Plan:**
+	* Support: Email + chat (additional support feature compared to the Start Plan)
+3. **Enterprise Plan:**
+	* Support: Dedicated manager (most comprehensive support feature, with a dedicated manager for the organization)
+
+Note that the Enterprise Plan also has unlimited users, which is not the case for the Start",80.159,80.159,23711.362,92.98573333333334,578,256,True,,23844.4,Q8_0,long-context-en,1,3.19,4909.0
+"Based on the provided documents, here is a detailed description of the pricing plans, discounts, and support levels:
+
+**Pricing Plans:**
+
+There are three pricing plans: Start, Business, and Enterprise.
+
+1. **Start Plan:** This plan costs 990 RUB/mo and is suitable for 5 users. It includes email support.
+2. **Business Plan:** This plan costs 2990 RUB/mo and is suitable for 25 users. It includes email and chat support.
+3. **Enterprise Plan:** This plan costs 9990 RUB/mo and is suitable for unlimited users. It includes dedicated manager support.
+
+**Discounts:**
+
+There is no information provided about discounts in the given documents.
+
+**Support Levels:**
+
+The support levels vary depending on the pricing plan:
+
+1. **Start Plan:** Email support
+2. **Business Plan:** Email and chat support
+3. **Enterprise Plan:** Dedicated manager support
+
+[1] Pricing_and_Discounts.xlsx (стр. 1 · Pricing)
+[2] User_Guide.pdf (стр. 1)
+[3] User_Guide.pdf (стр. 2)
+[4] User_Guide.pdf (стр. 3)",59.623,59.623,21730.256,88.33437398373984,578,247,True,,21835.5,Q8_0,long-context-en,2,3.19,4909.0

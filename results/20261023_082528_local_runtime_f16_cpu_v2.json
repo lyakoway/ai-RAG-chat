@@ -1,0 +1,133 @@
+{
+  "benchmark": "local_runtime_llamacpp",
+  "date_utc": "2026-10-23T05:25:28+00:00",
+  "git_commit": "af22c4b",
+  "command": "benchmarks/local_llamacpp.py --variants f16 --bench --ngl 0 --repeats 1 --max-tokens 96 --ctx 2048 --label f16_cpu_v2",
+  "runtime": "llama.cpp b11826 (llama-server), ngl=0, ctx=2048, threads=6",
+  "model": "meta-llama/Llama-3.2-3B-Instruct (GGUF, bartowski)",
+  "hardware": "Apple M1 Pro 8-core, 16 GB unified, macOS 13.6",
+  "max_tokens": 96,
+  "repeats": 1,
+  "per_variant": {
+    "f16": {
+      "model_file": "Llama-3.2-3B-Instruct-f16.gguf",
+      "model_size_gb": 5.99,
+      "load_time_s": 8.46,
+      "peak_rss_mb_after_warmup": 3569.6,
+      "swap_used_mb_before": 24876.0,
+      "swap_used_mb_after": 23597.56,
+      "prefill_ms": {
+        "n": 2,
+        "mean_ms": 22018.85,
+        "stdev_ms": 843.54,
+        "min_ms": 21422.37,
+        "p50_ms": 22018.85,
+        "p95_ms": 22555.67,
+        "p99_ms": 22603.39,
+        "max_ms": 22615.32
+      },
+      "prefill_ms_steady": {
+        "n": 1,
+        "mean_ms": 21422.37,
+        "stdev_ms": 0.0,
+        "min_ms": 21422.37,
+        "p50_ms": 21422.37,
+        "p95_ms": 21422.37,
+        "p99_ms": 21422.37,
+        "max_ms": 21422.37
+      },
+      "tpot_ms": {
+        "n": 2,
+        "mean_ms": 9102.23,
+        "stdev_ms": 289.14,
+        "min_ms": 8897.78,
+        "p50_ms": 9102.23,
+        "p95_ms": 9286.24,
+        "p99_ms": 9302.59,
+        "max_ms": 9306.68
+      },
+      "wall_ms": {
+        "n": 2,
+        "mean_ms": 213902.3,
+        "stdev_ms": 45446.04,
+        "min_ms": 181767.1,
+        "p50_ms": 213902.3,
+        "p95_ms": 242823.98,
+        "p99_ms": 245394.8,
+        "max_ms": 246037.5
+      },
+      "finish_reasons": [
+        "stop"
+      ],
+      "n_errors": 2
+    }
+  },
+  "rows": [
+    {
+      "answer": "Сотруднику положено 28 календарных дней ежегодного оплачиваемого отпуска.",
+      "finish_reason": "stop",
+      "server_prompt_ms": 22615.321,
+      "server_prompt_per_token_ms": 30.234386363636364,
+      "server_predicted_ms": 223360.39,
+      "server_tpot_ms": 9306.682916666667,
+      "prompt_tokens": 748,
+      "completion_tokens": 25,
+      "output_tokens_per_sec_gen": 0.1,
+      "ok": true,
+      "error": null,
+      "wall_ms": 246037.5,
+      "variant": "f16",
+      "prompt_name": "short-context-ru",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3569.6,
+      "is_first_request": true
+    },
+    {
+      "answer": "The price of the Business plan is 2990 RUB/mo. [1]",
+      "finish_reason": "stop",
+      "server_prompt_ms": 21422.373,
+      "server_prompt_per_token_ms": 39.09192153284671,
+      "server_predicted_ms": 160160.012,
+      "server_tpot_ms": 8897.778444444444,
+      "prompt_tokens": 575,
+      "completion_tokens": 19,
+      "output_tokens_per_sec_gen": 0.1,
+      "ok": true,
+      "error": null,
+      "wall_ms": 181767.1,
+      "variant": "f16",
+      "prompt_name": "short-context-en",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3569.6,
+      "is_first_request": false
+    },
+    {
+      "ok": false,
+      "error": "timed out",
+      "answer": "",
+      "finish_reason": null,
+      "wall_ms": 600070.7,
+      "variant": "f16",
+      "prompt_name": "long-context-ru",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3569.6,
+      "is_first_request": false
+    },
+    {
+      "ok": false,
+      "error": "timed out",
+      "answer": "",
+      "finish_reason": null,
+      "wall_ms": 600131.5,
+      "variant": "f16",
+      "prompt_name": "long-context-en",
+      "repeat": 0,
+      "model_size_gb": 5.99,
+      "peak_rss_mb": 3569.6,
+      "is_first_request": false
+    }
+  ]
+}
