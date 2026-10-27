@@ -1,0 +1,90 @@
+{
+  "benchmark": "context_scaling",
+  "date_utc": "2026-10-27T08:48:07+00:00",
+  "git_commit": "a4d6534",
+  "command": "benchmarks/context_scaling.py --backend zai --lengths 1024 4096 16384 --repeats 1 --label cloud",
+  "backend": "zai",
+  "metric_note": "llama: server_prompt_ms — серверный prefill, локальная компонента TTFT; zai: client-observed time_to_first_chunk (сеть+очередь+prefill+reasoning), НЕ inference TTFT",
+  "hardware": "Apple M1 Pro, 16 GB unified, macOS 13.6, CPU-only (-ngl 0)",
+  "summary": [
+    {
+      "target_tokens": 1024,
+      "n_ok": 1,
+      "ttfc_ms_p50": 5054.8,
+      "mean_in_tokens": 1264.0,
+      "ms_per_1k_tokens": 3999.05
+    },
+    {
+      "target_tokens": 4096,
+      "n_ok": 1,
+      "ttfc_ms_p50": 12824.1,
+      "mean_in_tokens": 2911.0,
+      "ms_per_1k_tokens": 4405.39
+    },
+    {
+      "target_tokens": 16384,
+      "n_ok": 1,
+      "ttfc_ms_p50": 3697.6,
+      "mean_in_tokens": 9349.0,
+      "ms_per_1k_tokens": 395.51
+    }
+  ],
+  "rows": [
+    {
+      "backend": "zai (client-observed)",
+      "target_tokens": 1024,
+      "repeat": 0,
+      "in_tokens_client_est": 1908,
+      "in_tokens_server": 1264,
+      "ttfc_ms": 5054.8,
+      "ttfc_content_ms": null,
+      "total_ms": 5056.4,
+      "error": null,
+      "note": "time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT"
+    },
+    {
+      "backend": "zai (client-observed)",
+      "target_tokens": 4096,
+      "repeat": 0,
+      "in_tokens_client_est": 4998,
+      "in_tokens_server": 2911,
+      "ttfc_ms": 12824.1,
+      "ttfc_content_ms": null,
+      "total_ms": 12830.4,
+      "error": null,
+      "note": "time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT"
+    },
+    {
+      "backend": "zai (client-observed)",
+      "target_tokens": 16384,
+      "repeat": 0,
+      "in_tokens_client_est": 17296,
+      "in_tokens_server": 9349,
+      "ttfc_ms": 3697.6,
+      "ttfc_content_ms": null,
+      "total_ms": 3698.8,
+      "error": null,
+      "note": "time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT"
+    }
+  ],
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

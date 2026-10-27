@@ -1,0 +1,4 @@
+backend,target_tokens,repeat,in_tokens_client_est,in_tokens_server,ttfc_ms,ttfc_content_ms,total_ms,error,note
+zai (client-observed),1024,0,1908,1264,5054.8,,5056.4,,time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT
+zai (client-observed),4096,0,4998,2911,12824.1,,12830.4,,time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT
+zai (client-observed),16384,0,17296,9349,3697.6,,3698.8,,time_to_first_chunk включает reasoning «думающей» модели — не inference TTFT

@@ -91,6 +91,31 @@ def check_citations(answer: str, n_sources: int) -> dict:
     }
 
 
+def check_citation_precision_recall(answer: str, hits: list[dict],
+                                    target_doc: str | None) -> dict:
+    """Детерминированные citation precision/recall (для вопросов с эталоном).
+
+    Номер [n] маппится на hits[n-1]['filename'] — порядок цитат совпадает с
+    порядком фрагментов в контексте (см. rag.build_context).
+    precision — доля всех [n]-ссылок, ведущих на целевой документ;
+    recall (coverage) — есть ли хотя бы одна ссылка на целевой документ (0/1).
+    Не применимо (нет эталона, контекста или ссылок) — None, из агрегатов исключается.
+    """
+    cites = [int(m) for m in CITATION_RE.findall(answer)]
+    if not target_doc or not hits or not cites:
+        return {"applicable": False, "precision": None, "recall": None,
+                "n_citations": len(cites), "n_to_target": 0}
+    valid = [n for n in cites if 1 <= n <= len(hits)]
+    to_target = [n for n in valid if hits[n - 1].get("filename") == target_doc]
+    return {
+        "applicable": True,
+        "precision": round(len(to_target) / len(cites), 4),
+        "recall": 1.0 if to_target else 0.0,
+        "n_citations": len(cites),
+        "n_to_target": len(to_target),
+    }
+
+
 def check_refusal(answer: str, forbidden_terms: list[str]) -> dict:
     """Честный отказ. Основной критерий — нет выдуманных фактов (fact leak).
     Ссылки [n] на «вот что есть в документах вместо» легитимны, поэтому
@@ -295,6 +320,7 @@ async def main_async(args) -> None:
                 row["completeness"] = check_should_contain(answer, item.get("should_contain", []))
                 row["citations"] = check_citations(answer, n_sources=len(hits))
                 row["citation_target"] = check_citation_target(retrieved_docs, item.get("doc"))
+                row["citation_pr"] = check_citation_precision_recall(answer, hits, item.get("doc"))
             else:
                 row["refusal"] = check_refusal(answer, item["forbidden_terms"])
 
@@ -322,6 +348,12 @@ async def main_async(args) -> None:
         "correctness_rate": rate(answer_rows, lambda r: r["correctness"]["passed"]),
         "citation_validity_rate": rate(answer_rows, lambda r: r["citations"]["valid"]),
         "citation_target_top1_rate": rate(answer_rows, lambda r: r["citation_target"]["passed"]),
+        "citation_precision_mean": (
+            round(sum(r["citation_pr"]["precision"] for r in answer_rows
+                      if r["citation_pr"]["applicable"]) /
+                  max(sum(1 for r in answer_rows if r["citation_pr"]["applicable"]), 1), 4)
+        ),
+        "citation_recall_rate": rate(answer_rows, lambda r: r["citation_pr"]["recall"] == 1.0),
         "completeness_coverage_mean": (
             round(sum(r["completeness"]["coverage"] for r in answer_rows
                       if r["completeness"]["applicable"]) /

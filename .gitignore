@@ -26,3 +26,4 @@ frontend/dist/
 backend/benchmarks/.models/
 backend/benchmarks/.llama-cpp/
 backend/benchmarks/.mlx-venv/
+backend/data/eval_pollutants/

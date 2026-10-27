@@ -40,7 +40,7 @@ idle takes ~50 s to wake up.</sub>
 | Cost per question · GLM-5.3-flash        | ≈ $0.0002 measured (~5,000 questions per $1) |
 | Vector search via API · p50              | 18 ms                      |
 | Demo pack indexing · 6 files → 12 chunks | 0.7 s                      |
-| pytest tests + CI                        | 112 (63 app + 49 bench)    |
+| pytest tests + CI                        | 128 (63 app + 65 bench)    |
 
 ## What the project is for
 
@@ -115,7 +115,7 @@ lost, and a model default set by latency — not by a tutorial.
 | **Default model**  | GLM-5.3-flash · TTFT ~2.5–3.0 s                 | **Shipped:** GLM-4.5-flash sits at 25–50 s on the same pipeline, the pipeline itself adds <1% |
 | Held-out retrieval | Recall@1 87.2% · Recall@3 97.9%                 | Supporting number on the public pack. Mixed-language queries are still open                  |
 | Answer judge       | 5.0/5 on three axes, same model family          | Supporting only. A strict eval needs an independent judge or a human                         |
-| Reliability        | 112 pytest tests + CI                           | Critical paths (errors, empty docs, agent loops) are under automated tests                   |
+| Reliability        | 128 pytest tests + CI                           | Critical paths (errors, empty docs, agent loops) are under automated tests                   |
 
 Bold rows are keep / reject decisions. The absolute scores below them are
 supporting measurements, not headline claims.
@@ -136,7 +136,7 @@ supporting measurements, not headline claims.
    DB, latency in logs.
 5. **Reproducible quality** — tests, CI, isolated eval environment and
    regression control: the eval index is rebuilt from scratch on every run.
-   112 pytest tests + GitHub Actions.
+   128 pytest tests + GitHub Actions.
 
 ## Architecture
 
@@ -191,7 +191,7 @@ supporting measurements, not headline claims.
 - **Failure handling** — provider timeout, tool-step errors and graceful
   recovery.
 - **Observability** — model, sources, latency, errors and user feedback.
-- **Testing** — 112 pytest tests (app + benchmark tools): RAG pipeline · hybrid
+- **Testing** — 128 pytest tests (app + benchmark tools): RAG pipeline · hybrid
   retrieval · document parsing · citations · API/SSE · error handling ·
   benchmark metrics and deterministic answer checks. CI on GitHub Actions.
 - **Reproducibility** — the evaluation index is rebuilt from scratch on every
@@ -331,10 +331,12 @@ pipeline the chat uses. Figures below are from the **held-out bilingual set
 scratch on every run.
 
 > **Full benchmark suite.** Reproducible tools for retrieval / LLM / load /
-> answer-level evaluation and local llama.cpp inference live in
-> [`backend/benchmarks/`](backend/benchmarks) with golden sets in
-> [`backend/eval/`](backend/eval) and raw JSON/CSV runs in
-> [`results/`](results). Methodology, definitions and every command:
+> answer-level evaluation, local llama.cpp inference, corpus robustness,
+> baseline-vs-candidate regression checks (`--fail-on-regression` for CI) and
+> context-length scaling live in [`backend/benchmarks/`](backend/benchmarks)
+> with golden sets in [`backend/eval/`](backend/eval) and raw JSON/CSV runs in
+> [`results/`](results) — each with a git commit, exact command and dataset
+> hash. Methodology, metric formulas and every command:
 > **[docs/benchmark.md](docs/benchmark.md)**.
 
 ### Retrieval quality (evaluation)
@@ -472,10 +474,10 @@ Python backend serving the static files from `/app/static`.
 
 ## Tests
 
-The backend is covered with **112 pytest tests**: 63 app tests (parsers
+The backend is covered with **128 pytest tests**: 63 app tests (parsers
 (PDF/DOCX/XLSX), chunking, language detection (RU/EN/中文/日本語/한국어), RAG
 pipeline and hybrid retrieval, citations / source mapping, the agent tool loop
-(fake providers), API/SSE flows and error handling) + 49 benchmark-tool tests
+(fake providers), API/SSE flows and error handling) + 65 benchmark-tool tests
 (percentile/Recall/MRR math, deterministic answer checks, judge-output parsing,
 timing aggregation). Tests run in an isolated `backend/data/test/` store —
 working data is untouched:

@@ -70,6 +70,21 @@ def mrr_at_k(ranks: list[int | None], k: int) -> float:
     return sum(1.0 / r for r in ranks if r is not None and r <= k) / len(ranks)
 
 
+def ndcg_at_k(ranks: list[int | None], k: int) -> float:
+    """nDCG@K для набора с одним релевантным документом на запрос.
+
+    DCG@K = Σ rel_i / log2(i+1); с одним релевантным на ранге r: DCG = 1/log2(r+1).
+    IDCG@K = 1/log2(1+1) = 1 (идеальный ранг 1), поэтому nDCG = mean(1/log2(r+1)),
+    0 для ненайденных. При одном релевантном nDCG@K жёстче наказывает низкие
+    ранги, чем MRR@K (rank 3: MRR 0.333, nDCG 0.5; rank 5: MRR 0.2, nDCG 0.387).
+    """
+    if not ranks:
+        return 0.0
+    import math
+
+    return sum(1.0 / math.log2(r + 1) for r in ranks if r is not None and r <= k) / len(ranks)
+
+
 def first_hit_rank(retrieved_docs: list[str], target: str) -> int | None:
     """Ранг (1-based) первого появления target в списке имён документов, None если нет."""
     for i, name in enumerate(retrieved_docs, start=1):
@@ -135,19 +150,52 @@ def command_line() -> str:
     return " ".join(shlex.quote(a) for a in sys.argv)
 
 
-def save_results(payload: dict, name: str, fmt: list[str] | None = None) -> dict:
+def golden_set_hash() -> dict[str, str]:
+    """sha256 (первые 16 hex) каждого golden-набора в eval/ — версия данных в артефакте."""
+    import hashlib
+
+    out: dict[str, str] = {}
+    for p in sorted(EVAL_DIR.glob("*.json")):
+        out[p.name] = hashlib.sha256(p.read_bytes()).hexdigest()[:16]
+    return out
+
+
+def dependency_versions() -> dict[str, str]:
+    """Версии Python/платформы и ключевых зависимостей benchmark-контура."""
+    import platform
+    from importlib.metadata import PackageNotFoundError, version
+
+    out = {"python": platform.python_version(), "platform": platform.platform()}
+    for name in ("fastembed", "chromadb", "rank-bm25", "tiktoken", "openai",
+                 "anthropic", "httpx", "pydantic", "fastapi", "psutil"):
+        try:
+            out[name] = version(name)
+        except PackageNotFoundError:
+            continue
+    return out
+
+
+def save_results(payload: dict, name: str, fmt: list[str] | None = None,
+                 out_dir: Path | None = None) -> dict:
     """Сохраняет результаты в results/<timestamp>_<name>.json (+ .csv для rows).
 
     payload["rows"] — список плоских словарей: попадут в CSV (по одному ряду
-    на запрос/итерацию). Возвращает словарь {формат: путь}.
+    на запрос/итерацию). Автоматически добавляет env-блок (sha256 golden set,
+    версии зависимостей), если его нет. Возвращает словарь {формат: путь}.
     """
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    results_dir = out_dir or RESULTS_DIR
+    results_dir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%d_%H%M%S")
     paths: dict[str, str] = {}
     fmt = fmt or ["json", "csv"]
 
+    payload.setdefault("env", {
+        "golden_set_sha256": golden_set_hash(),
+        "dependencies": dependency_versions(),
+    })
+
     if "json" in fmt:
-        p = RESULTS_DIR / f"{stamp}_{name}.json"
+        p = results_dir / f"{stamp}_{name}.json"
         p.write_text(
             json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
         )
@@ -160,7 +208,7 @@ def save_results(payload: dict, name: str, fmt: list[str] | None = None) -> dict
             for k in r:
                 if k not in keys and not isinstance(r[k], (dict, list)):
                     keys.append(k)
-        p = RESULTS_DIR / f"{stamp}_{name}.csv"
+        p = results_dir / f"{stamp}_{name}.csv"
         with p.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
             writer.writeheader()

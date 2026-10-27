@@ -110,13 +110,14 @@ class LlamaServer:
     """Контекстный менеджер: поднимает llama-server, отдаёт порт, убивает при выходе."""
 
     def __init__(self, gguf: Path, ngl: int, ctx: int, port: int,
-                 draft: Path | None = None, draft_max: int = 8) -> None:
+                 draft: Path | None = None, draft_max: int = 8, parallel: int = 1) -> None:
         self.gguf = gguf
         self.ngl = ngl
         self.ctx = ctx
         self.port = port
         self.draft = draft
         self.draft_max = draft_max
+        self.parallel = parallel
         self.proc: subprocess.Popen | None = None
         self.log_lines: list[str] = []
         self.load_time_s: float | None = None  # cold start: от Popen до /health ok
@@ -131,6 +132,9 @@ class LlamaServer:
             "--no-warmup",
             "--threads", "6",
         ]
+        if self.parallel > 1:
+            # -c — СУММАРНЫЙ контекст, делится на слоты (n_ctx_slot = c/parallel)
+            cmd += ["-np", str(self.parallel)]
         if self.draft:
             # b11826: --draft-max переименован в --spec-draft-n-max; --device none
             # нужен, потому что спекулятивная ветка инициализирует Metal даже при
@@ -155,7 +159,7 @@ class LlamaServer:
             except subprocess.TimeoutExpired:
                 self.proc.kill()
 
-    def complete(self, system: str, user: str, max_tokens: int) -> dict:
+    def complete(self, system: str, user: str, max_tokens: int, cache: bool = True) -> dict:
         """POST /v1/chat/completions (OpenAI-совместимый), timings берём из ответа
         llama-server (timings.* — серверные метрики prefill/генерации)."""
         import httpx
@@ -169,8 +173,9 @@ class LlamaServer:
                 ],
                 "max_tokens": max_tokens,
                 "temperature": 0.2,
-                # явное включение кэша промпта (в новых версиях включён по умолчанию)
-                "cache_prompt": True,
+                # кэш промпта: включён по умолчанию; отключается для замеров
+                # холодного prefill (context_scaling), чтобы повтор не попал в кэш
+                "cache_prompt": cache,
             },
             timeout=600.0,
         )

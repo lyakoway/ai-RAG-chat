@@ -230,7 +230,7 @@ def run_strategy(name: str, queries: list[dict], top_k: int, repeats: int, warmu
             }
         )
 
-    from benchmarks.metrics import latency_summary, mrr_at_k, recall_at_k
+    from benchmarks.metrics import latency_summary, mrr_at_k, ndcg_at_k, recall_at_k
 
     ranks = [r["rank"] for r in rows]
     return {
@@ -242,6 +242,7 @@ def run_strategy(name: str, queries: list[dict], top_k: int, repeats: int, warmu
             "recall@3": round(recall_at_k(ranks, 3), 4),
             "recall@5": round(recall_at_k(ranks, 5), 4),
             "mrr@5": round(mrr_at_k(ranks, 5), 4),
+            "ndcg@5": round(ndcg_at_k(ranks, 5), 4),
         },
         "latency": latency_summary(latencies),
         "rows": rows,
@@ -253,26 +254,27 @@ def per_category(rows: list[dict]) -> dict:
     for cat in sorted({r["category"] for r in rows}):
         subset = [r for r in rows if r["category"] == cat]
         ranks = [r["rank"] for r in subset]
-        from benchmarks.metrics import mrr_at_k, recall_at_k
+        from benchmarks.metrics import mrr_at_k, ndcg_at_k, recall_at_k
 
         out[cat] = {
             "n": len(subset),
             "recall@1": round(recall_at_k(ranks, 1), 4),
             "recall@3": round(recall_at_k(ranks, 3), 4),
             "mrr@5": round(mrr_at_k(ranks, 5), 4),
+            "ndcg@5": round(ndcg_at_k(ranks, 5), 4),
         }
     return out
 
 
 def print_report(results: list[dict]) -> None:
-    print(f"\n{'Strategy':<10} {'R@1':>7} {'R@3':>7} {'R@5':>7} {'MRR@5':>7} "
+    print(f"\n{'Strategy':<10} {'R@1':>7} {'R@3':>7} {'R@5':>7} {'MRR@5':>7} {'nDCG@5':>7} "
           f"{'p50 ms':>8} {'p95 ms':>8} {'errs':>5}")
-    print("-" * 70)
+    print("-" * 78)
     for r in results:
         m, lat = r["metrics"], r["latency"]
         print(
             f"{r['strategy']:<10} {m['recall@1']:>7.1%} {m['recall@3']:>7.1%} "
-            f"{m['recall@5']:>7.1%} {m['mrr@5']:>7.3f} "
+            f"{m['recall@5']:>7.1%} {m['mrr@5']:>7.3f} {m.get('ndcg@5', 0):>7.3f} "
             f"{lat.get('p50_ms', 0):>8.1f} {lat.get('p95_ms', 0):>8.1f} {r['n_errors']:>5}"
         )
     print()

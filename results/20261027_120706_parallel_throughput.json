@@ -1,0 +1,232 @@
+{
+  "benchmark": "parallel_throughput_llamacpp",
+  "date_utc": "2026-10-27T09:07:06+00:00",
+  "git_commit": "a4d6534",
+  "command": "benchmarks/parallel_throughput.py --parallel 1 2 4 --rounds 2 --max-tokens 64 --label swapnote",
+  "runtime": "llama.cpp b11826, CPU -ngl 0, total ctx 16384 (делится на -np слотов)",
+  "hardware": "Apple M1 Pro 8-core (6P+2E), 16 GB unified, macOS 13.6",
+  "rounds": 2,
+  "max_tokens": 64,
+  "aggregate_note": "aggregate_tok_s = Σ out_tokens батча / max(wall_ms) раунда (прокси по самому долгому запросу)",
+  "spec_decode_discovery": null,
+  "results": [
+    {
+      "parallel": 1,
+      "n_requests": 2,
+      "n_ok": 2,
+      "aggregate_tok_s_p50": 2.8,
+      "per_stream_tok_s_p50": 3.8,
+      "tpot_ms_p50": 271.7,
+      "rows": [
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 18017.9,
+          "prefill_ms": 10706.612,
+          "tpot_ms": 302.1306666666667,
+          "out_tokens": 25,
+          "stream_tok_s": 3.4,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 0
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 6027.1,
+          "prefill_ms": 176.008,
+          "tpot_ms": 241.21016666666665,
+          "out_tokens": 25,
+          "stream_tok_s": 4.3,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 0
+        }
+      ]
+    },
+    {
+      "parallel": 2,
+      "n_requests": 4,
+      "n_ok": 4,
+      "aggregate_tok_s_p50": 2.1,
+      "per_stream_tok_s_p50": 3.0,
+      "tpot_ms_p50": 387.4,
+      "rows": [
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 40425.6,
+          "prefill_ms": 20860.001,
+          "tpot_ms": 812.8478333333334,
+          "out_tokens": 25,
+          "stream_tok_s": 1.3,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 0
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 27530.3,
+          "prefill_ms": 6479.757,
+          "tpot_ms": 512.1149512195121,
+          "out_tokens": 42,
+          "stream_tok_s": 2.0,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 1
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 10271.6,
+          "prefill_ms": 5399.559,
+          "tpot_ms": 196.93845833333333,
+          "out_tokens": 25,
+          "stream_tok_s": 5.3,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 0
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 27323.6,
+          "prefill_ms": 48320.737,
+          "tpot_ms": 262.6051707317073,
+          "out_tokens": 42,
+          "stream_tok_s": 3.9,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 1
+        }
+      ]
+    },
+    {
+      "parallel": 4,
+      "n_requests": 8,
+      "n_ok": 8,
+      "aggregate_tok_s_p50": 2.8,
+      "per_stream_tok_s_p50": 2.4,
+      "tpot_ms_p50": 434.0,
+      "rows": [
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 76227.1,
+          "prefill_ms": 25486.549,
+          "tpot_ms": 2110.7957499999998,
+          "out_tokens": 25,
+          "stream_tok_s": 0.5,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 0
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 26311.0,
+          "prefill_ms": 9455.736,
+          "tpot_ms": 407.1670487804878,
+          "out_tokens": 42,
+          "stream_tok_s": 2.5,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 1
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 35416.2,
+          "prefill_ms": 14034.628,
+          "tpot_ms": 460.76513043478263,
+          "out_tokens": 47,
+          "stream_tok_s": 2.2,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 2
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 23290.7,
+          "prefill_ms": 7397.268,
+          "tpot_ms": 315.94264,
+          "out_tokens": 51,
+          "stream_tok_s": 3.2,
+          "finish_reason": "stop",
+          "round": 0,
+          "worker": 3
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 11387.5,
+          "prefill_ms": 6520.613,
+          "tpot_ms": 194.48012500000002,
+          "out_tokens": 25,
+          "stream_tok_s": 5.4,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 0
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 20465.4,
+          "prefill_ms": 6729.099,
+          "tpot_ms": 333.69936585365855,
+          "out_tokens": 42,
+          "stream_tok_s": 3.1,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 1
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 47726.0,
+          "prefill_ms": 343.364,
+          "tpot_ms": 1025.7596739130436,
+          "out_tokens": 47,
+          "stream_tok_s": 1.0,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 2
+        },
+        {
+          "ok": true,
+          "error": null,
+          "wall_ms": 27004.8,
+          "prefill_ms": 823.098,
+          "tpot_ms": 511.881,
+          "out_tokens": 51,
+          "stream_tok_s": 2.0,
+          "finish_reason": "stop",
+          "round": 1,
+          "worker": 3
+        }
+      ]
+    }
+  ],
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "benchmark": "context_scaling",
+  "date_utc": "2026-10-25T14:41:02+00:00",
+  "git_commit": "a4d6534",
+  "command": "benchmarks/context_scaling.py --backend llama --repeats 2",
+  "backend": "llama",
+  "metric_note": "llama: server_prompt_ms — серверный prefill, локальная компонента TTFT; zai: client-observed time_to_first_chunk (сеть+очередь+prefill+reasoning), НЕ inference TTFT",
+  "hardware": "Apple M1 Pro, 16 GB unified, macOS 13.6, CPU-only (-ngl 0)",
+  "summary": [
+    {
+      "target_tokens": 512,
+      "n_ok": 2,
+      "prefill_ms_p50": 15813.7,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    },
+    {
+      "target_tokens": 1024,
+      "n_ok": 2,
+      "prefill_ms_p50": 31591.5,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    },
+    {
+      "target_tokens": 2048,
+      "n_ok": 2,
+      "prefill_ms_p50": 43581.9,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    },
+    {
+      "target_tokens": 4096,
+      "n_ok": 2,
+      "prefill_ms_p50": 56616.9,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    },
+    {
+      "target_tokens": 8192,
+      "n_ok": 2,
+      "prefill_ms_p50": 4184759.0,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    },
+    {
+      "target_tokens": 16384,
+      "n_ok": 2,
+      "prefill_ms_p50": 5787360.5,
+      "mean_in_tokens": null,
+      "ms_per_1k_tokens": null
+    }
+  ],
+  "rows": [],
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  },
+  "status": "invalidated_memory_pressure",
+  "invalid_reason": "системный swap 35.6 GB на момент прогона: prefill 512 токенов 15.8 с против ~35 мс в валидных прогонах того же дня — замер отражает своп-пейджинг KV-кэша, а не зависимость prefill от длины. Чистый прогон требует перезагруженной машины."
+}

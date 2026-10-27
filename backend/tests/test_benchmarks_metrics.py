@@ -11,8 +11,10 @@ import pytest
 
 from benchmarks.metrics import (
     first_hit_rank,
+    golden_set_hash,
     latency_summary,
     mrr_at_k,
+    ndcg_at_k,
     percentile,
     recall_at_k,
 )
@@ -77,7 +79,44 @@ class TestRankMetrics:
         assert first_hit_rank(["b.pdf"], "a.docx") is None
 
 
-class TestGoldenSets:
+class TestNdcg:
+    def test_single_relevant_rank1_is_one(self):
+        # mean по всем запросам: ненайденные дают 0
+        assert ndcg_at_k([1], 5) == pytest.approx(1.0)
+        assert ndcg_at_k([1, None, None], 5) == pytest.approx(1 / 3)
+
+    def test_rank_penalised_logarithmically(self):
+        # один запрос, mean по нему же: rank 2: 1/log2(3)=0.631; 3: 0.5; 5: 0.387
+        assert ndcg_at_k([2], 5) == pytest.approx(0.6309, abs=1e-3)
+        assert ndcg_at_k([3], 5) == pytest.approx(0.5)
+        assert ndcg_at_k([5], 5) == pytest.approx(0.3869, abs=1e-3)
+
+    def test_not_found_is_zero(self):
+        assert ndcg_at_k([None, None], 5) == 0.0
+
+    def test_above_k_ignored(self):
+        assert ndcg_at_k([6], 5) == 0.0
+
+    def test_mean_over_queries(self):
+        # (1.0 + 0.5) / 2
+        assert ndcg_at_k([1, 3], 5) == pytest.approx(0.75)
+
+    def test_relative_to_mrr_by_rank(self):
+        # log-штраф nDCG мягче MRR на глубоком ранге (0.387 > 0.2 на rank 5),
+        # но жёстче на среднем (rank 2: 0.631 против 0.5 — нет, тоже мягче);
+        # ключевое отличие — жёсткое обнуление выше k у MRR, у nDCG — тоже.
+        assert ndcg_at_k([5], 5) == pytest.approx(0.3869, abs=1e-3)
+        assert mrr_at_k([5], 5) == pytest.approx(0.2)
+        assert ndcg_at_k([5], 5) > mrr_at_k([5], 5)
+
+
+class TestGoldenSetHash:
+    def test_hashes_present_and_stable(self):
+        h = golden_set_hash()
+        assert "golden_retrieval.json" in h
+        # тот же контент — тот же хеш
+        assert golden_set_hash()["golden_retrieval.json"] == h["golden_retrieval.json"]
+        assert len(h["golden_retrieval.json"]) == 16
     def test_retrieval_golden_matches_evaluate_py(self):
         """Golden-набор retrieval — точная копия GOLDEN из scripts/evaluate.py:
         те же вопросы и те же целевые документы, в том же порядке."""
