@@ -96,7 +96,16 @@ def make_pollutants(dir_path: Path) -> list[dict]:
 
 
 def try_ingest(path: Path) -> dict:
-    """Прогоняет файл через тот же путь приёмки, что POST /api/documents."""
+    """Прогоняет файл через тот же путь приёмки, что POST /api/documents.
+
+    Возвращает ФАКТИЧЕСКИЙ исход приёмки, а не «не упал ли вызов»:
+    ingest_document ловит ParseError внутрь себя (status=error), поэтому
+    прежняя метрика accepted=True ошибочно считала отвергнутые файлы
+    «принятыми». Дискриминация:
+      rejected  — parser вернул ParseError → status=error, 0 чанков
+      empty_ok  — файл распознан, но текста нет → status=error, 0 чанков
+      indexed   — чанки добавлены в индекс
+    """
     import mimetypes
 
     from app.core.ingestion import ingest_document
@@ -119,12 +128,21 @@ def try_ingest(path: Path) -> dict:
         dest = settings.upload_dir / f"{doc.id}{path.suffix.lower()}"
         dest.write_bytes(path.read_bytes())
         ingest_document(db, doc, dest)
-        return {"file": path.name, "accepted": True,
-                "chunks": doc.chunk_count if hasattr(doc, "chunk_count") else None,
-                "status": doc.status}
+        db.refresh(doc)
+        disposition = "indexed" if doc.status == "ready" and (doc.chunk_count or 0) > 0 else "rejected"
+        return {
+            "file": path.name,
+            "accepted": True,  # вызов завершился без исключения (совместимость поля)
+            "disposition": disposition,
+            "doc_status": doc.status,
+            "chunks": doc.chunk_count or 0,
+            "error": (doc.error or "")[:160] or None,
+        }
     except Exception as exc:  # noqa: BLE001
         db.rollback()
-        return {"file": path.name, "accepted": False, "error": f"{type(exc).__name__}: {exc}"[:160]}
+        return {"file": path.name, "accepted": False, "disposition": "crashed",
+                "doc_status": None, "chunks": 0,
+                "error": f"{type(exc).__name__}: {exc}"[:160]}
     finally:
         db.close()
 
@@ -161,8 +179,9 @@ def main() -> None:
             continue
         res = try_ingest(path)
         ingestion.append({**p_desc, **res})
-        print(f"  {p_desc['file']}: accepted={res['accepted']} "
-              f"{('error=' + res.get('error', '')) if not res['accepted'] else ''}")
+        print(f"  {p_desc['file']}: {res['disposition']} "
+              f"(status={res.get('doc_status')}, chunks={res.get('chunks')}"
+              f"{', err=' + res['error'][:60] if res.get('error') else ''})")
 
     dirty_count = vectorstore._collection().count()
     added = dirty_count - clean_count
@@ -227,6 +246,10 @@ def main() -> None:
             "dirty_chunks": dirty_count,
             "chunks_added_by_pollution": added,
             "pollutants": ingestion,
+            "dispositions": {
+                kind: sum(1 for i in ingestion if i.get("disposition") == kind)
+                for kind in ("indexed", "rejected", "crashed")
+            },
             "dirty_metrics": dirty_metrics,
             "latency": lat,
             "vs_clean_baseline": comparison,

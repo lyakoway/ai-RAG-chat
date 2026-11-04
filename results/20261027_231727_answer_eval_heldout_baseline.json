@@ -1,0 +1,596 @@
+{
+  "benchmark": "answer_eval",
+  "date_utc": "2026-10-27T20:17:27+00:00",
+  "git_commit": "5146a04",
+  "command": "benchmarks/answer_eval.py --model zai:glm-5.3-flash --judge zai:glm-4.5-flash --golden golden_answers_v2.json --label heldout_baseline",
+  "answer_model": "zai:glm-5.3-flash",
+  "golden_file": "golden_answers_v2.json",
+  "judge_model": "zai:glm-4.5-flash",
+  "judge_note": "LLM-as-judge субъективен; same-family судья склонен к завышению. Детерминированные проверки — первичны.",
+  "deterministic_definitions": {
+    "correctness": "все группы must_contain (хотя бы один синоним из группы) в ответе",
+    "citation_validity": "все [n] в диапазоне 1..top_k и их ≥1",
+    "citation_target": "топ-1 retrieval-документ == целевой документ",
+    "refusal_no_hallucination": "нет forbidden_terms в ответе (не выдумывает факты)",
+    "refusal_strict": "дополнительно нет [n]-ссылок"
+  },
+  "aggregates": {
+    "n_answer_questions": 8,
+    "correctness_rate": 1.0,
+    "citation_validity_rate": 1.0,
+    "citation_target_top1_rate": 0.875,
+    "citation_precision_mean": 1.0,
+    "citation_recall_rate": 1.0,
+    "n_answers_with_citations": 8,
+    "n_answers_without_citations": 0,
+    "correct_answer_without_citation_count": 0,
+    "completeness_coverage_mean": 1.0,
+    "n_truncated_finish_length": 0,
+    "n_repetition_suspected": 0,
+    "n_refusal_questions": 3,
+    "refusal_no_hallucination_rate": 0.6667,
+    "refusal_strict_no_citations_rate": 0.0,
+    "n_judged": 10,
+    "judge_faithfulness_avg": 5.0,
+    "judge_relevance_avg": 5.0,
+    "judge_citations_avg": 4.6,
+    "judge_vs_citations_agreement": 1.0,
+    "judge_agreement_n_pairs": 8,
+    "judge_failed_or_skipped": 1
+  },
+  "rows": [
+    {
+      "question_id": "a13",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Кто утверждает компенсацию за интернет и до какого числа подаётся заявка?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf"
+      ],
+      "answer": "По документам:\n\n- **Заявка** на компенсацию интернета (до 3000 руб./мес.) подаётся **через портал до 5 числа месяца** [2].\n- **Кто утверждает** компенсацию — в предоставленных документах информация не найдена. Указано только, что компенсацию выплачивает компания в целом [2].",
+      "answer_chars": 275,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": true,
+        "coverage": 1.0
+      },
+      "citations": {
+        "n_citations": 2,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": false
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 2,
+        "n_to_target": 2
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a14",
+      "kind": "answer",
+      "category": "fact",
+      "question": "What support is included in the Enterprise plan?",
+      "lang": "en",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Политика_удалённой_работы.docx",
+        "long_irrelevant.docx"
+      ],
+      "answer": "The Enterprise plan includes a **dedicated manager** for support [1].",
+      "answer_chars": 69,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": false,
+        "unique_4gram_ratio": null,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": true,
+        "coverage": 1.0
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 1,
+        "n_to_target": 1
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a15",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Сколько стоит тариф Старт и какая у него поддержка?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf"
+      ],
+      "answer": "Тариф **Старт** стоит **990 руб/мес**, поддержка — **Email** [1].",
+      "answer_chars": 65,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": false,
+        "unique_4gram_ratio": null,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": false,
+        "coverage": null
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 1,
+        "n_to_target": 1
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a16",
+      "kind": "answer",
+      "category": "fact",
+      "question": "Где именно в интерфейсе запускается импорт данных?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "answer": "Импорт данных запускается на вкладке **«Данные» → «Загрузить»** [1].\n\nДополнительно: поддерживаются форматы CSV и XLSX до 50 МБ, а ошибки импорта отображаются в журнале операций [1].",
+      "answer_chars": 182,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": true,
+        "coverage": 1.0
+      },
+      "citations": {
+        "n_citations": 2,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 2,
+        "n_to_target": 2
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a17",
+      "kind": "answer",
+      "category": "paraphrase",
+      "question": "Do employees need approval to work remotely, and whose approval is enough for a fully remote arrangement?",
+      "lang": "en",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "answer": "Yes, approval is required:\n\n- **Up to 3 days per week remote:** must be agreed upon with the employee's direct manager.\n- **Fully remote arrangement:** must be approved by the department director [1].",
+      "answer_chars": 200,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": false,
+        "coverage": null
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 1,
+        "n_to_target": 1
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a18",
+      "kind": "answer",
+      "category": "long",
+      "question": "Какой максимальный размер файла импорта и где отображаются ошибки импорта?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "Максимальный размер файла импорта — **50 МБ** (поддерживаются форматы CSV и XLSX) [1]. Ошибки импорта отображаются в **журнале операций** [1].",
+      "answer_chars": 142,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": true,
+        "coverage": 1.0
+      },
+      "citations": {
+        "n_citations": 2,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 2,
+        "n_to_target": 2
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a19",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "Сколько пользователей включено в тариф Корпоративный?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "answer": "В тариф **Корпоративный** включено **неограниченное количество пользователей** (без лимита) [1].",
+      "answer_chars": 96,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": false,
+        "unique_4gram_ratio": null,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": false,
+        "coverage": null
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 1,
+        "n_to_target": 1
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "a20",
+      "kind": "answer",
+      "category": "numeric",
+      "question": "How long is the workday and when must employees be reachable online?",
+      "lang": "en",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "The workday lasts 8 hours, and employees must be reachable online (in the corporate messenger) from 11:00 to 16:00 [1].",
+      "answer_chars": 119,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "correctness": {
+        "passed": true,
+        "missing": []
+      },
+      "completeness": {
+        "applicable": false,
+        "coverage": null
+      },
+      "citations": {
+        "n_citations": 1,
+        "valid": true,
+        "invalid_refs": []
+      },
+      "citation_target": {
+        "applicable": true,
+        "passed": true
+      },
+      "citation_pr": {
+        "applicable": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "n_citations": 1,
+        "n_to_target": 1
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n6",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Какие Training-курсы компания оплачивает сотрудникам?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "В предоставленных документах информации об оплачиваемых компанией Training-курсах нет.\n\nВ контексте содержатся только:\n- Политика удалённой работы (условия удалёнки, рабочее время, оборудование, отпуск) [1], [4]\n- Тарифы и скидки на продукты (планы Start, Business, Enterprise; скидки за годовую оплату и для некоммерческих организаций) [2], [3], [5]\n\nРекомендую обратиться к другому документу (например, политике обучения или HR-регламенту), если он существует.",
+      "answer_chars": 462,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": false,
+        "passed": true,
+        "passed_strict": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 1,
+        "issues": ""
+      }
+    },
+    {
+      "question_id": "n7",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "What is the company's office address and parking policy?",
+      "lang": "en",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "answer": "I couldn't find information about the office address or parking policy in the provided documents. The context only includes:\n\n- **Remote Work Policy** — remote work rules, working hours, equipment, vacation ([1], [3])\n- **Pricing and Discounts** — tariff plans and discount conditions ([2], [4], [5])\n\nIf you have a document covering office location or parking, please share it and I'll be happy to help.",
+      "answer_chars": 404,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "refusal": {
+        "no_fact_leak": true,
+        "leaked_terms": [],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": true,
+        "passed": true,
+        "passed_strict": false
+      },
+      "judge": null
+    },
+    {
+      "question_id": "n8",
+      "kind": "refusal",
+      "category": "refusal",
+      "question": "Сколько дней в году положено для дистанционной работы за границей?",
+      "lang": "ru",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Remote_Work_Policy.docx"
+      ],
+      "answer": "В предоставленных документах информации о лимите дней для дистанционной работы **за границей** не найдено.\n\nИз документов известно только общее количество дней удалённой работы:\n- До 3 дней в неделю по согласованию с непосредственным руководителем [1], [5]\n- Полностью удалённый формат согласуется с директором департамента [1], [5]\n\nЕсли вам нужна информация о работе из-за рубежа, рекомендую уточнить в другом документе или у HR-отдела.",
+      "answer_chars": 438,
+      "gen_error": null,
+      "finish_reason": null,
+      "repetition": {
+        "applicable": true,
+        "unique_4gram_ratio": 1.0,
+        "repetition_suspected": false
+      },
+      "refusal": {
+        "no_fact_leak": false,
+        "leaked_terms": [
+          "3"
+        ],
+        "no_citations_without_context": false,
+        "explicit_refusal_marker": true,
+        "passed": false,
+        "passed_strict": false
+      },
+      "judge": {
+        "faithfulness": 5,
+        "relevance": 5,
+        "citations": 5,
+        "issues": ""
+      }
+    }
+  ],
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_answers_v2.json": "3a87b328b5c1ea7c",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

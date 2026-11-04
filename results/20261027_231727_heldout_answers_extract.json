@@ -1,0 +1,73 @@
+{
+  "benchmark": "heldout_answers_extract",
+  "date_utc": "2026-10-27T20:17:27+00:00",
+  "model": "zai:glm-5.3-flash",
+  "rows": [
+    {
+      "question_id": "a13",
+      "answer": "По документам:\n\n- **Заявка** на компенсацию интернета (до 3000 руб./мес.) подаётся **через портал до 5 числа месяца** [2].\n- **Кто утверждает** компенсацию — в предоставленных документах информация не найдена. Указано только, что компенсацию выплачивает компания в целом [2].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a14",
+      "answer": "The Enterprise plan includes a **dedicated manager** for support [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a15",
+      "answer": "Тариф **Старт** стоит **990 руб/мес**, поддержка — **Email** [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a16",
+      "answer": "Импорт данных запускается на вкладке **«Данные» → «Загрузить»** [1].\n\nДополнительно: поддерживаются форматы CSV и XLSX до 50 МБ, а ошибки импорта отображаются в журнале операций [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a17",
+      "answer": "Yes, approval is required:\n\n- **Up to 3 days per week remote:** must be agreed upon with the employee's direct manager.\n- **Fully remote arrangement:** must be approved by the department director [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a18",
+      "answer": "Максимальный размер файла импорта — **50 МБ** (поддерживаются форматы CSV и XLSX) [1]. Ошибки импорта отображаются в **журнале операций** [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a19",
+      "answer": "В тариф **Корпоративный** включено **неограниченное количество пользователей** (без лимита) [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "a20",
+      "answer": "The workday lasts 8 hours, and employees must be reachable online (in the corporate messenger) from 11:00 to 16:00 [1].",
+      "finish_reason": null,
+      "kind": "answer"
+    },
+    {
+      "question_id": "n6",
+      "answer": "В предоставленных документах информации об оплачиваемых компанией Training-курсах нет.\n\nВ контексте содержатся только:\n- Политика удалённой работы (условия удалёнки, рабочее время, оборудование, отпуск) [1], [4]\n- Тарифы и скидки на продукты (планы Start, Business, Enterprise; скидки за годовую оплату и для некоммерческих организаций) [2], [3], [5]\n\nРекомендую обратиться к другому документу (например, политике обучения или HR-регламенту), если он существует.",
+      "finish_reason": null,
+      "kind": "refusal"
+    },
+    {
+      "question_id": "n7",
+      "answer": "I couldn't find information about the office address or parking policy in the provided documents. The context only includes:\n\n- **Remote Work Policy** — remote work rules, working hours, equipment, vacation ([1], [3])\n- **Pricing and Discounts** — tariff plans and discount conditions ([2], [4], [5])\n\nIf you have a document covering office location or parking, please share it and I'll be happy to help.",
+      "finish_reason": null,
+      "kind": "refusal"
+    },
+    {
+      "question_id": "n8",
+      "answer": "В предоставленных документах информации о лимите дней для дистанционной работы **за границей** не найдено.\n\nИз документов известно только общее количество дней удалённой работы:\n- До 3 дней в неделю по согласованию с непосредственным руководителем [1], [5]\n- Полностью удалённый формат согласуется с директором департамента [1], [5]\n\nЕсли вам нужна информация о работе из-за рубежа, рекомендую уточнить в другом документе или у HR-отдела.",
+      "finish_reason": null,
+      "kind": "refusal"
+    }
+  ]
+}

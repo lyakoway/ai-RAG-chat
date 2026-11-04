@@ -1,0 +1,238 @@
+{
+  "name": "golden-answers-v2",
+  "description": "Held-out набор для answer-level evaluation. Вопросы a13-a20 и n6-n8 составлены ПОСЛЕ всех прогонов этой конфигурации и никогда не использовались для настройки промптов или кода — это чистый held-out. Существующий golden_answers.json (a1-a12, n1-n5) объявлен dev-набором. Схема расширена полями supported / expected_abstention / pages.",
+  "schema": {
+    "q": "вопрос",
+    "doc": "целевой документ (document-level; page только у PDF — docx/xlsx парсятся без страниц)",
+    "pages": "страницы PDF-источника, если применимо (иначе null)",
+    "lang": "ru|en",
+    "category": "fact|numeric|paraphrase|cross-lingual|long|refusal",
+    "supported": "true — ответ есть в корпусе; false — корректное поведение: abstention",
+    "expected_abstention": "true → модель должна отказать (negative-вопрос)",
+    "must_contain": "группы обязательных фактов (для supported=true)",
+    "should_contain": "необязательные элементы (полнота)",
+    "forbidden_terms": "для abstention: факты, которые нельзя выдумывать",
+    "dev_or_heldout": "метка сплита"
+  },
+  "dev_queries_note": "dev-набор = queries из golden_answers.json (a1-a12, n1-n5). Он использовался в прогонах 2026-10-22..27; результаты на нём — dev-метрики, не безпристрастная оценка.",
+  "queries": [
+    {
+      "id": "a13",
+      "dev_or_heldout": "heldout",
+      "q": "Кто утверждает компенсацию за интернет и до какого числа подаётся заявка?",
+      "doc": "Политика_удалённой_работы.docx",
+      "pages": null,
+      "lang": "ru",
+      "category": "numeric",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "5"
+        ]
+      ],
+      "should_contain": [
+        "портал"
+      ],
+      "context_size": "short"
+    },
+    {
+      "id": "a14",
+      "dev_or_heldout": "heldout",
+      "q": "What support is included in the Enterprise plan?",
+      "doc": "Pricing_and_Discounts.xlsx",
+      "pages": null,
+      "lang": "en",
+      "category": "fact",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "manager"
+        ]
+      ],
+      "should_contain": [
+        "Dedicated",
+        "Enterprise"
+      ],
+      "context_size": "short"
+    },
+    {
+      "id": "a15",
+      "dev_or_heldout": "heldout",
+      "q": "Сколько стоит тариф Старт и какая у него поддержка?",
+      "doc": "Тарифы_и_скидки.xlsx",
+      "pages": null,
+      "lang": "ru",
+      "category": "numeric",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "990"
+        ],
+        [
+          "Email"
+        ]
+      ],
+      "should_contain": [],
+      "context_size": "short"
+    },
+    {
+      "id": "a16",
+      "dev_or_heldout": "heldout",
+      "q": "Где именно в интерфейсе запускается импорт данных?",
+      "doc": "Руководство_пользователя.pdf",
+      "pages": [
+        2
+      ],
+      "lang": "ru",
+      "category": "fact",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "Данные"
+        ],
+        [
+          "Загрузить"
+        ]
+      ],
+      "should_contain": [
+        "вкладк"
+      ],
+      "context_size": "short"
+    },
+    {
+      "id": "a17",
+      "dev_or_heldout": "heldout",
+      "q": "Do employees need approval to work remotely, and whose approval is enough for a fully remote arrangement?",
+      "doc": "Remote_Work_Policy.docx",
+      "pages": null,
+      "lang": "en",
+      "category": "paraphrase",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "manager"
+        ],
+        [
+          "director"
+        ]
+      ],
+      "should_contain": [],
+      "context_size": "short"
+    },
+    {
+      "id": "a18",
+      "dev_or_heldout": "heldout",
+      "q": "Какой максимальный размер файла импорта и где отображаются ошибки импорта?",
+      "doc": "Руководство_пользователя.pdf",
+      "pages": [
+        2
+      ],
+      "lang": "ru",
+      "category": "long",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "50"
+        ],
+        [
+          "журнал"
+        ]
+      ],
+      "should_contain": [
+        "операций"
+      ],
+      "context_size": "long"
+    },
+    {
+      "id": "a19",
+      "dev_or_heldout": "heldout",
+      "q": "Сколько пользователей включено в тариф Корпоративный?",
+      "doc": "Тарифы_и_скидки.xlsx",
+      "pages": null,
+      "lang": "ru",
+      "category": "numeric",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "лимит",
+          "без лимита"
+        ]
+      ],
+      "should_contain": [],
+      "context_size": "short"
+    },
+    {
+      "id": "a20",
+      "dev_or_heldout": "heldout",
+      "q": "How long is the workday and when must employees be reachable online?",
+      "doc": "Remote_Work_Policy.docx",
+      "pages": null,
+      "lang": "en",
+      "category": "numeric",
+      "supported": true,
+      "expected_abstention": false,
+      "must_contain": [
+        [
+          "8"
+        ],
+        [
+          "11:00"
+        ],
+        [
+          "16:00"
+        ]
+      ],
+      "should_contain": [],
+      "context_size": "short"
+    },
+    {
+      "id": "n6",
+      "dev_or_heldout": "heldout",
+      "q": "Какие Training-курсы компания оплачивает сотрудникам?",
+      "doc": null,
+      "pages": null,
+      "lang": "ru",
+      "category": "refusal",
+      "supported": false,
+      "expected_abstention": true,
+      "forbidden_terms": [],
+      "markup_note": "выдумка неперечислима (названия/суммы курсов); основной сигнал — explicit refusal marker + judge; forbidden пуст намеренно, маркеры корпуса ('28' и т.п.) ловят легитимное перечисление «что есть вместо» — дефект n8"
+    },
+    {
+      "id": "n7",
+      "dev_or_heldout": "heldout",
+      "q": "What is the company's office address and parking policy?",
+      "doc": null,
+      "pages": null,
+      "lang": "en",
+      "category": "refusal",
+      "supported": false,
+      "expected_abstention": true,
+      "forbidden_terms": [],
+      "markup_note": "адрес/парковка в корпусе не упоминаются; маркеры часов ('11:00') ловили легитимное перечисление — убраны"
+    },
+    {
+      "id": "n8",
+      "dev_or_heldout": "heldout",
+      "q": "Сколько дней в году положено для дистанционной работы за границей?",
+      "doc": null,
+      "pages": null,
+      "lang": "ru",
+      "category": "refusal",
+      "supported": false,
+      "expected_abstention": true,
+      "forbidden_terms": [
+        "60",
+        "90"
+      ],
+      "markup_note": "выдуманные лимиты заграницы (60/90 дней). Маркеры '3' и '30' убраны: ловят легитимные факты корпуса («до 3 дней в неделю», 'сессия 30 минут') — модель перечисляет их при честном отказе"
+    }
+  ]
+}

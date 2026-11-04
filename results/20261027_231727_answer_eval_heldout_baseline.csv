@@ -1,0 +1,37 @@
+question_id,kind,category,question,lang,answer,answer_chars,gen_error,finish_reason,judge
+a13,answer,numeric,Кто утверждает компенсацию за интернет и до какого числа подаётся заявка?,ru,"По документам:
+
+- **Заявка** на компенсацию интернета (до 3000 руб./мес.) подаётся **через портал до 5 числа месяца** [2].
+- **Кто утверждает** компенсацию — в предоставленных документах информация не найдена. Указано только, что компенсацию выплачивает компания в целом [2].",275,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a14,answer,fact,What support is included in the Enterprise plan?,en,The Enterprise plan includes a **dedicated manager** for support [1].,69,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a15,answer,numeric,Сколько стоит тариф Старт и какая у него поддержка?,ru,"Тариф **Старт** стоит **990 руб/мес**, поддержка — **Email** [1].",65,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a16,answer,fact,Где именно в интерфейсе запускается импорт данных?,ru,"Импорт данных запускается на вкладке **«Данные» → «Загрузить»** [1].
+
+Дополнительно: поддерживаются форматы CSV и XLSX до 50 МБ, а ошибки импорта отображаются в журнале операций [1].",182,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a17,answer,paraphrase,"Do employees need approval to work remotely, and whose approval is enough for a fully remote arrangement?",en,"Yes, approval is required:
+
+- **Up to 3 days per week remote:** must be agreed upon with the employee's direct manager.
+- **Fully remote arrangement:** must be approved by the department director [1].",200,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a18,answer,long,Какой максимальный размер файла импорта и где отображаются ошибки импорта?,ru,Максимальный размер файла импорта — **50 МБ** (поддерживаются форматы CSV и XLSX) [1]. Ошибки импорта отображаются в **журнале операций** [1].,142,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a19,answer,numeric,Сколько пользователей включено в тариф Корпоративный?,ru,В тариф **Корпоративный** включено **неограниченное количество пользователей** (без лимита) [1].,96,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+a20,answer,numeric,How long is the workday and when must employees be reachable online?,en,"The workday lasts 8 hours, and employees must be reachable online (in the corporate messenger) from 11:00 to 16:00 [1].",119,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"
+n6,refusal,refusal,Какие Training-курсы компания оплачивает сотрудникам?,ru,"В предоставленных документах информации об оплачиваемых компанией Training-курсах нет.
+
+В контексте содержатся только:
+- Политика удалённой работы (условия удалёнки, рабочее время, оборудование, отпуск) [1], [4]
+- Тарифы и скидки на продукты (планы Start, Business, Enterprise; скидки за годовую оплату и для некоммерческих организаций) [2], [3], [5]
+
+Рекомендую обратиться к другому документу (например, политике обучения или HR-регламенту), если он существует.",462,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 1, 'issues': ''}"
+n7,refusal,refusal,What is the company's office address and parking policy?,en,"I couldn't find information about the office address or parking policy in the provided documents. The context only includes:
+
+- **Remote Work Policy** — remote work rules, working hours, equipment, vacation ([1], [3])
+- **Pricing and Discounts** — tariff plans and discount conditions ([2], [4], [5])
+
+If you have a document covering office location or parking, please share it and I'll be happy to help.",404,,,
+n8,refusal,refusal,Сколько дней в году положено для дистанционной работы за границей?,ru,"В предоставленных документах информации о лимите дней для дистанционной работы **за границей** не найдено.
+
+Из документов известно только общее количество дней удалённой работы:
+- До 3 дней в неделю по согласованию с непосредственным руководителем [1], [5]
+- Полностью удалённый формат согласуется с директором департамента [1], [5]
+
+Если вам нужна информация о работе из-за рубежа, рекомендую уточнить в другом документе или у HR-отдела.",438,,,"{'faithfulness': 5, 'relevance': 5, 'citations': 5, 'issues': ''}"

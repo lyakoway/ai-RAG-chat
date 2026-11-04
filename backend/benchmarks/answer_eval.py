@@ -54,6 +54,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-judge", action="store_true", help="только детерминированные проверки")
     p.add_argument("--top-k", type=int, default=5)
     p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--golden", default="golden_answers.json",
+                   help="файл набора в backend/eval/ (v1 — два списка; v2 — queries+expected_abstention)")
     p.add_argument("--answers-from", default=None,
                    help="JSON с готовыми ответами (results/…_local_answers.json) вместо живого вызова --model")
     p.add_argument("--label", default="")
@@ -249,9 +251,17 @@ async def main_async(args) -> None:
 
     ensure_index()
 
-    golden = json.loads((BASE / "eval" / "golden_answers.json").read_text(encoding="utf-8"))
-    answer_qs = golden["answer_queries"][: args.limit] if args.limit else golden["answer_queries"]
-    negative_qs = golden["negative_queries"][: args.limit] if args.limit else golden["negative_queries"]
+    golden_file = BASE / "eval" / args.golden
+    golden = json.loads(golden_file.read_text(encoding="utf-8"))
+    if "queries" in golden and "answer_queries" not in golden:
+        # Схема v2: единый список queries с expected_abstention.
+        answer_qs = [q for q in golden["queries"] if not q.get("expected_abstention")]
+        negative_qs = [q for q in golden["queries"] if q.get("expected_abstention")]
+    else:
+        answer_qs = golden["answer_queries"][: args.limit] if args.limit else golden["answer_queries"]
+        negative_qs = golden["negative_queries"][: args.limit] if args.limit else golden["negative_queries"]
+    for q in (*answer_qs, *negative_qs):
+        q.setdefault("doc", None)
 
     answer_provider = None if args.answers_from else get_provider(args.model)
     judge_provider = None if args.no_judge else get_provider(args.judge)
@@ -354,6 +364,18 @@ async def main_async(args) -> None:
                   max(sum(1 for r in answer_rows if r["citation_pr"]["applicable"]), 1), 4)
         ),
         "citation_recall_rate": rate(answer_rows, lambda r: r["citation_pr"]["recall"] == 1.0),
+        # Знаменатели (важно: precision считается ТОЛЬКО на ответах с цитатами,
+        # recall_rate — на всех answer-ответах; без этих счётчиков цифры
+        # несопоставимы между конфигурациями)
+        "n_answers_with_citations": sum(
+            1 for r in answer_rows if r["citation_pr"]["n_citations"] > 0),
+        "n_answers_without_citations": sum(
+            1 for r in answer_rows if r["citation_pr"]["n_citations"] == 0),
+        # Отказ от цитирования при верном ответе — отдельный класс отказа
+        # таксономии (correct answer without citation), не «ошибка цитат»
+        "correct_answer_without_citation_count": sum(
+            1 for r in answer_rows
+            if r["correctness"]["passed"] and r["citation_pr"]["n_citations"] == 0),
         "completeness_coverage_mean": (
             round(sum(r["completeness"]["coverage"] for r in answer_rows
                       if r["completeness"]["applicable"]) /
@@ -391,6 +413,7 @@ async def main_async(args) -> None:
             "git_commit": git_commit(),
             "command": command_line(),
             "answer_model": args.model if not args.answers_from else f"from:{args.answers_from}",
+            "golden_file": args.golden,
             "judge_model": args.judge if judge_provider else None,
             "judge_note": "LLM-as-judge субъективен; same-family судья склонен к завышению. "
                           "Детерминированные проверки — первичны.",
