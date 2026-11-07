@@ -10,6 +10,9 @@ Event protocol (each `data:` payload is JSON):
 from __future__ import annotations
 
 import json
+import logging
+import time
+import uuid
 from collections.abc import AsyncIterator
 
 from fastapi import APIRouter, BackgroundTasks, Depends
@@ -28,6 +31,60 @@ from app.schemas.dto import ChatRequest
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 _HISTORY_LIMIT = 8  # last N messages fed back to the model for context
+
+logger = logging.getLogger("app.chat")
+
+
+def _effective_top_k(top_k: int | None) -> int:
+    """Серверный clamp: None → прод-default; значения выше капа обрезаются
+    (клиентский top_k не доверяется). Отрицательные отсечены pydantic (ge=1)."""
+    from app.config import get_settings
+
+    settings = get_settings()
+    if top_k is None:
+        return settings.retrieval_top_k
+    return max(1, min(top_k, settings.chat_top_k_max))
+
+
+def _log_chat_request(
+    *,
+    request_id: str,
+    mode: str,
+    model_id: str,
+    provider: str,
+    retrieval_ms: float | None,
+    llm_ms: float | None,
+    total_ms: float | None,
+    usage: dict | None,
+    status: str,
+    error_category: str | None,
+    n_sources: int,
+    context_chunks: int,
+) -> None:
+    """Структурированный лог chat-запроса (JSON-строка).
+
+    Без текста вопроса/ответа, имён документов и ключей. usage_source:
+    provider (фактические счётчики) | unavailable (провайдер не вернул usage —
+    точная стоимость НЕ утверждается).
+    """
+    record = {
+        "event": "chat_request",
+        "request_id": request_id,
+        "mode": mode,
+        "model": model_id,
+        "provider": provider,
+        "retrieval_ms": retrieval_ms,
+        "llm_ms": llm_ms,
+        "total_ms": total_ms,
+        "in_tokens": usage.get("prompt_tokens") if usage else None,
+        "out_tokens": usage.get("completion_tokens") if usage else None,
+        "usage_source": "provider" if usage else "unavailable",
+        "status": status,
+        "error_category": error_category,
+        "n_sources": n_sources,
+        "context_chunks": context_chunks,
+    }
+    logger.info(json.dumps(record, ensure_ascii=False))
 
 
 def _sse(event: str, data: dict) -> str:
@@ -84,15 +141,22 @@ async def chat(
         )
 
     # ---- Classic RAG (single retrieve → answer) ----
+    effective_top_k = _effective_top_k(req.top_k)
+    t_retr = time.perf_counter()
     hits = rag.retrieve(
         query=req.message,
-        top_k=req.top_k,
+        top_k=effective_top_k,
         category=req.category,
         document_ids=req.document_ids,
     )
+    retrieval_ms = round((time.perf_counter() - t_retr) * 1000, 1)
     sources = rag.to_sources(hits)
-    system = rag.build_system_prompt(hits, req.lang)
+    from app.config import get_settings as _gs
+
+    system = rag.build_system_prompt(hits, req.lang, max_tokens=_gs().chat_context_token_budget)
     followups = _static_followups([s.filename for s in sources], req.lang)
+
+    request_id = uuid.uuid4().hex[:12]
 
     async def gen_rag() -> AsyncIterator[str]:
         yield _sse("sources", {
@@ -102,19 +166,40 @@ async def chat(
         if followups:
             yield _sse("followups", {"followups": followups})
         buffer: list[str] = []
+        t_llm = time.perf_counter()
+        status, error_category = "ok", None
         try:
             async for delta in provider.stream(system, history, req.lang):
                 buffer.append(delta)
                 yield _sse("token", {"delta": delta})
         except Exception as exc:  # noqa: BLE001
+            status = "llm_error"
+            error_category = type(exc).__name__
             prefix = "Model error" if req.lang == "en" else "Ошибка модели"
             yield _sse("error", {"message": f"{prefix}: {exc}"})
+        llm_ms = round((time.perf_counter() - t_llm) * 1000, 1)
 
         answer = "".join(buffer)
         message_id = _persist_assistant(
             conv_id, answer, [s.model_dump() for s in sources], None
         )
         yield _sse("done", {"message_id": message_id, "conversation_id": conv_id})
+
+        # Структурированный лог (после done; без текста запроса/ответа).
+        _log_chat_request(
+            request_id=request_id,
+            mode="rag",
+            model_id=req.model,
+            provider=getattr(provider, "provider", "unknown"),
+            retrieval_ms=retrieval_ms,
+            llm_ms=llm_ms,
+            total_ms=round(retrieval_ms + llm_ms, 1),
+            usage=getattr(provider, "last_usage", None),
+            status=status,
+            error_category=error_category,
+            n_sources=len(sources),
+            context_chunks=len(hits),
+        )
 
         # Автозаголовок — фоновой задачей ПОСЛЕ закрытия стрима: держать SSE
         # открытым на время LLM-вызова нельзя (прокси придерживает хвост,
@@ -153,7 +238,7 @@ async def _gen_agent(
                 db=db_agent,
                 category=req.category,
                 document_ids=req.document_ids,
-                top_k=req.top_k,
+                top_k=_effective_top_k(req.top_k),
                 user_message=req.message,
             ):
                 if event == "agent_step":

@@ -50,7 +50,8 @@ class ChatRequest(BaseModel):
     model: str = "mock"
     category: str | None = None                 # filter retrieval by category
     document_ids: list[str] | None = None        # or restrict to specific docs
-    top_k: int | None = None
+    # Верхняя граница дополнительно clamp'ится серверным chat_top_k_max в роуте.
+    top_k: int | None = Field(default=None, ge=1)
     lang: str = "ru"                             # UI language: "ru" | "en"
     mode: str = "rag"                            # "rag" | "agent"
 

@@ -41,6 +41,19 @@ class Settings(BaseSettings):
     local_embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     openai_embedding_model: str = "text-embedding-3-small"
 
+    # --- Safety / resource limits (server-side, не доверяем клиенту) ---
+    # Верхняя граница top_k из запроса. Продовый default 5, векторный поиск в
+    # UI шлёт 10; 20 оставляет запас для больших корпусов и совпадает с
+    # retrieval_candidates (пул кандидатов до rerank).
+    chat_top_k_max: int = 20
+    # Лимит размера загружаемого файла (МБ). 50 МБ согласованы с демо-сценарием
+    # (User Guide: «файлы до 50 МБ») и покрывают документы типичного корпуса.
+    max_upload_mb: int = 50
+    # Бюджет токенов на блок CONTEXT в промпте. Текущий демо-корпус укладывается
+    # в ~2–3k токенов (5 чанков); 3000 сохраняет текущее поведение и защищает
+    # от раздувания промпта при top_k близком к капу или длинных чанках.
+    chat_context_token_budget: int = 3000
+
     # --- Advanced retrieval (env: SEARCH_RERANK=1 включает реранк) ---
     # Гибрид (BM25 + вектора через RRF) включён по умолчанию: на двуязычном
     # демо-корпусе он вытягивает правильный документ из-под языкового «двойника»

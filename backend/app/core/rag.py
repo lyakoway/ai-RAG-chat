@@ -45,7 +45,10 @@ def retrieve(
     )
 
 
-def build_context(hits: list[dict]) -> str:
+def build_context(hits: list[dict], max_tokens: int | None = None) -> str:
+    """Собирает блок CONTEXT. При заданном бюджете токенов чанки сверх бюджета
+    отбрасываются целиком (не режутся посреди текста), минимум один чанк всегда
+    попадает в контекст — чтобы grounded-ответ был возможен."""
     blocks = []
     for i, h in enumerate(hits, start=1):
         loc = f"стр. {h['page']}" if h.get("page") else ""
@@ -53,12 +56,26 @@ def build_context(hits: list[dict]) -> str:
             loc = f"{loc} · {h['label']}" if loc else h["label"]
         header = f"[{i}] {h['filename']} ({loc})".strip()
         blocks.append(f"{header}\n{h['text']}")
+    if max_tokens is not None and len(blocks) > 1:
+        from app.core.chunking import _encoder
+
+        enc = _encoder()
+        kept: list[str] = []
+        used = 0
+        for block in blocks:
+            block_tokens = len(enc.encode(block))
+            if kept and used + block_tokens > max_tokens:
+                break  # целые чанки сверх бюджета отбрасываются
+            kept.append(block)
+            used += block_tokens
+        blocks = kept
     return "\n\n---\n\n".join(blocks)
 
 
-def build_system_prompt(hits: list[dict], lang: str = "ru") -> str:
+def build_system_prompt(hits: list[dict], lang: str = "ru",
+                        max_tokens: int | None = None) -> str:
     empty = "(нет релевантных фрагментов)" if lang == "ru" else "(no relevant fragments)"
-    context = build_context(hits) if hits else empty
+    context = build_context(hits, max_tokens=max_tokens) if hits else empty
     template = SYSTEM_PROMPTS.get(lang, SYSTEM_PROMPT_RU)
     return template.format(context=context)
 

@@ -22,8 +22,13 @@ COLLECTION = "documents"
 @lru_cache
 def _client():
     import chromadb
+    from chromadb.config import Settings
 
-    return chromadb.PersistentClient(path=str(settings.chroma_dir))
+    # Поддерживаемый механизм отключения telemetry (анонимная телеметрия в stderr).
+    return chromadb.PersistentClient(
+        path=str(settings.chroma_dir),
+        settings=Settings(anonymized_telemetry=False),
+    )
 
 
 @lru_cache

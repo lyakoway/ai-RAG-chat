@@ -87,6 +87,9 @@ class OpenAIProvider:
 
     def __init__(self, model: str = "gpt-4o-mini") -> None:
         self.model = model
+        # Usage последнего завершённого стрима (если провайдер его вернул).
+        # Опциональное расширение Protocol: отсутствие поля = usage недоступен.
+        self.last_usage: dict | None = None
 
     def _api_key(self) -> str | None:
         return settings.openai_api_key
@@ -108,14 +111,25 @@ class OpenAIProvider:
         payload = [{"role": "system", "content": system}] + [
             {"role": m.role, "content": m.content} for m in messages
         ]
+        # include_usage: провайдер (OpenAI, Z.ai) добавляет финальный чанк с
+        # usage и ПУСТЫМ choices — валим только контентные поля, не падаем.
+        self.last_usage = None
         stream = await client.chat.completions.create(
             model=self.model,
             messages=payload,
             stream=True,
             temperature=0.2,
+            stream_options={"include_usage": True},
             **({"extra_body": self.extra_body} if self.extra_body else {}),
         )
         async for chunk in stream:
+            if not getattr(chunk, "choices", None):
+                if getattr(chunk, "usage", None):
+                    self.last_usage = {
+                        "prompt_tokens": chunk.usage.prompt_tokens,
+                        "completion_tokens": chunk.usage.completion_tokens,
+                    }
+                continue
             delta = chunk.choices[0].delta.content
             if delta:
                 yield delta
@@ -159,6 +173,7 @@ class AnthropicProvider:
 
     def __init__(self, model: str = "claude-sonnet-5") -> None:
         self.model = model
+        self.last_usage: dict | None = None
 
     def available(self) -> bool:
         return bool(settings.anthropic_api_key)
@@ -172,6 +187,7 @@ class AnthropicProvider:
             api_key=settings.anthropic_api_key, timeout=LLM_TIMEOUT_SECONDS, max_retries=1
         )
         payload = [{"role": m.role, "content": m.content} for m in messages if m.role != "system"]
+        self.last_usage = None
         async with client.messages.stream(
             model=self.model,
             system=system,
@@ -181,6 +197,11 @@ class AnthropicProvider:
         ) as stream:
             async for text in stream.text_stream:
                 yield text
+            final = stream.get_final_message()
+            self.last_usage = {
+                "prompt_tokens": final.usage.input_tokens,
+                "completion_tokens": final.usage.output_tokens,
+            }
 
 
 class OllamaProvider:
@@ -188,6 +209,7 @@ class OllamaProvider:
 
     def __init__(self, model: str = "llama3.1") -> None:
         self.model = model
+        self.last_usage: dict | None = None
 
     def available(self) -> bool:
         """Reachable AND this specific model has been pulled."""
@@ -216,6 +238,7 @@ class OllamaProvider:
             payload["options"] = {"num_gpu": settings.ollama_num_gpu}
         # Локальный Ollama медленный, но живой: длинный read-таймаут вместо None.
         timeout = httpx.Timeout(connect=10.0, read=600.0, write=60.0, pool=10.0)
+        self.last_usage = None
         async with httpx.AsyncClient(timeout=timeout) as client:
             async with client.stream(
                 "POST", f"{settings.ollama_base_url}/api/chat", json=payload
@@ -224,6 +247,13 @@ class OllamaProvider:
                     if not line:
                         continue
                     data = json.loads(line)
+                    if data.get("done"):
+                        # Финальный чанк Ollama несёт фактические счётчики генерации.
+                        if data.get("prompt_eval_count") is not None:
+                            self.last_usage = {
+                                "prompt_tokens": data["prompt_eval_count"],
+                                "completion_tokens": data.get("eval_count"),
+                            }
                     token = data.get("message", {}).get("content")
                     if token:
                         yield token

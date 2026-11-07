@@ -57,6 +57,15 @@ async def upload_document(
     if ext not in ALLOWED_EXT:
         raise HTTPException(400, f"Формат {ext or '?'} не поддерживается. Разрешены: PDF, Word, Excel.")
 
+    # Серверный лимит размера (клиентская валидация не считается): сначала по
+    # content-length (быстрый отказ до чтения), затем по фактическому объёму.
+    max_bytes = settings.max_upload_mb * 1024 * 1024
+    declared = file.size or 0  # UploadFile.size от FastAPI (по multipart-заголовкам)
+    if declared and declared > max_bytes:
+        raise HTTPException(
+            413, f"Файл больше {settings.max_upload_mb} МБ. Лимит сервера: {settings.max_upload_mb} МБ."
+        )
+
     doc = Document(
         filename=file.filename or "document",
         content_type=file.content_type or "application/octet-stream",
@@ -71,8 +80,20 @@ async def upload_document(
     db.refresh(doc)
 
     dest = settings.upload_dir / f"{doc.id}{ext}"
+    written = 0
     with dest.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
+        while chunk := file.file.read(1024 * 1024):
+            written += len(chunk)
+            if written > max_bytes:
+                f.close()
+                dest.unlink(missing_ok=True)
+                db.delete(doc)
+                db.commit()
+                raise HTTPException(
+                    413,
+                    f"Файл больше {settings.max_upload_mb} МБ. Лимит сервера: {settings.max_upload_mb} МБ.",
+                )
+            f.write(chunk)
     doc.size_bytes = dest.stat().st_size
     db.add(doc)
     db.commit()
