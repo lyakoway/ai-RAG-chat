@@ -42,6 +42,7 @@ def _collect(provider, user_message="вопрос по документам"):
                 history=[],
                 lang="ru",
                 db=db,
+                workspace_id="default",
                 category=None,
                 document_ids=None,
                 top_k=5,

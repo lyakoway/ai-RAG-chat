@@ -84,11 +84,15 @@ async def run_agent(
     history: list[ChatMessage],
     lang: str,
     db: Session,
+    workspace_id: str,
     category: str | None,
     document_ids: list[str] | None,
     top_k: int | None,
     user_message: str,
 ) -> AsyncIterator[tuple[str, dict]]:
+    """workspace_id обязателен (trusted context из api/deps): SQL-инструменты
+    агента изолированы. Chroma retrieval изолируется в Step 4."""
+    _ = workspace_id  # изоляция retrieval — Step 4; здесь для list_documents
     """Yield SSE-ready (event, data) pairs: agent_step, sources, token."""
 
     # Demo provider: deterministic multi-step flow (always works offline).
@@ -98,6 +102,7 @@ async def run_agent(
             history=history,
             lang=lang,
             db=db,
+            workspace_id=workspace_id,
             category=category,
             document_ids=document_ids,
             top_k=top_k,
@@ -144,6 +149,7 @@ async def run_agent(
                 tool_name,
                 args,
                 db=db,
+                workspace_id=workspace_id,
                 category=category,
                 document_ids=document_ids,
                 top_k=top_k,
@@ -219,11 +225,13 @@ async def _mock_agent(
     history: list[ChatMessage],
     lang: str,
     db: Session,
+    workspace_id: str,
     category: str | None,
     document_ids: list[str] | None,
     top_k: int | None,
     user_message: str,
 ) -> AsyncIterator[tuple[str, dict]]:
+    _ = workspace_id  # mock-инструменты принимают ws для симметрии сигнатур
     """Offline demo: list → search → answer, with visible agent steps."""
     steps: list[dict] = []
 
@@ -231,6 +239,7 @@ async def _mock_agent(
         "list_documents",
         {},
         db=db,
+        workspace_id=workspace_id,
         category=category,
         document_ids=document_ids,
         top_k=top_k,
@@ -250,6 +259,7 @@ async def _mock_agent(
         "search_documents",
         {"query": user_message},
         db=db,
+        workspace_id=workspace_id,
         category=category,
         document_ids=document_ids,
         top_k=top_k,

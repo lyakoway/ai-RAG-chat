@@ -41,12 +41,25 @@ def get_workspace(request: Request) -> WorkspaceContext:
     Режимы задаются в settings (WORKSPACE_AUTH_MODE / WORKSPACE_TOKENS);
     strict без конфигурации невозможен — Settings fail fast на старте.
     Значение токена никогда не логируется и не попадает в текст ошибки.
+
+    ВРЕМЕННАЯ схема demo (задокументировано в docs/STAGE_4B_PLAN.md и
+    docs/migration-plan.md): заголовок X-Workspace опционален и НЕ является
+    auth — он лишь маркирует workspace до появления полноценной
+    authentication. Любой клиент может подменить X-Workspace; enforcement
+    появится вместе с auth (strict уже защищён токен-маппингом).
     """
-    from app.config import get_settings
+    from app.config import get_settings, validate_workspace_id
 
     settings = get_settings()
     if settings.workspace_auth_mode == "demo":
-        return WorkspaceContext(workspace_id="default")
+        ws = _header(request, "X-Workspace")
+        if not ws:
+            return WorkspaceContext(workspace_id="default")
+        try:
+            validate_workspace_id(ws)
+        except ValueError:
+            raise HTTPException(status_code=422, detail="Invalid X-Workspace header")
+        return WorkspaceContext(workspace_id=ws)
 
     token = _header(request, "X-Workspace-Key")
     if not token:
@@ -57,3 +70,15 @@ def get_workspace(request: Request) -> WorkspaceContext:
     if workspace_id is None:
         raise HTTPException(status_code=401, detail="Invalid workspace key")
     return WorkspaceContext(workspace_id=workspace_id)
+
+
+def get_scoped(db, model, obj_id: str, workspace_id: str):
+    """Получение записи по id С обязательной проверкой workspace.
+
+    Возвращает None для несуществующей И чужой записи — роуты отдают 404,
+    чтобы не раскрывать существование (никогда не 403).
+    """
+    obj = db.get(model, obj_id)
+    if obj is None or getattr(obj, "workspace_id", None) != workspace_id:
+        return None
+    return obj

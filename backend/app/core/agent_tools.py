@@ -39,15 +39,26 @@ def run_tool(
     args: dict,
     *,
     db: Session,
+    workspace_id: str,
     category: str | None,
     document_ids: list[str] | None,
     top_k: int | None,
 ) -> tuple[str, list[dict]]:
-    """Execute a tool. Returns (observation_text, retrieval_hits)."""
+    """Execute a tool. Returns (observation_text, retrieval_hits).
+
+    workspace_id обязателен (без default): SQL-инструменты изолированы.
+    search_documents использует Chroma retrieval — его изоляция Step 4."""
     args = args or {}
     if name == "list_documents":
         cat = args.get("category") or category
-        q = select(Document).where(Document.status == "ready").order_by(Document.created_at.desc())
+        q = (
+            select(Document)
+            .where(
+                Document.status == "ready",
+                Document.workspace_id == workspace_id,
+            )
+            .order_by(Document.created_at.desc())
+        )
         if cat:
             q = q.where(Document.category == cat)
         docs = db.scalars(q.limit(50)).all()

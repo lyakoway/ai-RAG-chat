@@ -15,11 +15,12 @@ import time
 import uuid
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.api.deps import WorkspaceContext, get_scoped, get_workspace
 from app.core import agent as agent_loop
 from app.core import rag
 from app.db.models import Conversation, Message
@@ -49,6 +50,7 @@ def _effective_top_k(top_k: int | None) -> int:
 def _log_chat_request(
     *,
     request_id: str,
+    workspace_id: str,
     mode: str,
     model_id: str,
     provider: str,
@@ -70,6 +72,7 @@ def _log_chat_request(
     record = {
         "event": "chat_request",
         "request_id": request_id,
+        "workspace_id": workspace_id,
         "mode": mode,
         "model": model_id,
         "provider": provider,
@@ -93,17 +96,28 @@ def _sse(event: str, data: dict) -> str:
 
 @router.post("")
 async def chat(
-    req: ChatRequest, background: BackgroundTasks, db: Session = Depends(get_db)
+    req: ChatRequest, background: BackgroundTasks, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
 ):
     mode = (req.mode or "rag").lower()
     if mode not in ("rag", "agent"):
         mode = "rag"
 
     # 1. Resolve / create the conversation and persist the user message.
-    conv = db.get(Conversation, req.conversation_id) if req.conversation_id else None
+    # Workspace scope: чужой conversation_id → 404 (не раскрываем существование).
+    conv = (
+        get_scoped(db, Conversation, req.conversation_id, ws.workspace_id)
+        if req.conversation_id
+        else None
+    )
     conv_created = conv is None
     if conv is None:
-        conv = Conversation(title=_title_from(req.message), model=req.model)
+        if req.conversation_id:
+            raise HTTPException(404, "Диалог не найден")
+        conv = Conversation(
+            title=_title_from(req.message), model=req.model,
+            workspace_id=ws.workspace_id,
+        )
         db.add(conv)
         db.commit()
         db.refresh(conv)
@@ -113,9 +127,15 @@ async def chat(
     db.commit()
 
     # 2. Build history for the model (chronological, capped).
+    # History scoped: JOIN с Conversation по workspace (миграционный план,
+    # needs-review → safe при scoped Conversation).
     history_rows = db.scalars(
         select(Message)
-        .where(Message.conversation_id == conv.id)
+        .join(Conversation, Message.conversation_id == Conversation.id)
+        .where(
+            Message.conversation_id == conv.id,
+            Conversation.workspace_id == ws.workspace_id,
+        )
         .order_by(Message.created_at.desc())
         .limit(_HISTORY_LIMIT)
     ).all()
@@ -188,6 +208,7 @@ async def chat(
         # Структурированный лог (после done; без текста запроса/ответа).
         _log_chat_request(
             request_id=request_id,
+            workspace_id=ws.workspace_id,
             mode="rag",
             model_id=req.model,
             provider=getattr(provider, "provider", "unknown"),
@@ -236,6 +257,7 @@ async def _gen_agent(
                 history=history,
                 lang=req.lang,
                 db=db_agent,
+                workspace_id=ws.workspace_id,
                 category=req.category,
                 document_ids=req.document_ids,
                 top_k=_effective_top_k(req.top_k),

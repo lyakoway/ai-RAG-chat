@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.api.deps import WorkspaceContext, get_scoped, get_workspace
 from app.config import get_settings
 from app.core import vectorstore
 from app.core.ingestion import detect_lang_from_filename, ingest_document
@@ -52,6 +53,7 @@ async def upload_document(
     file: UploadFile = File(...),
     category: str = Form("General"),
     db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
 ):
     ext = Path(file.filename or "").suffix.lower()
     if ext not in ALLOWED_EXT:
@@ -71,6 +73,7 @@ async def upload_document(
         content_type=file.content_type or "application/octet-stream",
         category=(category or "General").strip() or "General",
         status="processing",
+        workspace_id=ws.workspace_id,
         # Предварительный язык виден сразу, до индексации (потом уточняется
         # по содержимому в ingest_document).
         lang=detect_lang_from_filename(file.filename or ""),
@@ -105,7 +108,8 @@ async def upload_document(
 
 @router.post("/demo", response_model=list[DocumentOut], status_code=201)
 def load_demo_documents(
-    background: BackgroundTasks, db: Session = Depends(get_db)
+    background: BackgroundTasks, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
 ) -> list[Document]:
     """One-click demo pack: copies backend/samples into the upload flow.
 
@@ -129,6 +133,7 @@ def load_demo_documents(
             status="processing",
             lang=detect_lang_from_filename(path.name),
             pair_key=DEMO_PAIRS.get(path.name),
+            workspace_id=ws.workspace_id,
         )
         db.add(doc)
         db.commit()
@@ -147,30 +152,45 @@ def load_demo_documents(
 
 
 @router.get("", response_model=list[DocumentOut])
-def list_documents(category: str | None = None, db: Session = Depends(get_db)):
-    stmt = select(Document).order_by(Document.created_at.desc())
+def list_documents(
+    category: str | None = None, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
+):
+    stmt = select(Document).where(Document.workspace_id == ws.workspace_id).order_by(
+        Document.created_at.desc()
+    )
     if category and category != "All":
         stmt = stmt.where(Document.category == category)
     return list(db.scalars(stmt))
 
 
 @router.get("/categories", response_model=list[str])
-def list_categories(db: Session = Depends(get_db)):
-    rows = db.execute(select(Document.category).distinct()).scalars()
+def list_categories(db: Session = Depends(get_db), ws: WorkspaceContext = Depends(get_workspace)):
+    rows = db.execute(
+        select(Document.category)
+        .where(Document.workspace_id == ws.workspace_id)
+        .distinct()
+    ).scalars()
     return sorted({c for c in rows if c})
 
 
 @router.get("/{document_id}", response_model=DocumentOut)
-def get_document(document_id: str, db: Session = Depends(get_db)):
-    doc = db.get(Document, document_id)
+def get_document(
+    document_id: str, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
+):
+    doc = get_scoped(db, Document, document_id, ws.workspace_id)
     if not doc:
         raise HTTPException(404, "Документ не найден")
     return doc
 
 
 @router.get("/{document_id}/file")
-def download_document(document_id: str, db: Session = Depends(get_db)):
-    doc = db.get(Document, document_id)
+def download_document(
+    document_id: str, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
+):
+    doc = get_scoped(db, Document, document_id, ws.workspace_id)
     if not doc:
         raise HTTPException(404, "Документ не найден")
     ext = Path(doc.filename).suffix.lower()
@@ -188,20 +208,26 @@ def download_document(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.delete("/{document_id}", status_code=204)
-def delete_document(document_id: str, db: Session = Depends(get_db)):
-    doc = db.get(Document, document_id)
+def delete_document(
+    document_id: str, db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
+):
+    doc = get_scoped(db, Document, document_id, ws.workspace_id)
     if not doc:
         raise HTTPException(404, "Документ не найден")
 
     # Принцип взаимности: у парных документов (RU/EN-двойники демо-пака)
     # удаляем сразу оба; обычные загрузки удаляются поодиночке.
+    # Пара удаляется только в пределах своего workspace.
     ids = [document_id]
     if doc.pair_key:
         ids += [
             d.id
             for d in db.scalars(
                 select(Document).where(
-                    Document.pair_key == doc.pair_key, Document.id != document_id
+                    Document.pair_key == doc.pair_key,
+                    Document.workspace_id == ws.workspace_id,
+                    Document.id != document_id,
                 )
             )
         ]
