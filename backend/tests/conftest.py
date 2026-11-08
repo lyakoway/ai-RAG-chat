@@ -17,6 +17,10 @@ os.environ["CHROMA_DIR"] = str(TEST_DATA / "chroma")
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DATA / 'app.db'}"
 # Гибрид включён — тестируем продовую конфигурацию.
 os.environ["SEARCH_HYBRID"] = "1"
+# Workspace auth: тесты явно в demo (workspace "default" без токена).
+# strict-сценарии тестируются отдельным файлом через env/monkeypatch.
+os.environ["WORKSPACE_AUTH_MODE"] = "demo"
+os.environ.pop("WORKSPACE_TOKENS", None)
 sys.path.insert(0, str(BASE))
 
 import pytest  # noqa: E402
