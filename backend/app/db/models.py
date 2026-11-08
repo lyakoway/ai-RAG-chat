@@ -38,6 +38,13 @@ class Document(Base):
     lang: Mapped[str | None] = mapped_column(String(8), nullable=True)
     # Ключ пары RU/EN-двойников демо-пака: удаление одного сносит и перевод.
     pair_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    # Владелец документа (Stage 4B). Временно nullable: SQLite не позволяет
+    # ALTER TABLE ADD COLUMN … NOT NULL без DEFAULT (подставлять 'default'
+    # существующим строкам нельзя по плану §9) — backfill + NOT NULL constraint
+    # выполняет миграция app/db/migrate.py (отдельный этап).
+    workspace_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
@@ -47,6 +54,12 @@ class Conversation(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     title: Mapped[str] = mapped_column(String(512), default="New chat")
     model: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    # Владелец диалога (Stage 4B). Nullable по той же причине, что и в Document
+    # (SQLite ALTER-ограничение); Message наследует workspace через эту связь —
+    # дублирующее поле в Message не добавляется.
+    workspace_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
