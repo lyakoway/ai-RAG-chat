@@ -15,6 +15,7 @@ BASE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE))
 
 import pytest
+from sqlalchemy import text as sa_text
 
 from app.db.models import Conversation, Document, Message
 from app.db.session import (
@@ -156,6 +157,80 @@ class TestModelsWorkspace:
         engine.dispose()
 
 
+class TestModelMigrationSync:
+    """Модель и миграция не разошлись: create_all-схема (модель) идентична
+    migrate-схеме по workspace_id (NOT NULL + DEFAULT 'default')."""
+
+    def _fresh(self, tmp_path: Path):
+        from sqlalchemy import create_engine, inspect as sa_inspect, text as sa_text
+        from sqlalchemy.orm import sessionmaker
+
+        from app.db import models as _models  # noqa: F401 — регистрация в metadata
+        from app.db.models import Conversation, Document
+        from app.db.session import Base
+
+        engine = create_engine(f"sqlite:///{tmp_path / 'sync.db'}")
+        Base.metadata.create_all(bind=engine)
+        Session = sessionmaker(bind=engine)
+        return engine, Session, sa_inspect, sa_text
+
+    def test_model_column_not_null_with_default(self, tmp_path):
+        engine, _, sa_inspect, _ = self._fresh(tmp_path)
+        for model in ("documents", "conversations"):
+            col = next(c for c in sa_inspect(engine).get_columns(model)
+                       if c["name"] == "workspace_id")
+            assert col["nullable"] is False
+            # SQLite reflection отдаёт DEFAULT как строку "'default'"
+            assert "'default'" in str(col["default"])
+        engine.dispose()
+
+    def test_orm_insert_without_workspace_gets_default(self, tmp_path):
+        engine, Session, _, _ = self._fresh(tmp_path)
+        s = Session()
+        s.add(Document(id="d-nw", filename="x.docx", content_type="docx"))  # без ws
+        s.commit()
+        ws = s.execute(sa_text("SELECT workspace_id FROM documents WHERE id='d-nw'")).scalar()
+        assert ws == "default"
+        s.close()
+        engine.dispose()
+
+    def test_raw_sql_insert_without_workspace_gets_server_default(self, tmp_path):
+        """Прямой SQL INSERT без workspace_id (остальные NOT NULL заданы) —
+        server_default в DDL подставляет 'default'."""
+        engine, _, sa_inspect, sa_text = self._fresh(tmp_path)
+        with engine.begin() as conn:
+            conn.execute(sa_text(
+                "INSERT INTO conversations (id, title, created_at, updated_at) "
+                "VALUES ('c-nw', 'без ws', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            ))
+        ws = sa_inspect(engine).get_columns("conversations")
+        row = sa_text  # placeholder to keep linters honest
+        from sqlalchemy import inspect as _i
+
+        with engine.connect() as conn:
+            value = conn.execute(sa_text(
+                "SELECT workspace_id FROM conversations WHERE id='c-nw'"
+            )).scalar()
+        assert value == "default"
+        engine.dispose()
+
+    def test_raw_insert_null_ws_fails(self, tmp_path):
+        """NOT NULL enforcement на слое БД: явный NULL → IntegrityError.
+        Примечание: ORM-вставка с workspace_id=None НЕ упадёт — SQLAlchemy
+        применит Python-default 'default' (это production-поведение до Step 3:
+        пути без ws получают default, а не ошибку)."""
+        engine, _, _, sa_text = self._fresh(tmp_path)
+        from sqlalchemy import text as plain_text
+
+        with engine.begin() as conn:
+            with pytest.raises(Exception):
+                conn.execute(plain_text(
+                    "INSERT INTO documents (id, filename, workspace_id) "
+                    "VALUES ('d-null', 'x.docx', NULL)"
+                ))
+        engine.dispose()
+
+
 class TestInitDbIdempotent:
     def test_repeated_init_db_preserves_data(self, client, demo_loaded):
         """Повторный init_db() на test store: схема идемпотентна, существующие
@@ -174,21 +249,27 @@ class TestInitDbIdempotent:
         docs = client.get("/api/documents").json()
         assert all(d["filename"] for d in docs)
 
-    def test_init_db_does_not_backfill_workspace(self, client, demo_loaded):
-        """schema-only: init_db не подставляет default и не трогает
-        workspace_id существующих записей (data migration — отдельная команда)."""
-        from sqlalchemy import select
+    def test_init_db_is_schema_only_no_backfill(self, tmp_path):
+        """Вечный инвариант: init_db() — schema-only, никогда не бэкфиллит.
 
-        from app.db.models import Document
-        from app.db.session import SessionLocal, init_db
+        На изолированной tmp-базе со «старой схемой» (таблица без workspace_id
+        и данными) init-логика добавляет nullable-колонку, существующие строки
+        остаются IS NULL. Не проверяется на общей/боевой базе: там после
+        migrate phase 1 все записи уже в 'default' (см. docs/migration-plan.md)."""
+        import sqlite3
 
-        s = SessionLocal()
-        ids = s.scalars(select(Document.id)).all()
-        init_db()
-        for doc_id in ids:
-            row = s.execute(
-                select(Document.workspace_id).where(Document.id == doc_id)
-            ).scalar()
-            assert row is None, f"{doc_id}: init_db подставил workspace_id — это data migration"
-        s.rollback()
-        s.close()
+        from app.db.session import _ensure_sqlite_column
+
+        db = sqlite3.connect(tmp_path / "legacy.db")
+        db.execute(
+            "CREATE TABLE documents ("
+            " id VARCHAR(32) PRIMARY KEY NOT NULL, filename VARCHAR(512) NOT NULL)"
+        )
+        db.execute("INSERT INTO documents VALUES ('doc-legacy', 'старый документ.docx')")
+        db.commit()
+        assert _ensure_sqlite_column(db, "documents", "workspace_id", "VARCHAR(64)") is True
+        row = db.execute(
+            "SELECT workspace_id FROM documents WHERE id='doc-legacy'"
+        ).fetchone()
+        assert row[0] is None, "init_db/ensure не должен подставлять default — это data migration"
+        db.close()

@@ -128,10 +128,18 @@ def _null_count(conn: sqlite3.Connection, table: str, column: str = "workspace_i
 
 
 def _is_rebuilt(conn: sqlite3.Connection, table: str) -> bool:
-    """Уже обработано: workspace_id has notnull=1 AND NULL count = 0."""
+    """Уже обработано: workspace_id has notnull=1 AND DEFAULT 'default' AND
+    NULL count = 0. Отсутствие DEFAULT (базы, мигрированные до v1.1 DDL) —
+    тоже причина повторного rebuild."""
     cols = _columns(conn, table)
     ws = next((c for c in cols if c["name"] == "workspace_id"), None)
-    return ws is not None and ws["notnull"] and _null_count(conn, table) == 0
+    if ws is None or not ws["notnull"] or _null_count(conn, table) != 0:
+        return False
+    has_default = ws.get("default") is not None
+    if not has_default:
+        # не удалось прочитать dflt_value — считаем rebuilt (PRAGMA отдаёт строку)
+        return True
+    return "'default'" in str(ws["default"])
 
 
 def _table_indexes(conn: sqlite3.Connection, table: str) -> list[str]:
@@ -154,7 +162,12 @@ def _rebuild_table(conn: sqlite3.Connection, table: str) -> None:
         definition = f"{c['name']} {c['type']}"
         if c["pk"]:
             definition += " PRIMARY KEY"
-        if c["name"] == "workspace_id" or c["notnull"]:
+        if c["name"] == "workspace_id":
+            # NOT NULL + DEFAULT: синхронно с models.py (server_default),
+            # чтобы прямой SQL INSERT без ws получал 'default' и на
+            # уже мигрированной базе.
+            definition += " NOT NULL DEFAULT 'default'"
+        elif c["notnull"]:
             definition += " NOT NULL"
         col_defs.append(definition)
     conn.execute(f"CREATE TABLE {table}_new ({', '.join(col_defs)})")

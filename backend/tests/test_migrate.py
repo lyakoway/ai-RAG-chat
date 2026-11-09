@@ -70,15 +70,20 @@ class TestBackfill:
 
 
 class TestNotNullEnforcement:
-    def test_insert_without_workspace_fails(self, tmp_path):
+    def test_insert_without_workspace_gets_default(self, tmp_path):
+        """После migrate: NOT NULL + DEFAULT 'default'. Прямой SQL INSERT без
+        workspace_id получает 'default' — доказательство синхронности
+        DDL миграции и server_default модели (docs/migration-plan.md)."""
         db_path = tmp_path / "app.db"
         _make_db(db_path)
         m.run_migration(db_path)
         db = sqlite3.connect(str(db_path))
         assert _ws_column(db, "documents")["notnull"] is True
+        assert "'default'" in str(_ws_column(db, "documents")["default"])
         assert _ws_column(db, "conversations")["notnull"] is True
-        with pytest.raises(sqlite3.IntegrityError):
-            db.execute("INSERT INTO documents (id, filename) VALUES ('d3', 'x.docx')")
+        db.execute("INSERT INTO documents (id, filename) VALUES ('d3', 'x.docx')")
+        ws = db.execute("SELECT workspace_id FROM documents WHERE id='d3'").fetchone()[0]
+        assert ws == "default", "server_default должен сработать на прямом SQL INSERT"
         db.close()
 
 

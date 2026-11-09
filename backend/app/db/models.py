@@ -8,7 +8,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
@@ -38,12 +38,14 @@ class Document(Base):
     lang: Mapped[str | None] = mapped_column(String(8), nullable=True)
     # Ключ пары RU/EN-двойников демо-пака: удаление одного сносит и перевод.
     pair_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
-    # Владелец документа (Stage 4B). Временно nullable: SQLite не позволяет
-    # ALTER TABLE ADD COLUMN … NOT NULL без DEFAULT (подставлять 'default'
-    # существующим строкам нельзя по плану §9) — backfill + NOT NULL constraint
-    # выполняет миграция app/db/migrate.py (отдельный этап).
-    workspace_id: Mapped[str | None] = mapped_column(
-        String(64), nullable=True, index=True
+    # Владелец документа (Stage 4B, migrate phase 1 применена: NOT NULL +
+    # DEFAULT 'default' в БД). default — для ORM-вставок без явного значения;
+    # server_default — для прямых SQL INSERT и для путей, которые пока не
+    # передают ws явно (до Step 3 API isolation). Он НЕ подменяет изоляцию:
+    # с Step 3 все INSERT-пути передают workspace_id явно.
+    workspace_id: Mapped[str] = mapped_column(
+        String(64), nullable=False, index=True,
+        default="default", server_default=text("'default'"),
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
@@ -54,11 +56,12 @@ class Conversation(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     title: Mapped[str] = mapped_column(String(512), default="New chat")
     model: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    # Владелец диалога (Stage 4B). Nullable по той же причине, что и в Document
-    # (SQLite ALTER-ограничение); Message наследует workspace через эту связь —
-    # дублирующее поле в Message не добавляется.
-    workspace_id: Mapped[str | None] = mapped_column(
-        String(64), nullable=True, index=True
+    # Владелец диалога (Stage 4B, migrate phase 1 применена — см. Document).
+    # Message наследует workspace через эту связь — дублирующее поле в Message
+    # не добавляется.
+    workspace_id: Mapped[str] = mapped_column(
+        String(64), nullable=False, index=True,
+        default="default", server_default=text("'default'"),
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
