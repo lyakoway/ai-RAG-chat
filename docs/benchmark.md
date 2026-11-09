@@ -70,9 +70,11 @@ README-цифры воспроизведены штатным скриптом `
 
 ```bash
 cd backend
-.venv/bin/python benchmarks/retrieval_eval.py --strategy all          # dense + bm25 + hybrid
-.venv/bin/python benchmarks/retrieval_eval.py --strategy hybrid --repeats 3
+WORKSPACE_AUTH_MODE=demo .venv/bin/python benchmarks/retrieval_eval.py --strategy all --repeats 3
+WORKSPACE_AUTH_MODE=demo .venv/bin/python benchmarks/retrieval_eval.py --strategy hybrid --repeats 3
 ```
+(Demo-env нужен всем CLI eval/benchmark-скриптам: они работают с workspace
+`default`; strict-режим приложения требует WORKSPACE_TOKENS.)
 
 - **dense** — только векторный ANN-поиск (fastembed `paraphrase-multilingual-MiniLM-L12-v2` + ChromaDB cosine);
 - **bm25** — только лексический BM25 (`rank_bm25.BM25Okapi` по тем же чанкам);

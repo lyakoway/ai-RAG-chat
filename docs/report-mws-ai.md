@@ -285,6 +285,42 @@ vLLM, фактические числа, поведение KV-cache при ко
 - Документация: docs/answer-quality-evaluation.md (методика, таксономия
   отказов, human-review мини-выборка, ограничения).
 
+## 7.5. Workspace isolation (Stage 4B complete, 2026-11-09)
+
+**Зачем**: multi-user RAG требует изоляции двух вещей — документов (SQL) и
+контекста LLM (Chroma). Утечка второго незаметнее: чанки чужого workspace
+попадают в промпт и процитируются ответом.
+
+**Как реализовано**:
+- SQL: `workspace_id` в `Document`/`Conversation` (`nullable=False`,
+  `default/server_default='default'`, индексы); Message наследует через
+  родительскую Conversation (JOIN).
+- API: `Depends(get_workspace)` — trusted identity из backend-конфигурации
+  (`WORKSPACE_AUTH_MODE=strict|demo`; strict требует `WORKSPACE_TOKENS`,
+  fail fast на старте); все запросы scoped (`get_scoped`); чужой ресурс →
+  **404** (не 403 — не раскрывать существование); unsafe-место
+  `set_message_feedback` (прямой `db.get(Message)`) закрыто JOIN'ом.
+- Chroma: `workspace_id` в metadata каждого чанка; `query/delete` —
+  обязательный where; вызов без workspace_id → ValueError (нет global
+  fallback); миграция metadata — merge **без пересчёта векторов**
+  (`migrate_chroma.py`).
+- Порядок миграции боевой базы: остановка → согласованный backup (app.db с
+  integrity_check + chroma/ с проверкой размера + uploads/) → migrate SQL
+  (249 NULL → 0) → migrate Chroma (39 → 0, converged) → запуск → ручная
+  двух-workspace проверка.
+
+**Измерения**: SQL backfill+rebuild ~1.1 s; Chroma metadata merge ~0.6 s;
+полный миграционный pipeline (backup + обе фазы) ~2.7 s. Изоляция подтверждена
+тестами (cross-workspace матрица) и ручной проверкой с реальным LLM:
+ws_a на вопрос про факт ws_b — «нет информации», 77777 не утек; ws_b —
+цитирует свой документ.
+
+**Ограничения**: demo-режим `X-Workspace` — labeling до auth (любой клиент
+может подменить; strict — workspace-scoped API key, защищён); retrieval
+scoped, но embeddings/chroma-квоты per-workspace нет; audit log отсутствует.
+**Future work**: production auth (сессии/OIDC поверх get_workspace), rate
+limiting, audit log, per-workspace квоты.
+
 ## 8. Категории достижений
 
 **1. Подтверждено экспериментами (сырые данные в results/):**

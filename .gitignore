@@ -27,3 +27,7 @@ backend/benchmarks/.models/
 backend/benchmarks/.llama-cpp/
 backend/benchmarks/.mlx-venv/
 backend/data/eval_pollutants/
+
+# Production migration backups (содержат копию пользовательских данных)
+backend/backups/
+backend/data/backups/

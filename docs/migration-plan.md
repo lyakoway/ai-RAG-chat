@@ -1,8 +1,34 @@
 # Migration Plan — workspace_id backfill, rebuild и gate до API isolation
 
-Статус: **фаза A/B + Step 3 (API isolation) реализованы**, 2026-11-08.
-Gate пройден, Step 3 выполнен. Оставшийся риск: Chroma не изолирован до Step 4
-(см. §5.1).
+Статус: **Stage 4B COMPLETE** — изоляция SQL + API + Chroma реализована,
+**боевая миграция выполнена** 2026-11-09 (backup `backups/prod_20261109T114847Z_d818d5/`,
+отчёты в `migration_report.json` и `chroma_migration_report.json` внутри).
+
+Факты боевой миграции:
+- SQL: 249 NULL → 0 (`documents` 18 + `conversations` 231 → 'default'),
+  foreign_key_check ok, ~1.1 s;
+- Chroma: 40 чанков, 39 missing → 0 updated (metadata merge, без переиндексации),
+  converged, ~0.6 s;
+- оба migrate повторно: **no-op / converged** (идемпотентность на боевой базе);
+- общий backup: app.db (integrity_check ok) + chroma/ (размер совпадает) +
+  uploads/; retention — хранить ≥ N дней (N определяется владельцем);
+- ручная двух-workspace проверка на живом сервере — пройдена (см. §10.1 ниже).
+
+### §10.1 Ручная двух-workspace проверка (живой сервер, 2026-11-09)
+
+| # | Сценарий | Результат |
+|---|---|---|
+| 1 | upload ws_a (User_Guide.pdf), upload ws_b (факт «Омега 77777») | 201/201 |
+| 2 | list ws_a | только User_Guide.pdf (2 файла) |
+| 3 | list ws_b | только ws_b_doc.docx |
+| 4 | GET документа ws_a с ws_b | **404** |
+| 5 | GET файла ws_a с ws_b | **404** |
+| 6 | DELETE документа ws_a с ws_b | **404**, документ жив |
+| 7 | /api/search ws_a «User Guide» | только User_Guide.pdf |
+| 8 | /api/search ws_b тот же запрос | только ws_b_doc.docx (top-k ближайшие своего ws; нерелевантный свой текст — качество retrieval, не утечка) |
+| 9 | chat ws_a «Сколько стоит тариф Омега?» (GLM-5.3-flash) | «нет информации о тарифе Омега» — **77777 не утек** |
+| 10 | chat ws_b тот же вопрос (позитивный контроль) | «тариф Омега стоит 77 777 руб/мес [1]» — свой факт процитирован |
+| 11 | без header | workspace `default`, свои 18 документов |
 Основание: фактическая верификация кода на коммите `93fdaf1` + Stage 4A.
 
 ## 1. Текущее состояние (факты этапа 1)

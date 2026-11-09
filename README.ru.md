@@ -187,6 +187,19 @@ dense, реранкер, который проиграл, и модель по �
 - **Reproducibility** — evaluation-индекс пересобирается с нуля при каждом
   запуске.
 
+## Изоляция workspace
+
+Документы, диалоги и чанки Chroma скоупятся по `workspace_id` (Stage 4B).
+API берёт workspace из доверенной backend-зависимости
+(`WORKSPACE_AUTH_MODE=strict|demo`; demo принимает опциональный заголовок
+`X-Workspace` — это маркировка workspace, не auth; strict требует
+`WORKSPACE_TOKENS` и fail fast на старте). Чужой ресурс → 404; retrieval
+фильтруется по workspace; миграция данных (`app/db/migrate.py`,
+`app/db/migrate_chroma.py`) идемпотентна, с backup и integrity-проверками.
+Подробности и ручная двух-workspace проверка:
+[docs/migration-plan.md](docs/migration-plan.md),
+[docs/report-mws-ai.md](docs/report-mws-ai.md) §7.5.
+
 ## Быстрый старт
 
 Приложение работает **без ключей** — в демо-режиме (mock LLM) и с локальными
@@ -332,9 +345,9 @@ OLLAMA_NUM_GPU=0      # форсировать CPU (обход Metal-бага н
 
 ```bash
 cd backend
-.venv/bin/python scripts/evaluate.py             # конфиг по умолчанию (гибрид)
-SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # чистый векторный поиск
-.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder (отклонён)
+WORKSPACE_AUTH_MODE=demo .venv/bin/python scripts/evaluate.py             # конфиг по умолчанию (гибрид)
+WORKSPACE_AUTH_MODE=demo SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # чистый векторный поиск
+WORKSPACE_AUTH_MODE=demo .venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder (отклонён)
 ```
 
 Результаты (Recall@1 / Recall@3 / MRR@5 / латентность поиска на запрос, CPU,

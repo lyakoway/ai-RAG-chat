@@ -199,6 +199,18 @@ supporting measurements, not headline claims.
 - **Reproducibility** — the evaluation index is rebuilt from scratch on every
   run.
 
+## Workspace isolation
+
+Documents, conversations and Chroma chunks are scoped by `workspace_id`
+(Stage 4B). API reads workspace from a trusted backend dependency
+(`WORKSPACE_AUTH_MODE=strict|demo`; demo accepts an optional `X-Workspace`
+header — workspace labeling, not auth; strict requires `WORKSPACE_TOKENS` and
+fails fast). Cross-workspace access returns 404; retrieval filters by
+workspace; data migration (`app/db/migrate.py`, `app/db/migrate_chroma.py`)
+is idempotent with backup + integrity checks. Details and manual
+two-workspace verification: [docs/migration-plan.md](docs/migration-plan.md),
+[docs/report-mws-ai.md](docs/report-mws-ai.md) §7.5.
+
 ## Quick start
 
 The app runs **without keys** — in demo mode (mock LLM) with local embeddings.
@@ -345,9 +357,9 @@ scratch on every run.
 
 ```bash
 cd backend
-.venv/bin/python scripts/evaluate.py             # default config (hybrid)
-SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # pure vector search
-.venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder (rejected)
+WORKSPACE_AUTH_MODE=demo .venv/bin/python scripts/evaluate.py             # default config (hybrid)
+WORKSPACE_AUTH_MODE=demo SEARCH_HYBRID=0 .venv/bin/python scripts/evaluate.py   # pure vector search
+WORKSPACE_AUTH_MODE=demo .venv/bin/python scripts/evaluate.py --rerank    # + cross-encoder (rejected)
 ```
 
 Results (Recall@1 / Recall@3 / MRR@5 / search latency per query, CPU,
