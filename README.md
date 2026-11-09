@@ -10,12 +10,39 @@ pinned: false
 
 English | [Русский](README.ru.md)
 
-# 📚 AI RAG Chat — chat with your internal documents
+# 📚 AI RAG Chat — multi-user RAG with measured isolation
 
-> Document Q&A over your own files (PDF, Word, Excel) **with citations to the
-> exact source page**. Three modes side by side: **RAG Chat**, **AI Agent**
-> and **Vector Search** — so the difference is visible on the same question.
-> Answers are grounded **only in the uploaded documents**.
+**What it does** — document Q&A over your own files (PDF, Word, Excel) with
+citations to the exact source page, hybrid retrieval, per-workspace isolation
+of documents *and* LLM context, and a reproducible evaluation harness.
+
+**Why it matters** — multi-user RAG without context isolation leaks documents
+through the LLM: chunks from workspace B silently enter the prompt and get
+cited by an answer to workspace A. Here it is measured and closed — negative
+control on a live LLM: chat in ws_a on a ws_b fact returns "no information";
+the same question in ws_b cites the fact. See §10.1 in
+[docs/migration-plan.md](docs/migration-plan.md).
+
+**How it works**
+
+```
+ingestion → hybrid retrieval (BM25 + dense, RRF) → LLM (GLM-5.3-flash / OpenAI / Ollama)
+    ↑ Chroma chunks scoped by workspace_id (mandatory where, no fallback)      ↓
+workspace-scoped SQL (documents, conversations) ← citations + answer eval ← negative control
+```
+
+**What evaluation showed** (47 held-out queries; details in [docs/benchmark.md](docs/benchmark.md)):
+
+- Hybrid retrieval (BM25 + dense, RRF): **Recall@1 87.2%** vs dense-only 53.2%
+  (+34 p.p.), Recall@3 97.9%, nDCG@5 0.940 — [ADR-001](docs/adr/ADR-001-hybrid-retrieval.md);
+  cross-encoder reranker measured and rejected (−45 p.p.) — [ADR-002](docs/adr/ADR-002-no-cross-encoder-reranker.md).
+- Workspace isolation: SQL migration 249 NULL → 0 (NOT NULL, ~24 ms), Chroma
+  metadata merge 39 → 0 (no re-embedding, ~0.6 s), both idempotent (re-run =
+  no-op) — [ADR-003](docs/adr/ADR-003-workspace-isolation.md).
+- Negative control on live GLM-5.3-flash: ws_a chat does not cite the ws_b
+  fact; ws_b chat cites its own.
+- 260 tests; known rejected optimizations documented with evidence —
+  [docs/report-mws-ai.md](docs/report-mws-ai.md) §8.
 
 ### 🔗 Live demo → **https://lyakoway-rag-chat.hf.space**
 
@@ -36,11 +63,12 @@ idle takes ~50 s to wake up.</sub>
 | Metric                                   | Value                      |
 | ---------------------------------------- | -------------------------- |
 | Recall@1 · held-out set (47 queries)     | **87%**                    |
+| nDCG@5 · hybrid vs dense                 | **0.940** vs 0.786         |
 | First token (TTFT) · GLM-5.3-flash       | ~2.5–3 s                   |
 | Cost per question · GLM-5.3-flash        | ≈ $0.0002 measured (~5,000 questions per $1) |
 | Vector search via API · p50              | 18 ms                      |
 | Demo pack indexing · 6 files → 12 chunks | 0.7 s                      |
-| pytest tests + CI                        | 174 (63 app + 111 bench)    |
+| pytest tests + CI                        | 260 (63 app + 197 bench)   |
 
 ## What the project is for
 

@@ -308,6 +308,9 @@ vLLM, фактические числа, поведение KV-cache при ко
   integrity_check + chroma/ с проверкой размера + uploads/) → migrate SQL
   (249 NULL → 0) → migrate Chroma (39 → 0, converged) → запуск → ручная
   двух-workspace проверка.
+- ADR: [docs/adr/ADR-001-hybrid-retrieval.md](adr/ADR-001-hybrid-retrieval.md),
+  [ADR-002-no-cross-encoder-reranker.md](adr/ADR-002-no-cross-encoder-reranker.md),
+  [ADR-003-workspace-isolation.md](adr/ADR-003-workspace-isolation.md).
 
 **Измерения**: SQL backfill+rebuild ~1.1 s; Chroma metadata merge ~0.6 s;
 полный миграционный pipeline (backup + обе фазы) ~2.7 s. Изоляция подтверждена
@@ -321,7 +324,28 @@ scoped, но embeddings/chroma-квоты per-workspace нет; audit log отс
 **Future work**: production auth (сессии/OIDC поверх get_workspace), rate
 limiting, audit log, per-workspace квоты.
 
-## 8. Категории достижений
+## 8. What we tried and rejected (with evidence)
+
+Каждый пункт: гипотеза → измерение → результат → решение. Ни одного «не
+получилось с первого раза» без цифр; часть «отрицательных» результатов — самая
+ценная часть этого проекта.
+
+| # | Гипотеза | Что измерили | Результат | Решение |
+|---|---|---|---|---|
+| 1 | Cross-encoder reranker улучшит top-k | 47 held-out: Recall@1 41.7% vs hybrid 87.2%, MRR@5 0.694, +~2.9 s | reranker поднимает языковых двойников и добавляет ~3 s | **Отклонён** (ADR-002) |
+| 2 | Prefix caching ускорит retrieval | llama.cpp: prefill unique 231 ms vs cache-hit 500 ms (Q4, n=3); Q8: 212 vs 159 ms (−25%) | эффект неустойчив, CPU prefill слишком дешёв (0.05 ms/токен) — копирование KV сопоставимо с пересчётом | **Не внедрён**; переоценка на GPU |
+| 3 | Speculative decoding ускорит генерацию | b11826 + 1B draft Q4: TPOT 43.7 vs 39.8 ms/tok без draft (+10%), cold start 12.7 vs 8.5 s | draft конкурирует за те же ядра CPU | **Отклонён**; acceptance rate недоступен через OpenAI-эндпоинт b11826 (discovery-тест) |
+| 4 | Параллельные слоты llama.cpp (-np) дадут throughput | -np 1/2/4: aggregate 2.1–2.8 tok/s плоский, per-stream 3.8→2.4, TPOT 272→434 ms | ядра CPU и так насыщены одним стримом | **Не внедрён**; переоценка на GPU |
+| 5 | Длинный контекст: кривая prefill vs длину | prefill 512 ток = 15.8 с против ~35 мс валидных — swap 35.6 GB, пейджинг KV | **кривая невалидна**, артефакт помечен invalidated | **Аннулирован**; чистый замок требует машины без swap (документировано) |
+| 6 | Few-shot поднимет цитирование у 3B (V1) | V1 coverage 1/12 vs V0 0/12, validity деградировал | few-shot без явных правил не переносится | **Отклонён**; V2 (few-shot + правила) принят — см. citation-experiment.md |
+| 7 | Один валидный нерелевантный документ не повлияет на retrieval | robustness: Recall@1 87.2% → 80.8% (−6.4 п.п.) | влияние реальное; ingestion-валидация работает (4/5 отвергнуты), уязвимость — fusion к шуму | **Зафиксировано**; fusion-изменения не внедрялись без подтверждённого механизма |
+| 8 | Облачные модели нуждаются в V2-цитировании | GLM-5.3-flash held-out: citations 8/8 без V2 | **не нужны** — перенос V2 только для локального провайдера | Решение по данным |
+
+Плюс два исправленных собственных дефекта измерений (зафиксированы, не
+скрыты): «28/28» → фактически 24/24 в load-отчёте; первый robustness-прогон
+считал rejected-файлы «принятыми» (метрика мерила «не упал», а не исход).
+
+## 8.1. Категории достижений
 
 **1. Подтверждено экспериментами (сырые данные в results/):**
 retrieval-сравнение 3 стратегий (baseline воспроизведён 3 раза, все цифры
