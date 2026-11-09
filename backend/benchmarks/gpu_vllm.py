@@ -71,7 +71,7 @@ def build_prompts() -> list[dict]:
     golden = json.loads((BASE / "eval" / "golden_answers.json").read_text(encoding="utf-8"))
     out = []
     for p in golden["benchmark_prompts"]:
-        hits = rag.retrieve(query=p["q"])
+        hits = rag.retrieve(query=p["q"], workspace_id="default")
         out.append({
             "id": p["id"], "name": p["name"], "q": p["q"],
             "system": rag.build_system_prompt(hits, "ru" if "-ru" in p["name"] else "en"),

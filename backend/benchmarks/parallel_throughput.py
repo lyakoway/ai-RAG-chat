@@ -75,7 +75,7 @@ def build_prompts() -> list[tuple[str, str]]:
 
     out = []
     for q in QUESTIONS:
-        hits = rag.retrieve(query=q)
+        hits = rag.retrieve(query=q, workspace_id="default")
         out.append((rag.build_system_prompt(hits, "ru"), q))
     return out
 

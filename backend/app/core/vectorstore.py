@@ -40,8 +40,13 @@ def _collection():
 
 
 def add_document_chunks(
-    *, document_id: str, filename: str, category: str, chunks: list[Chunk]
+    *, document_id: str, filename: str, category: str, chunks: list[Chunk],
+    workspace_id: str,
 ) -> None:
+    """Индексация чанков. workspace_id обязателен и пишется в metadata
+    каждого чанка — основа retrieval-изоляции (Step 4)."""
+    if not workspace_id:
+        raise ValueError("add_document_chunks: workspace_id обязателен")
     if not chunks:
         return
     emb = get_embeddings()
@@ -56,19 +61,30 @@ def add_document_chunks(
             "page": c.page,
             "label": c.label or "",
             "chunk_index": c.index,
+            "workspace_id": workspace_id,
         }
         for c in chunks
     ]
     _collection().add(ids=ids, documents=texts, embeddings=vectors, metadatas=metadatas)
 
 
-def delete_document(document_id: str) -> None:
-    _collection().delete(where={"document_id": document_id})
+def delete_document(document_id: str, workspace_id: str) -> None:
+    """Удаление чанков документа. workspace_id обязателен: без него удаление
+    невозможно (защита от cross-workspace удаления)."""
+    if not workspace_id:
+        raise ValueError("delete_document: workspace_id обязателен")
+    _collection().delete(where={
+        "$and": [
+            {"document_id": document_id},
+            {"workspace_id": workspace_id},
+        ]
+    })
 
 
 def query(
     *,
     text: str,
+    workspace_id: str,
     top_k: int,
     category: str | None = None,
     document_ids: list[str] | None = None,
@@ -78,8 +94,15 @@ def query(
     Pipeline: vector ANN → optional BM25 fusion (RRF) → optional cross-encoder
     rerank → top_k. Advanced stages are opt-in via env (SEARCH_HYBRID /
     SEARCH_RERANK) so the plain demo stays lightweight.
+
+    workspace_id ОБЯЗАТЕЛЕН (без default): query без него поднимает ValueError
+    — защита от global fallback при неполной миграции. Чанки без workspace_id
+    в metadata не возвращаются фильтром (Chroma where не матчит отсутствующее
+    поле); их существование после migrate_chroma = баг миграции.
     """
-    where = _build_where(category, document_ids)
+    if not workspace_id:
+        raise ValueError("vectorstore.query: workspace_id обязателен")
+    where = _build_where(workspace_id, category, document_ids)
     emb = get_embeddings()
 
     count = _collection().count()
@@ -207,14 +230,14 @@ def _fuse_with_bm25(
     return ordered[:n_candidates]
 
 
-def _build_where(category: str | None, document_ids: list[str] | None) -> dict:
-    clauses: list[dict] = []
+def _build_where(workspace_id: str, category: str | None,
+                 document_ids: list[str] | None) -> dict:
+    """Chroma where: workspace_id всегда первым условием изоляции."""
+    clauses: list[dict] = [{"workspace_id": workspace_id}]
     if category and category != "All":
         clauses.append({"category": category})
     if document_ids:
         clauses.append({"document_id": {"$in": document_ids}})
     if len(clauses) == 1:
         return clauses[0]
-    if len(clauses) > 1:
-        return {"$and": clauses}
-    return {}
+    return {"$and": clauses}

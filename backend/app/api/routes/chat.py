@@ -164,6 +164,7 @@ async def chat(
     effective_top_k = _effective_top_k(req.top_k)
     t_retr = time.perf_counter()
     hits = rag.retrieve(
+        workspace_id=ws.workspace_id,
         query=req.message,
         top_k=effective_top_k,
         category=req.category,

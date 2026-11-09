@@ -65,7 +65,7 @@ def run_llama(args) -> list[dict]:
     from benchmarks.local_llamacpp import LLAMA_DIR, LlamaServer, MODELS_DIR
 
     gguf = MODELS_DIR / "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
-    hits = rag.retrieve(query=QUESTION)
+    hits = rag.retrieve(query=QUESTION, workspace_id="default")
     system = rag.build_system_prompt(hits, "ru")
     base_tokens = count_tokens(system) + count_tokens(QUESTION)
     print(f"Базовый RAG-промпт: {base_tokens} токенов; длины паддинга: {args.lengths}")
@@ -101,7 +101,7 @@ def run_zai(args) -> list[dict]:
     from app.core import rag
     from benchmarks.llm_bench import stream_openai_compat
 
-    hits = rag.retrieve(query=QUESTION)
+    hits = rag.retrieve(query=QUESTION, workspace_id="default")
     system = rag.build_system_prompt(hits, "ru")
 
     async def one(target: int, rep: int) -> dict:

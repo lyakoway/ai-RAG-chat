@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.core import vectorstore
 from app.core.embeddings import active_model_name
+from app.api.deps import WorkspaceContext, get_workspace
 from app.db.session import get_db
 from app.schemas.dto import SearchResponse, Source
 
@@ -33,6 +34,7 @@ def vector_search(
     ),
     top_k: int | None = Query(None, ge=_TOP_K_MIN, le=_TOP_K_MAX),
     db: Session = Depends(get_db),
+    ws: WorkspaceContext = Depends(get_workspace),
 ) -> SearchResponse:
     query = q.strip()
     if not query:
@@ -43,6 +45,7 @@ def vector_search(
     started = time.perf_counter()
     hits = vectorstore.query(
         text=query,
+        workspace_id=ws.workspace_id,
         top_k=top_k or settings.retrieval_top_k,
         category=category,
         document_ids=ids or None,

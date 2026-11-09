@@ -191,6 +191,7 @@ async def run_agent(
 
     # Fallback: one search + grounded answer like classic RAG.
     hits = rag.retrieve(
+        workspace_id=workspace_id,
         query=user_message,
         top_k=top_k,
         category=category,

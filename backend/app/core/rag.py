@@ -35,13 +35,21 @@ SYSTEM_PROMPTS = {"ru": SYSTEM_PROMPT_RU, "en": SYSTEM_PROMPT_EN}
 def retrieve(
     *,
     query: str,
+    workspace_id: str,
     top_k: int | None = None,
     category: str | None = None,
     document_ids: list[str] | None = None,
 ) -> list[dict]:
+    """Retrieval scoped по workspace (Stage 4B Step 4). workspace_id обязателен
+    — пропуск = ValueError на уровне vectorstore.query (защита от global
+    fallback при неполной Chroma-миграции)."""
     k = top_k or settings.retrieval_top_k
     return vectorstore.query(
-        text=query, top_k=k, category=category, document_ids=document_ids
+        text=query,
+        workspace_id=workspace_id,
+        top_k=k,
+        category=category,
+        document_ids=document_ids,
     )
 
 

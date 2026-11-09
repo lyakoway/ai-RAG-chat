@@ -340,7 +340,7 @@ def build_prompts(mode: str, prompt_set: str) -> list[dict]:
         if wanted and p.get("context_size") != wanted:
             continue
         if mode == "rag":
-            hits = rag.retrieve(query=p["q"])
+            hits = rag.retrieve(query=p["q"], workspace_id="default")
             system = rag.build_system_prompt(hits, "ru" if "ru" in p["name"] else "en")
             retrieval_ms = None  # замеряется на живом прогоне в main
             doc_hint = p["doc_hint"]
@@ -470,7 +470,7 @@ async def main_async(args) -> None:
                     from app.core import rag
 
                     tr = time.perf_counter()
-                    hits = rag.retrieve(query=prompt["user"])
+                    hits = rag.retrieve(query=prompt["user"], workspace_id="default")
                     retrieval_ms = round((time.perf_counter() - tr) * 1000, 2)
                     prompt = {**prompt, "retrieved_docs": [h["filename"] for h in hits]}
                 r = await bench_one(model_id, prompt, args)

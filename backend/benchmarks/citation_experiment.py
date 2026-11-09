@@ -247,7 +247,7 @@ def run_variant(vid: str, prompts: dict[str, str], items: list[dict], kinds: lis
 def srv_retrieve(query: str, top_k: int) -> list[dict]:
     from app.core import rag
 
-    return rag.retrieve(query=query, top_k=top_k)
+    return rag.retrieve(query=query, top_k=top_k, workspace_id="default")
 
 
 def main() -> None:

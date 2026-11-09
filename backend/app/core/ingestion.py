@@ -52,11 +52,18 @@ def ingest_document(db: Session, document: Document, path: Path) -> None:
     try:
         segments = parse_document(path, document.content_type)
         chunks = chunk_segments(segments)
+        if not document.workspace_id:
+            # После migrate phase 1 Document без ws невозможен; отсутствие —
+            # баг миграции, тихо индексировать в "глобальный" контекст нельзя.
+            raise ValueError(
+                f"Document {document.id} без workspace_id: выполните миграцию"
+            )
         vectorstore.add_document_chunks(
             document_id=document.id,
             filename=document.filename,
             category=document.category,
             chunks=chunks,
+            workspace_id=document.workspace_id,
         )
         document.page_count = page_count(segments)
         document.chunk_count = len(chunks)

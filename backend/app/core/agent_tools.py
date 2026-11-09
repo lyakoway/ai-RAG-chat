@@ -81,6 +81,7 @@ def run_tool(
         if not query:
             return ("Error: args.query is required.", [])
         hits = rag.retrieve(
+            workspace_id=workspace_id,
             query=query,
             top_k=top_k,
             category=category,

@@ -169,7 +169,7 @@ def hybrid_search(text: str, top_k: int) -> list[dict]:
     """Продовый путь: vectorstore.query c SEARCH_HYBRID=1 (RRF-сплав)."""
     from app.core import vectorstore
 
-    return vectorstore.query(text=text, top_k=top_k)
+    return vectorstore.query(text=text, workspace_id="default", top_k=top_k)
 
 
 SEARCHERS = {"dense": dense_search, "bm25": bm25_only_search, "hybrid": hybrid_search}

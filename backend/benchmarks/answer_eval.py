@@ -279,12 +279,12 @@ async def main_async(args) -> None:
             qid = item["id"]
             print(f"[{kind}] {item['q'][:60]}")
             if kind == "answer":
-                hits = rag.retrieve(query=item["q"], top_k=args.top_k)
+                hits = rag.retrieve(query=item["q"], top_k=args.top_k, workspace_id="default")
                 context = rag.build_context(hits)
                 system = rag.build_system_prompt(hits, item.get("lang", "ru"))
                 retrieved_docs = [h["filename"] for h in hits]
             else:
-                hits = rag.retrieve(query=item["q"], top_k=args.top_k)
+                hits = rag.retrieve(query=item["q"], top_k=args.top_k, workspace_id="default")
                 context = rag.build_context(hits)
                 system = rag.build_system_prompt(hits, item.get("lang", "ru"))
                 retrieved_docs = [h["filename"] for h in hits]

@@ -69,7 +69,8 @@ Gate пройден, Step 3 выполнен. Оставшийся риск: Chr
       переиндексации — подтверждено фактическим прогоном 0.5.23; тест M-7 —
       при реализации Step 4).
 
-**Gate пройден; Step 3 (API isolation) ВЫПОЛНЕН** (2026-11-08):
+**Gate пройден; Step 3 (API isolation) и Step 4 (Chroma isolation) ВЫПОЛНЕНЫ**
+(2026-11-08 / 2026-11-09):
 Depends(get_workspace) на documents/chat/conversations/feedback; scoped
 list/get/rename/delete/download/upload; unsafe `set_message_feedback` закрыт
 (JOIN Conversation); history scoped через JOIN Conversation; agent
@@ -77,8 +78,8 @@ list_documents scoped; chat создаёт Conversation с workspace_id явно
 пишет workspace_id. Чужой ресурс → 404 (не 403/401) — подтверждено тестами
 (test_workspace_isolation.py, 14 сценариев) и ручной проверкой живого сервера.
 
-До Step 4 (Chroma): retrieval может вернуть чанки любого workspace — privacy
-контекста LLM не гарантирована (см. §5.1, осознанный промежуточный риск).
+Изоляция полная: SQL + API + Chroma. Multi-user deployment требует лишь
+замены workspace labeling (X-Workspace в demo) на полноценную auth.
 
 ## 5. Rollback
 
@@ -104,13 +105,14 @@ list_documents scoped; chat создаёт Conversation с workspace_id явно
   IntegrityError).
 - Если процесс миграции упал, lock-файл `<db>.migration.lock` остаётся;
   удалить вручную после проверки, что процесс миграции не работает.
-- **Промежуточный риск до Step 4 (Chroma isolation) — АКТУАЛЕН**: retrieval
-  (включая /api/search и agent tool search_documents) фильтрует только по
-  category/document_ids — чанки ЛЮБОГО workspace попадают в контекст LLM.
-  API-изоляция (Step 3) SQL-слой закрыла, но privacy контекста LLM не
-  гарантируется до Step 4: запрос в ws_a может получить в контексте фрагменты
-  документов ws_b и процитировать их. Для однопользовательского demo —
-  осознанный риск; для multi-user deployment Step 4 ОБЯЗАТЕЛЕН.
+- ~~Промежуточный риск до Step 4~~ **ЗАКРЫТ (Step 4 выполнен, 2026-11-09)**:
+  retrieval изолирован — `vectorstore.query/delete/add` требуют workspace_id
+  (отсутствие → ValueError, никакого global fallback), metadata каждого чанка
+  содержит workspace_id; миграция `app/db/migrate_chroma.py` заполнила
+  workspace_id всем существующим чанкам (metadata merge без пересчёта
+  векторов; прогон на копии: 36→0 missing, converged, повтор no-op).
+  Integration-тесты: /api/search и RAG-контекст ws_a не возвращают и не
+  цитируют чанки ws_b (test_chroma_isolation.py).
 
 ## 6. Ограничения
 
