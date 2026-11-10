@@ -129,16 +129,18 @@ def run_migration(
         total, before_missing = _missing_report(col, doc_ws)
         if total == 0:
             return _report(started, backup_path, total, before_missing, 0,
-                           0, [], "no-op (пустая коллекция)")
+                           0, [], "no-op (пустая коллекция)", already_had_ws=0)
 
         # батчевый merge: по каждому document_id обновляем только missing-чанки
         updated = 0
+        already_had_ws = 0
         for document_id, ws in doc_ws.items():
             data = col.get(where={"document_id": document_id}, include=["metadatas"])
             ids = data.get("ids") or []
             metas = data.get("metadatas") or []
             missing = [cid for cid, meta in zip(ids, metas)
                        if not (meta or {}).get("workspace_id")]
+            already_had_ws += len(ids) - len(missing)
             for i in range(0, len(missing), batch):
                 part = missing[i:i + batch]
                 col.update(ids=part, metadatas=[{"workspace_id": ws}] * len(part))
@@ -155,7 +157,8 @@ def run_migration(
             "before_missing": before_missing,
             "after_missing": after_missing,
             "updated": updated,
-            "orphan_chunks_no_sql_doc": len(orphans),
+            "already_had_ws": already_had_ws,
+            "orphan_chunks": len(orphans),
             "duration_ms": round((time.perf_counter() - started) * 1000, 1),
             "phase": "converged" if converged else "partial",
             "note": "metadata merge без пересчёта векторов (Chroma update)",
@@ -166,7 +169,8 @@ def run_migration(
         lock_path.unlink(missing_ok=True)
 
 
-def _report(started, backup_path, total, before, after, updated, orphans, phase) -> dict:
+def _report(started, backup_path, total, before, after, updated, orphans, phase,
+            already_had_ws: int = 0) -> dict:
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "backup_path": str(backup_path),
@@ -174,6 +178,7 @@ def _report(started, backup_path, total, before, after, updated, orphans, phase)
         "before_missing": before,
         "after_missing": after,
         "updated": updated,
+        "already_had_ws": already_had_ws,
         "orphan_chunks_no_sql_doc": len(orphans),
         "duration_ms": round((time.perf_counter() - started) * 1000, 1),
         "phase": phase,

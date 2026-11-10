@@ -332,7 +332,7 @@ limiting, audit log, per-workspace квоты.
 
 | # | Гипотеза | Что измерили | Результат | Решение |
 |---|---|---|---|---|
-| 1 | Cross-encoder reranker улучшит top-k | 47 held-out: Recall@1 41.7% vs hybrid 87.2%, MRR@5 0.694, +~2.9 s | reranker поднимает языковых двойников и добавляет ~3 s | **Отклонён** (ADR-002) |
+| 1 | Cross-encoder reranker улучшит top-k | re-measured 2026-11-09 (47 held-out, fastembed TextCrossEncoder, hybrid top-20 пул): Recall@1 61.7% = −25.5 п.п. vs hybrid 87.2%, MRR@5 0.683, rerank p50 ~6.7 с; ранний замер 41.7%/−45.5 п.п. не сохранился как артефакт | **Отклонён** (ADR-002, re-measured) |
 | 2 | Prefix caching ускорит retrieval | llama.cpp: prefill unique 231 ms vs cache-hit 500 ms (Q4, n=3); Q8: 212 vs 159 ms (−25%) | эффект неустойчив, CPU prefill слишком дешёв (0.05 ms/токен) — копирование KV сопоставимо с пересчётом | **Не внедрён**; переоценка на GPU |
 | 3 | Speculative decoding ускорит генерацию | b11826 + 1B draft Q4: TPOT 43.7 vs 39.8 ms/tok без draft (+10%), cold start 12.7 vs 8.5 s | draft конкурирует за те же ядра CPU | **Отклонён**; acceptance rate недоступен через OpenAI-эндпоинт b11826 (discovery-тест) |
 | 4 | Параллельные слоты llama.cpp (-np) дадут throughput | -np 1/2/4: aggregate 2.1–2.8 tok/s плоский, per-stream 3.8→2.4, TPOT 272→434 ms | ядра CPU и так насыщены одним стримом | **Не внедрён**; переоценка на GPU |

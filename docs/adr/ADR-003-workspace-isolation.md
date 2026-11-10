@@ -71,7 +71,9 @@ Staged, each step verifiable:
 ## Evidence
 
 - Migration reports: `backend/backups/prod_20261109T114847Z_d818d5/` (SQL
-  249→0, Chroma 39→0, fk_check ok), `backend/data/backups/migration_report.json`.
+  249→0, Chroma 39→0, fk_check ok), `backend/backups/prod_20261109T114847Z_d818d5/migration_report.json`
+  (+ `chroma_migration_report.json` там же; `backend/data/backups/` — рабочая
+  копия фазы Chroma, см. migration-plan §5.1).
 - Isolation matrix: `backend/tests/test_workspace_isolation.py` (14 scenarios),
   Chroma: `backend/tests/test_chroma_isolation.py`.
 - Live LLM negative control: chat ws_a on a ws_b fact → "no information"

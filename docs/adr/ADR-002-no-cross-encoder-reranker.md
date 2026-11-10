@@ -28,7 +28,14 @@ production configuration.
 | Option | Recall@1 | MRR@5 | Latency | Outcome |
 |---|---|---|---|---|
 | Hybrid (no reranker) | **87.2%** | **0.925** | p50 ≈ 18–40 ms | **kept** |
-| Hybrid + cross-encoder reranker | 41.7% | 0.694 | ~2.9 s | **rejected** (−45.5 p.p. Recall@1 vs hybrid, +~3 s) |
+| Hybrid + cross-encoder reranker | 61.7% | 0.683 | rerank p50 ≈ 6.7 s (ONNX CPU) | **rejected** (−25.5 p.p. Recall@1 vs hybrid, +~6.7 s rerank latency) |
+
+> Re-measured 2026-11-09 on the same 47-query held-out set with
+> fastembed `TextCrossEncoder` (BAAI/bge-reranker-base, ONNX), candidates =
+> hybrid top-20, artifact `results/*reranker_47q.json`. The early measurement
+> (41.7% Recall@1, −45.5 p.p.) was not preserved as an artifact; the
+> re-measurement confirms the same direction (reranker degrades Recall@1 and
+> adds seconds of latency) with a smaller gap.
 
 ## Evidence
 

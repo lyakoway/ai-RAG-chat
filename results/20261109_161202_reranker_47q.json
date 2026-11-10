@@ -1,0 +1,802 @@
+{
+  "benchmark": "reranker_eval",
+  "summary": {
+    "model": "BAAI/bge-reranker-base (fastembed TextCrossEncoder, ONNX ~1 GB)",
+    "candidates_pool": 20,
+    "top_k": 5,
+    "n_queries": 47,
+    "recall@1": 0.617,
+    "recall@3": 0.6383,
+    "recall@5": 0.8723,
+    "mrr@5": 0.6826,
+    "ndcg@5": 0.7285,
+    "rerank_latency_ms": {
+      "p50": 6748.3,
+      "p95": 8740.6,
+      "mean": 6646.1
+    },
+    "hybrid_baseline": {
+      "recall@1": 0.8723,
+      "recall@3": 0.9787,
+      "recall@5": 0.9787,
+      "mrr@5": 0.9255,
+      "ndcg@5": 0.9395
+    }
+  },
+  "rows": [
+    {
+      "id": 1,
+      "category": "fact",
+      "query": "Сколько дней в неделю можно работать удалённо?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 4,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 3952.6,
+      "rerank_ms": 11605.1
+    },
+    {
+      "id": 2,
+      "category": "fact",
+      "query": "Кто согласовывает полностью удалённый формат работы?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "retrieval_ms": 115.9,
+      "rerank_ms": 8624.2
+    },
+    {
+      "id": 3,
+      "category": "fact",
+      "query": "Сколько стоит тариф Старт?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 36.7,
+      "rerank_ms": 7655.0
+    },
+    {
+      "id": 4,
+      "category": "fact",
+      "query": "Какой самый дорогой тариф и что в него входит?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 45.9,
+      "rerank_ms": 7111.7
+    },
+    {
+      "id": 5,
+      "category": "fact",
+      "query": "Какая поддержка предусмотрена для корпоративного тарифа?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 34.0,
+      "rerank_ms": 7836.7
+    },
+    {
+      "id": 6,
+      "category": "fact",
+      "query": "Какие форматы файлов поддерживает импорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 42.0,
+      "rerank_ms": 3605.4
+    },
+    {
+      "id": 7,
+      "category": "fact",
+      "query": "Где в интерфейсе запускается импорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 50.3,
+      "rerank_ms": 6427.3
+    },
+    {
+      "id": 8,
+      "category": "fact",
+      "query": "Как включить двухфакторную аутентификацию?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": null,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 36.7,
+      "rerank_ms": 6911.4
+    },
+    {
+      "id": 9,
+      "category": "fact",
+      "query": "Кому доступен экспорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": null,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "retrieval_ms": 41.0,
+      "rerank_ms": 5112.8
+    },
+    {
+      "id": 10,
+      "category": "fact",
+      "query": "How many days per week can employees work remotely?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 35.9,
+      "rerank_ms": 6837.1
+    },
+    {
+      "id": 11,
+      "category": "fact",
+      "query": "Who approves a fully remote arrangement?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 155.0,
+      "rerank_ms": 6483.9
+    },
+    {
+      "id": 12,
+      "category": "fact",
+      "query": "How much does the Business plan cost per month?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 4,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "retrieval_ms": 61.0,
+      "rerank_ms": 6522.4
+    },
+    {
+      "id": 13,
+      "category": "fact",
+      "query": "Which plan includes no user limit?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 60.2,
+      "rerank_ms": 4805.3
+    },
+    {
+      "id": 14,
+      "category": "fact",
+      "query": "What file formats does data import support?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 45.0,
+      "rerank_ms": 3679.8
+    },
+    {
+      "id": 15,
+      "category": "fact",
+      "query": "Where are import errors shown?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 34.6,
+      "rerank_ms": 3439.9
+    },
+    {
+      "id": 16,
+      "category": "numeric",
+      "query": "В какие часы сотрудник должен быть на связи онлайн?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 4,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 45.2,
+      "rerank_ms": 6440.8
+    },
+    {
+      "id": 17,
+      "category": "numeric",
+      "query": "Сколько часов длится рабочий день?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": null,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "retrieval_ms": 35.0,
+      "rerank_ms": 6326.0
+    },
+    {
+      "id": 18,
+      "category": "numeric",
+      "query": "Какая компенсация за интернет положена удалённым сотрудникам?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx"
+      ],
+      "retrieval_ms": 39.2,
+      "rerank_ms": 6895.3
+    },
+    {
+      "id": 19,
+      "category": "numeric",
+      "query": "До какого числа подаётся заявка на компенсацию интернета?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 56.6,
+      "rerank_ms": 6855.2
+    },
+    {
+      "id": 20,
+      "category": "numeric",
+      "query": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 4,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 33.4,
+      "rerank_ms": 6687.5
+    },
+    {
+      "id": 21,
+      "category": "numeric",
+      "query": "За сколько дней до отпуска нужно подать заявление?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 3,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 37.1,
+      "rerank_ms": 7129.1
+    },
+    {
+      "id": 22,
+      "category": "numeric",
+      "query": "Сколько пользователей включено в тариф Бизнес?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 4,
+      "retrieved": [
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 53.4,
+      "rerank_ms": 4606.6
+    },
+    {
+      "id": 23,
+      "category": "numeric",
+      "query": "Какая скидка даётся при оплате за год?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "retrieval_ms": 53.4,
+      "rerank_ms": 7515.5
+    },
+    {
+      "id": 24,
+      "category": "numeric",
+      "query": "Какой максимальный размер файла для импорта?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 42.2,
+      "rerank_ms": 4005.0
+    },
+    {
+      "id": 25,
+      "category": "numeric",
+      "query": "Через сколько минут простоя завершается сессия?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 37.7,
+      "rerank_ms": 6300.0
+    },
+    {
+      "id": 26,
+      "category": "numeric",
+      "query": "What are the mandatory online availability hours?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "retrieval_ms": 63.9,
+      "rerank_ms": 6382.9
+    },
+    {
+      "id": 27,
+      "category": "numeric",
+      "query": "How much does the company reimburse for internet?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": null,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 53.9,
+      "rerank_ms": 6230.9
+    },
+    {
+      "id": 28,
+      "category": "numeric",
+      "query": "What is the annual paid leave entitlement?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 52.1,
+      "rerank_ms": 7389.4
+    },
+    {
+      "id": 29,
+      "category": "numeric",
+      "query": "How many users are included in the Start plan?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "retrieval_ms": 56.2,
+      "rerank_ms": 3905.4
+    },
+    {
+      "id": 30,
+      "category": "numeric",
+      "query": "After how many minutes of inactivity does the session end?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 56.4,
+      "rerank_ms": 8477.0
+    },
+    {
+      "id": 31,
+      "category": "paraphrase",
+      "query": "Могу ли я работать из дома всю неделю, если договорюсь с руководителем?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx"
+      ],
+      "retrieval_ms": 109.9,
+      "rerank_ms": 7426.7
+    },
+    {
+      "id": 32,
+      "category": "paraphrase",
+      "query": "Что компания предоставляет для работы из дома?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": null,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 32.7,
+      "rerank_ms": 8253.7
+    },
+    {
+      "id": 33,
+      "category": "paraphrase",
+      "query": "Какие требования к паролю при регистрации?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 45.4,
+      "rerank_ms": 6621.2
+    },
+    {
+      "id": 34,
+      "category": "paraphrase",
+      "query": "Планирую оплатить сразу за год — есть ли выгода?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 48.8,
+      "rerank_ms": 6748.3
+    },
+    {
+      "id": 35,
+      "category": "paraphrase",
+      "query": "Мы некоммерческая организация — есть ли для нас скидка?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "retrieval_ms": 41.5,
+      "rerank_ms": 8135.2
+    },
+    {
+      "id": 36,
+      "category": "paraphrase",
+      "query": "Do I need to stay online during working hours, and when exactly?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 94.2,
+      "rerank_ms": 7385.9
+    },
+    {
+      "id": 37,
+      "category": "paraphrase",
+      "query": "How far in advance should I request my vacation?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 66.9,
+      "rerank_ms": 8740.6
+    },
+    {
+      "id": 38,
+      "category": "paraphrase",
+      "query": "We are a non-profit organisation — do we get better pricing?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 177.8,
+      "rerank_ms": 9027.5
+    },
+    {
+      "id": 39,
+      "category": "paraphrase",
+      "query": "Is there a limit on how big my upload can be?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 48.2,
+      "rerank_ms": 6654.8
+    },
+    {
+      "id": 40,
+      "category": "cross-lingual",
+      "query": "Какая цена у тарифа Business?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 38.0,
+      "rerank_ms": 8258.0
+    },
+    {
+      "id": 41,
+      "category": "cross-lingual",
+      "query": "Сколько стоит Enterprise и что в него входит?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 143.8,
+      "rerank_ms": 7751.8
+    },
+    {
+      "id": 42,
+      "category": "cross-lingual",
+      "query": "Как настроить two-factor authentication?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 4,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 45.8,
+      "rerank_ms": 4198.5
+    },
+    {
+      "id": 43,
+      "category": "cross-lingual",
+      "query": "Что политика говорит про reimbursement интернета?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": null,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 40.5,
+      "rerank_ms": 7269.0
+    },
+    {
+      "id": 44,
+      "category": "cross-lingual",
+      "query": "According to the Russian pricing sheet, what does Старт cost?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "retrieved": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "retrieval_ms": 86.9,
+      "rerank_ms": 6062.0
+    },
+    {
+      "id": 45,
+      "category": "cross-lingual",
+      "query": "How many vacation days does Политика удалённой работы grant?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx"
+      ],
+      "retrieval_ms": 54.6,
+      "rerank_ms": 7154.6
+    },
+    {
+      "id": 46,
+      "category": "cross-lingual",
+      "query": "Какие требования к паролю в User Guide?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "retrieved": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "retrieval_ms": 86.3,
+      "rerank_ms": 4473.0
+    },
+    {
+      "id": 47,
+      "category": "cross-lingual",
+      "query": "Что Remote Work Policy говорит про рабочие часы?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 44.2,
+      "rerank_ms": 6399.3
+    }
+  ],
+  "dataset": "golden_retrieval.json (47 queries)",
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_answers_v2.json": "cc208238b4147af6",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

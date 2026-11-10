@@ -1,0 +1,82 @@
+{
+  "benchmark": "reranker_eval",
+  "summary": {
+    "model": "BAAI/bge-reranker-base (fastembed TextCrossEncoder, ONNX ~1 GB)",
+    "candidates_pool": 20,
+    "top_k": 5,
+    "n_queries": 2,
+    "recall@1": 0.5,
+    "recall@3": 0.5,
+    "recall@5": 1.0,
+    "mrr@5": 0.625,
+    "ndcg@5": 0.7153,
+    "rerank_latency_ms": {
+      "p50": 10461.7,
+      "p95": 13041.0,
+      "mean": 10461.7
+    },
+    "hybrid_baseline": {
+      "recall@1": 0.8723,
+      "recall@3": 0.9787,
+      "recall@5": 0.9787,
+      "mrr@5": 0.9255,
+      "ndcg@5": 0.9395
+    }
+  },
+  "rows": [
+    {
+      "id": 1,
+      "category": "fact",
+      "query": "Сколько дней в неделю можно работать удалённо?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 4,
+      "retrieved": [
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx"
+      ],
+      "retrieval_ms": 4102.6,
+      "rerank_ms": 13041.0
+    },
+    {
+      "id": 2,
+      "category": "fact",
+      "query": "Кто согласовывает полностью удалённый формат работы?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "retrieved": [
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "retrieval_ms": 95.4,
+      "rerank_ms": 7882.4
+    }
+  ],
+  "dataset": "golden_retrieval.json (47 queries)",
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_answers_v2.json": "cc208238b4147af6",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

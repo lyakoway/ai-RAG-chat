@@ -35,7 +35,9 @@ workspace-scoped SQL (documents, conversations) ← citations + answer eval ← 
 
 - Hybrid retrieval (BM25 + dense, RRF): **Recall@1 87.2%** vs dense-only 53.2%
   (+34 p.p.), Recall@3 97.9%, nDCG@5 0.940 — [ADR-001](docs/adr/ADR-001-hybrid-retrieval.md);
-  cross-encoder reranker measured and rejected (−45 p.p.) — [ADR-002](docs/adr/ADR-002-no-cross-encoder-reranker.md).
+  cross-encoder reranker re-measured and rejected (61.7% Recall@1, −25.5 p.p.,
+  +seconds of rerank latency; early measurement 41.7% not preserved) —
+  [ADR-002](docs/adr/ADR-002-no-cross-encoder-reranker.md).
 - Workspace isolation: SQL migration 249 NULL → 0 (NOT NULL, ~24 ms), Chroma
   metadata merge 39 → 0 (no re-embedding, ~0.6 s), both idempotent (re-run =
   no-op) — [ADR-003](docs/adr/ADR-003-workspace-isolation.md).
@@ -139,7 +141,7 @@ lost, and a model default set by latency — not by a tutorial.
 | Decision           | Measurement                                     | Why it shipped                                                                              |
 | ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | **Retrieval**      | Hybrid BM25 + RRF · +34 p.p. Recall@1 vs dense  | **Kept:** dense-only hit 53% on RU/EN twins, lexical fusion is required, not optional        |
-| **Reranker**       | −45 p.p. Recall@1 · +~3 s                       | **Rejected:** the cross-encoder promotes language twins and adds latency                     |
+| **Reranker**       | −25.5 p.p. Recall@1 · +6.7 s (re-measured 2026-11; early run −45 p.p. not preserved) | **Rejected:** the cross-encoder promotes language twins and adds latency                     |
 | **Default model**  | GLM-5.3-flash · TTFT ~2.5–3.0 s                 | **Shipped:** GLM-4.5-flash sits at 25–50 s on the same pipeline, the pipeline itself adds <1% |
 | Held-out retrieval | Recall@1 87.2% · Recall@3 97.9%                 | Supporting number on the public pack. Mixed-language queries are still open                  |
 | Answer judge       | 5.0/5 on three axes, same model family          | Supporting only. A strict eval needs an independent judge or a human                         |
@@ -155,7 +157,8 @@ supporting measurements, not headline claims.
    measured in this README, not claimed.
 2. **Evaluation before optimization** — golden set → Recall@K → experiment →
    keep or reject. Held-out set (47 queries): hybrid became the default, the
-   reranker was rejected (−45 p.p., +~3 s).
+   reranker was rejected (re-measured 2026-11: −25.5 p.p., early run −45 p.p.
+   not preserved).
 3. **Data-driven architecture** — compare retrieval, models and pipeline
    config on the same eval set. GLM-5.3-flash is the default: GLM-4.5-flash
    sits at 25–50 s TTFT on the same pipeline.
@@ -397,11 +400,12 @@ paraphrase-multilingual-MiniLM):
 | ------------------------------------ | --------- | -------- | --------- | ---------- |
 | Vector search                        | 53.2%     | 91.5%    | 0.727     | 11 ms      |
 | **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 17 ms      |
-| Hybrid + reranker                    | 41.7%     | 100%     | 0.694     | ~2.9 s     |
+| Hybrid + reranker (re-measured 2026-11) | 61.7%     | 63.8%    | 0.683     | +6.7 s rerank p50 |
 
 **Decision:** hybrid BM25 + RRF is the default — the best measured trade-off
 on this held-out set. The reranker row was tested and **rejected**
-(−45 p.p. Recall@1, +~3 s): the cross-encoder scores semantic relevance, and
+(re-measured 2026-11: Recall@1 61.7% = −25.5 p.p. vs hybrid, rerank p50 ~6.7 s;
+the early measurement 41.7% is not preserved as an artifact): the cross-encoder scores semantic relevance, and
 a RU/EN “twin” is just as semantically relevant.
 
 Per-category breakdown (hybrid, default):
