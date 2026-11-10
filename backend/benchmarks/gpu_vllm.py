@@ -59,6 +59,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--temperature", type=float, default=0.2)
     p.add_argument("--timeout", type=float, default=120.0)
     p.add_argument("--gpu-poll-s", type=float, default=1.0)
+    p.add_argument("--quantization", default=None,
+                   help="квантование, заданное при старте vLLM-сервера (fp8, gptq, …); фиксируется в env артефакта")
+    p.add_argument("--dtype", default=None,
+                   help="dtype весов/активаций (auto, fp16, bf16, fp8) — как на сервере")
+    p.add_argument("--vllm-version", default=None,
+                   help="версия vLLM на GPU-машине (если не задана — попытка importlib.metadata.version('vllm'))")
     p.add_argument("--label", default="")
     p.add_argument("--no-json", action="store_true")
     return p.parse_args()
@@ -147,6 +153,38 @@ async def stream_once(client, args, prompt: dict) -> dict:
         "output_tokens_per_sec": round(out_tokens / (stream_ms / 1000), 1) if stream_ms and out_tokens else None,
         "finish_reason": finish_reason,
     }
+
+
+def gpu_env_info() -> dict | None:
+    """Snapshot GPU через nvidia-smi; None если нет NVIDIA GPU (dev-машина)."""
+    import subprocess
+
+    try:
+        out = subprocess.run(
+            ["nvidia-smi", "--query-gpu=name,memory.total,driver_version",
+             "--format=csv,noheader"],
+            capture_output=True, text=True, timeout=5, check=True,
+        )
+        name, vram, driver = out.stdout.strip().splitlines()[0].split(", ")
+        cuda_ver = None
+        nvcc = subprocess.run(["nvcc", "--version"], capture_output=True, text=True, timeout=5)
+        for line in nvcc.stdout.splitlines():
+            if "release" in line.lower():
+                cuda_ver = line.split("release")[-1].strip().split(",")[0]
+        return {"gpu_name": name.strip(), "vram_total_mib": int(vram),
+                "driver_version": driver.strip(), "cuda_version": cuda_ver}
+    except Exception:
+        return None
+
+
+def vllm_version_safe() -> str | None:
+    """Версия vLLM; None если пакет не установлен (dev-машина без GPU)."""
+    import importlib.metadata
+
+    try:
+        return importlib.metadata.version("vllm")
+    except importlib.metadata.PackageNotFoundError:
+        return None
 
 
 async def poll_gpu(interval_s: float):
@@ -257,6 +295,15 @@ async def main_async(args) -> None:
             "runtime": f"vLLM OpenAI-compatible server @ {args.base_url}",
             "model": args.model,
             "levels": levels,
+            "env": {
+                "gpu": gpu_env_info(),
+                "vllm_version": vllm_version_safe(),
+                "quantization": args.quantization,
+                "dtype": args.dtype,
+                "concurrency_levels": args.levels,
+                "gpu_poll_interval_s": args.gpu_poll_s,
+                "prefix_caching": "server-side (vLLM enable_prefix_caching; см. runbook)",
+            },
             "rows": all_rows,
         }
         label = f"_{args.label}" if args.label else ""
