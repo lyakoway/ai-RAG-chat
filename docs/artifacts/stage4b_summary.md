@@ -44,8 +44,8 @@
   сценариев), `backend/tests/test_chroma_isolation.py` (retrieval-изоляция,
   включая интеграционный «chat ws_a не содержит факт ws_b»). Полный suite —
   260 passed.
-- Воспроизведение всех цифр: [docs/reproduce.md](../reproduce.md)
-  (команда → ожидаемый артефакт → где смотреть).
+- Reproduce all numbers: [docs/reproduce.md](../reproduce.md)
+  (command → expected artifact → where to look).
 
 ## 5. Ограничения
 
