@@ -390,6 +390,11 @@ paraphrase-multilingual-MiniLM):
 | **Гибрид BM25 + RRF (по умолчанию)** | **87,2%** | 97,9%    | **0,926** | 17 мс       |
 | Гибрид + реранкер (re-measured 2026-11) | 61,7%     | 63,8%    | 0,683     | +6,7 с rerank p50 |
 
+<sub>Конфигурация rerank-latency: CPU (без GPU), fastembed TextCrossEncoder,
+BAAI/bge-reranker-base ONNX (~1 ГБ), кандидаты hybrid top-20 → rerank →
+top-5 (`benchmarks/reranker_eval.py`). Ранняя цифра ~2,9 с — другая
+конфигурация (не сохранилась); повторный замер на CPU ONNX: p50 ≈ 6,7 с.</sub>
+
 **Решение:** гибрид BM25 + RRF — стратегия по умолчанию, лучший замерённый
 компромисс на этом held-out. Строка реранкера **проверена и отклонена**
 (re-measured 2026-11: Recall@1 61,7% = −25,5 п.п. против гибрида, rerank

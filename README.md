@@ -402,6 +402,11 @@ paraphrase-multilingual-MiniLM):
 | **Hybrid BM25 + RRF (default)**      | **87.2%** | 97.9%    | **0.926** | 17 ms      |
 | Hybrid + reranker (re-measured 2026-11) | 61.7%     | 63.8%    | 0.683     | +6.7 s rerank p50 |
 
+<sub>Rerank latency config: CPU (no GPU), fastembed TextCrossEncoder,
+BAAI/bge-reranker-base ONNX (~1 GB), candidates hybrid top-20 → rerank →
+top-5 (`benchmarks/reranker_eval.py`). The early ~2.9 s figure was a
+different config (not preserved); re-measured on CPU ONNX: p50 ≈ 6.7 s.</sub>
+
 **Decision:** hybrid BM25 + RRF is the default — the best measured trade-off
 on this held-out set. The reranker row was tested and **rejected**
 (re-measured 2026-11: Recall@1 61.7% = −25.5 p.p. vs hybrid, rerank p50 ~6.7 s;

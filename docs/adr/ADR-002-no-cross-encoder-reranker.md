@@ -36,6 +36,11 @@ production configuration.
 > (41.7% Recall@1, −45.5 p.p.) was not preserved as an artifact; the
 > re-measurement confirms the same direction (reranker degrades Recall@1 and
 > adds seconds of latency) with a smaller gap.
+>
+> Latency config: re-measured on CPU (no GPU), fastembed TextCrossEncoder,
+> BAAI/bge-reranker-base ONNX (~1 GB), candidates = hybrid top-20 → rerank →
+> top-5, batch as in `benchmarks/reranker_eval.py`. The early ~2.9 s figure
+> was a different config (not preserved); on CPU ONNX rerank p50 ≈ 6.7 s.
 
 ## Evidence
 
