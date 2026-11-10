@@ -1,0 +1,48 @@
+id,category,query,target_doc,rank,retrieval_ms,rerank_ms
+1,fact,Сколько дней в неделю можно работать удалённо?,Политика_удалённой_работы.docx,4,3952.6,11605.1
+2,fact,Кто согласовывает полностью удалённый формат работы?,Политика_удалённой_работы.docx,1,115.9,8624.2
+3,fact,Сколько стоит тариф Старт?,Тарифы_и_скидки.xlsx,1,36.7,7655.0
+4,fact,Какой самый дорогой тариф и что в него входит?,Тарифы_и_скидки.xlsx,1,45.9,7111.7
+5,fact,Какая поддержка предусмотрена для корпоративного тарифа?,Тарифы_и_скидки.xlsx,1,34.0,7836.7
+6,fact,Какие форматы файлов поддерживает импорт данных?,Руководство_пользователя.pdf,4,42.0,3605.4
+7,fact,Где в интерфейсе запускается импорт данных?,Руководство_пользователя.pdf,4,50.3,6427.3
+8,fact,Как включить двухфакторную аутентификацию?,Руководство_пользователя.pdf,,36.7,6911.4
+9,fact,Кому доступен экспорт данных?,Руководство_пользователя.pdf,,41.0,5112.8
+10,fact,How many days per week can employees work remotely?,Remote_Work_Policy.docx,1,35.9,6837.1
+11,fact,Who approves a fully remote arrangement?,Remote_Work_Policy.docx,1,155.0,6483.9
+12,fact,How much does the Business plan cost per month?,Pricing_and_Discounts.xlsx,4,61.0,6522.4
+13,fact,Which plan includes no user limit?,Pricing_and_Discounts.xlsx,1,60.2,4805.3
+14,fact,What file formats does data import support?,User_Guide.pdf,1,45.0,3679.8
+15,fact,Where are import errors shown?,User_Guide.pdf,1,34.6,3439.9
+16,numeric,В какие часы сотрудник должен быть на связи онлайн?,Политика_удалённой_работы.docx,4,45.2,6440.8
+17,numeric,Сколько часов длится рабочий день?,Политика_удалённой_работы.docx,,35.0,6326.0
+18,numeric,Какая компенсация за интернет положена удалённым сотрудникам?,Политика_удалённой_работы.docx,1,39.2,6895.3
+19,numeric,До какого числа подаётся заявка на компенсацию интернета?,Политика_удалённой_работы.docx,1,56.6,6855.2
+20,numeric,Сколько календарных дней длится ежегодный оплачиваемый отпуск?,Политика_удалённой_работы.docx,4,33.4,6687.5
+21,numeric,За сколько дней до отпуска нужно подать заявление?,Политика_удалённой_работы.docx,3,37.1,7129.1
+22,numeric,Сколько пользователей включено в тариф Бизнес?,Тарифы_и_скидки.xlsx,4,53.4,4606.6
+23,numeric,Какая скидка даётся при оплате за год?,Тарифы_и_скидки.xlsx,1,53.4,7515.5
+24,numeric,Какой максимальный размер файла для импорта?,Руководство_пользователя.pdf,4,42.2,4005.0
+25,numeric,Через сколько минут простоя завершается сессия?,Руководство_пользователя.pdf,4,37.7,6300.0
+26,numeric,What are the mandatory online availability hours?,Remote_Work_Policy.docx,1,63.9,6382.9
+27,numeric,How much does the company reimburse for internet?,Remote_Work_Policy.docx,,53.9,6230.9
+28,numeric,What is the annual paid leave entitlement?,Remote_Work_Policy.docx,1,52.1,7389.4
+29,numeric,How many users are included in the Start plan?,Pricing_and_Discounts.xlsx,1,56.2,3905.4
+30,numeric,After how many minutes of inactivity does the session end?,User_Guide.pdf,1,56.4,8477.0
+31,paraphrase,"Могу ли я работать из дома всю неделю, если договорюсь с руководителем?",Политика_удалённой_работы.docx,1,109.9,7426.7
+32,paraphrase,Что компания предоставляет для работы из дома?,Политика_удалённой_работы.docx,,32.7,8253.7
+33,paraphrase,Какие требования к паролю при регистрации?,Руководство_пользователя.pdf,4,45.4,6621.2
+34,paraphrase,Планирую оплатить сразу за год — есть ли выгода?,Тарифы_и_скидки.xlsx,1,48.8,6748.3
+35,paraphrase,Мы некоммерческая организация — есть ли для нас скидка?,Тарифы_и_скидки.xlsx,1,41.5,8135.2
+36,paraphrase,"Do I need to stay online during working hours, and when exactly?",Remote_Work_Policy.docx,1,94.2,7385.9
+37,paraphrase,How far in advance should I request my vacation?,Remote_Work_Policy.docx,1,66.9,8740.6
+38,paraphrase,We are a non-profit organisation — do we get better pricing?,Pricing_and_Discounts.xlsx,1,177.8,9027.5
+39,paraphrase,Is there a limit on how big my upload can be?,User_Guide.pdf,1,48.2,6654.8
+40,cross-lingual,Какая цена у тарифа Business?,Тарифы_и_скидки.xlsx,1,38.0,8258.0
+41,cross-lingual,Сколько стоит Enterprise и что в него входит?,Тарифы_и_скидки.xlsx,1,143.8,7751.8
+42,cross-lingual,Как настроить two-factor authentication?,Руководство_пользователя.pdf,4,45.8,4198.5
+43,cross-lingual,Что политика говорит про reimbursement интернета?,Политика_удалённой_работы.docx,,40.5,7269.0
+44,cross-lingual,"According to the Russian pricing sheet, what does Старт cost?",Тарифы_и_скидки.xlsx,1,86.9,6062.0
+45,cross-lingual,How many vacation days does Политика удалённой работы grant?,Политика_удалённой_работы.docx,1,54.6,7154.6
+46,cross-lingual,Какие требования к паролю в User Guide?,User_Guide.pdf,1,86.3,4473.0
+47,cross-lingual,Что Remote Work Policy говорит про рабочие часы?,Remote_Work_Policy.docx,1,44.2,6399.3

@@ -1,0 +1,43 @@
+{
+  "stage": "4C production migration",
+  "timestamp": "2026-11-09T11:48:50.088818+00:00",
+  "backup_dir": "backups/prod_20261109T114847Z_d818d5",
+  "sql_report": {
+    "timestamp": "2026-11-09T11:48:47.533423+00:00",
+    "backup_path": "backups/prod_20261109T114847Z_d818d5/migration/app_20261109T114847Z.db",
+    "before_null_count": 249,
+    "after_null_count": 0,
+    "foreign_key_check_ok": true,
+    "duration_ms": 24.2,
+    "phase": "migrated",
+    "tables": {
+      "documents": {
+        "null_count": 0,
+        "rebuilt": true
+      },
+      "conversations": {
+        "null_count": 0,
+        "rebuilt": true
+      }
+    },
+    "columns_added": {
+      "documents": false,
+      "conversations": false
+    }
+  },
+  "chroma_report": {
+    "timestamp": "2026-11-09T11:48:50.088261+00:00",
+    "chroma_path": "/Users/aamazurenk/Desktop/AI-Engineer/ai-RAG-chat/backend/data/chroma",
+    "backup_path": "backups/prod_20261109T114847Z_d818d5/chroma_migration/chroma_20261109T114847Z_a8b834",
+    "total_chunks": 40,
+    "before_missing": 39,
+    "after_missing": 0,
+    "updated": 39,
+    "orphan_chunks_no_sql_doc": 0,
+    "duration_ms": 2553.3,
+    "phase": "converged",
+    "note": "metadata merge без пересчёта векторов (Chroma update)",
+    "converged": true
+  },
+  "duration_ms": 2665.1
+}

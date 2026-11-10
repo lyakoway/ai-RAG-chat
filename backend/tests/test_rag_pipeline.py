@@ -10,7 +10,7 @@ EN_DOC = "Remote_Work_Policy.docx"
 
 class TestRetrievalMetadata:
     def test_retrieve_returns_hits_with_metadata(self, demo_loaded):
-        hits = rag.retrieve(query="сколько дней отпуск", top_k=3)
+        hits = rag.retrieve(query="сколько дней отпуск", top_k=3, workspace_id="default")
         assert hits
         for h in hits:
             assert h["document_id"] and h["filename"]
@@ -18,35 +18,36 @@ class TestRetrievalMetadata:
             assert "text" in h and h["text"].strip()
 
     def test_retrieve_respects_top_k(self, demo_loaded):
-        assert len(rag.retrieve(query="тариф", top_k=2)) <= 2
+        assert len(rag.retrieve(query="тариф", top_k=2, workspace_id="default")) <= 2
 
     def test_category_filter_excludes_others(self, demo_loaded):
         # У демо-пака категория Demo — фильтр по несуществующей даёт пусто.
-        assert rag.retrieve(query="тариф", category="Nope") == []
+        assert rag.retrieve(query="тариф", category="Nope", workspace_id="default") == []
 
     def test_document_ids_filter(self, demo_loaded):
-        hits = rag.retrieve(query="тариф", top_k=5)
+        hits = rag.retrieve(query="тариф", top_k=5, workspace_id="default")
         target = hits[0]["document_id"]
-        for h in rag.retrieve(query="тариф", top_k=5, document_ids=[target]):
+        for h in rag.retrieve(query="тариф", top_k=5, document_ids=[target], workspace_id="default"):
             assert h["document_id"] == target
 
     def test_wrong_document_ids_returns_empty(self, demo_loaded):
-        assert rag.retrieve(query="тариф", document_ids=["nonexistent-id"]) == []
+        assert rag.retrieve(query="тариф", document_ids=["nonexistent-id"], workspace_id="default") == []
 
 
 class TestHybridLocalization:
     def test_ru_question_localizes_ru_twin(self, demo_loaded):
         """Двуязычный корпус: RU-вопрос должен поднять RU-документ, а не EN-двойника."""
-        hits = rag.retrieve(query="Сколько дней в неделю можно работать удалённо?")
+        hits = rag.retrieve(query="Сколько дней в неделю можно работать удалённо?", workspace_id="default")
         assert hits[0]["filename"] == RU_DOC
 
     def test_en_question_localizes_en_twin(self, demo_loaded):
-        hits = rag.retrieve(query="How many days per week can employees work remotely?")
+        hits = rag.retrieve(query="How many days per week can employees work remotely?", workspace_id="default")
         assert hits[0]["filename"] == EN_DOC
 
     def test_cross_language_query_still_finds_document(self, demo_loaded):
         """EN-вопрос с именем RU-документа — гибрид вытягивает названный документ."""
         hits = rag.retrieve(
+            workspace_id="default",
             query="How many vacation days does Политика удалённой работы grant?",
             top_k=5,
         )
@@ -76,7 +77,7 @@ class TestRRFFusion:
 
 class TestPromptBuilding:
     def test_build_context_formats_blocks(self, demo_loaded):
-        hits = rag.retrieve(query="сколько дней отпуск", top_k=2)
+        hits = rag.retrieve(query="сколько дней отпуск", top_k=2, workspace_id="default")
         context = rag.build_context(hits)
         assert "[1]" in context and "---" in context
 
@@ -85,7 +86,7 @@ class TestPromptBuilding:
         assert "нет релевантных фрагментов" in prompt
 
     def test_system_prompt_lang_en(self, demo_loaded):
-        hits = rag.retrieve(query="тариф", top_k=1)
+        hits = rag.retrieve(query="тариф", top_k=1, workspace_id="default")
         prompt = rag.build_system_prompt(hits, "en")
         assert "CONTEXT:" in prompt
         assert "Answer IN ENGLISH" in prompt

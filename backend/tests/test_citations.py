@@ -24,7 +24,7 @@ def _upload_docx(client, name, builder, category="Edge"):
 
 class TestSourceMapping:
     def test_to_sources_maps_fields(self, demo_loaded):
-        hits = rag.retrieve(query="сколько стоит тариф старт", top_k=2)
+        hits = rag.retrieve(query="сколько стоит тариф старт", top_k=2, workspace_id="default")
         sources = rag.to_sources(hits)
         assert len(sources) == len(hits)
         for s in sources:
@@ -32,13 +32,13 @@ class TestSourceMapping:
             assert s.snippet and s.score is not None
 
     def test_pdf_chunks_carry_page_numbers(self, demo_loaded):
-        hits = rag.retrieve(query="двухфакторная аутентификация", top_k=5)
+        hits = rag.retrieve(query="двухфакторная аутентификация", top_k=5, workspace_id="default")
         pdf_hits = [h for h in hits if h["filename"] == RU_PDF]
         assert pdf_hits
         assert all(1 <= h["page"] <= 3 for h in pdf_hits)
 
     def test_build_context_includes_page(self, demo_loaded):
-        hits = rag.retrieve(query="двухфакторная аутентификация", top_k=3)
+        hits = rag.retrieve(query="двухфакторная аутентификация", top_k=3, workspace_id="default")
         pdf_hits = [h for h in hits if h["filename"] == RU_PDF]
         if pdf_hits:
             context = rag.build_context(pdf_hits[:1])

@@ -1,0 +1,944 @@
+{
+  "benchmark": "retrieval_eval",
+  "date_utc": "2026-11-09T11:52:41+00:00",
+  "git_commit": "81ecc05",
+  "command": "benchmarks/retrieval_eval.py --strategy hybrid",
+  "golden_set": "golden-retrieval-v1",
+  "golden_set_version": "backend/scripts/evaluate.py, коммит af22c4b; метрики этой выборки опубликованы в README (hybrid Recall@1 87.2%)",
+  "corpus": "backend/samples (6 files)",
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "chunking": {
+    "chunk_size": 800,
+    "chunk_overlap": 120,
+    "tokenizer": "cl100k_base"
+  },
+  "top_k": 5,
+  "repeats": 1,
+  "warmup_queries": 1,
+  "hardware": "Apple M1 Pro, 16 GB (если не указано иное в docs/benchmark.md)",
+  "results": [
+    {
+      "strategy": "hybrid",
+      "n_queries": 47,
+      "n_errors": 0,
+      "metrics": {
+        "recall@1": 0.8723,
+        "recall@3": 0.9787,
+        "recall@5": 0.9787,
+        "mrr@5": 0.9255,
+        "ndcg@5": 0.9395
+      },
+      "latency": {
+        "n": 47,
+        "mean_ms": 37.15,
+        "stdev_ms": 15.22,
+        "min_ms": 19.95,
+        "p50_ms": 34.35,
+        "p95_ms": 54.03,
+        "p99_ms": 98.53,
+        "max_ms": 98.81
+      }
+    }
+  ],
+  "per_category": {
+    "hybrid": {
+      "cross-lingual": {
+        "n": 8,
+        "recall@1": 0.625,
+        "recall@3": 0.875,
+        "mrr@5": 0.75,
+        "ndcg@5": 0.7827
+      },
+      "fact": {
+        "n": 15,
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 1.0
+      },
+      "numeric": {
+        "n": 15,
+        "recall@1": 0.8667,
+        "recall@3": 1.0,
+        "mrr@5": 0.9333,
+        "ndcg@5": 0.9508
+      },
+      "paraphrase": {
+        "n": 9,
+        "recall@1": 0.8889,
+        "recall@3": 1.0,
+        "mrr@5": 0.9444,
+        "ndcg@5": 0.959
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": 1,
+      "category": "fact",
+      "query": "Сколько дней в неделю можно работать удалённо?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Remote_Work_Policy.docx"
+      ],
+      "latency_ms": 35.72,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 2,
+      "category": "fact",
+      "query": "Кто согласовывает полностью удалённый формат работы?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 33.54,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 3,
+      "category": "fact",
+      "query": "Сколько стоит тариф Старт?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 23.53,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 4,
+      "category": "fact",
+      "query": "Какой самый дорогой тариф и что в него входит?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 53.5,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 5,
+      "category": "fact",
+      "query": "Какая поддержка предусмотрена для корпоративного тарифа?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 35.31,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 6,
+      "category": "fact",
+      "query": "Какие форматы файлов поддерживает импорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 54.25,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 7,
+      "category": "fact",
+      "query": "Где в интерфейсе запускается импорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 39.27,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 8,
+      "category": "fact",
+      "query": "Как включить двухфакторную аутентификацию?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 32.72,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 9,
+      "category": "fact",
+      "query": "Кому доступен экспорт данных?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 20.13,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 10,
+      "category": "fact",
+      "query": "How many days per week can employees work remotely?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 34.29,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 11,
+      "category": "fact",
+      "query": "Who approves a fully remote arrangement?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Тарифы_и_скидки.xlsx",
+        "User_Guide.pdf",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 98.2,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 12,
+      "category": "fact",
+      "query": "How much does the Business plan cost per month?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "top1_doc": "Pricing_and_Discounts.xlsx",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 33.14,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 13,
+      "category": "fact",
+      "query": "Which plan includes no user limit?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "top1_doc": "Pricing_and_Discounts.xlsx",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 30.47,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 14,
+      "category": "fact",
+      "query": "What file formats does data import support?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 32.74,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 15,
+      "category": "fact",
+      "query": "Where are import errors shown?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 27.42,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 16,
+      "category": "numeric",
+      "query": "В какие часы сотрудник должен быть на связи онлайн?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 26.04,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 17,
+      "category": "numeric",
+      "query": "Сколько часов длится рабочий день?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 25.68,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 18,
+      "category": "numeric",
+      "query": "Какая компенсация за интернет положена удалённым сотрудникам?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 32.48,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 19,
+      "category": "numeric",
+      "query": "До какого числа подаётся заявка на компенсацию интернета?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 41.02,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 20,
+      "category": "numeric",
+      "query": "Сколько календарных дней длится ежегодный оплачиваемый отпуск?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 46.0,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 21,
+      "category": "numeric",
+      "query": "За сколько дней до отпуска нужно подать заявление?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 2,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 46.2,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 22,
+      "category": "numeric",
+      "query": "Сколько пользователей включено в тариф Бизнес?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 98.81,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 23,
+      "category": "numeric",
+      "query": "Какая скидка даётся при оплате за год?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 29.65,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 24,
+      "category": "numeric",
+      "query": "Какой максимальный размер файла для импорта?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 37.63,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 25,
+      "category": "numeric",
+      "query": "Через сколько минут простоя завершается сессия?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 1,
+      "top1_doc": "Руководство_пользователя.pdf",
+      "retrieved_docs": [
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 28.26,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 26,
+      "category": "numeric",
+      "query": "What are the mandatory online availability hours?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "latency_ms": 35.65,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 27,
+      "category": "numeric",
+      "query": "How much does the company reimburse for internet?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 2,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "latency_ms": 35.36,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 28,
+      "category": "numeric",
+      "query": "What is the annual paid leave entitlement?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 51.39,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 29,
+      "category": "numeric",
+      "query": "How many users are included in the Start plan?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "top1_doc": "Pricing_and_Discounts.xlsx",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx"
+      ],
+      "latency_ms": 25.21,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 30,
+      "category": "numeric",
+      "query": "After how many minutes of inactivity does the session end?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 26.2,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 31,
+      "category": "paraphrase",
+      "query": "Могу ли я работать из дома всю неделю, если договорюсь с руководителем?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Руководство_пользователя.pdf",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 31.74,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 32,
+      "category": "paraphrase",
+      "query": "Что компания предоставляет для работы из дома?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 19.95,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 33,
+      "category": "paraphrase",
+      "query": "Какие требования к паролю при регистрации?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 2,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 37.19,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 34,
+      "category": "paraphrase",
+      "query": "Планирую оплатить сразу за год — есть ли выгода?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 39.17,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 35,
+      "category": "paraphrase",
+      "query": "Мы некоммерческая организация — есть ли для нас скидка?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 41.44,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 36,
+      "category": "paraphrase",
+      "query": "Do I need to stay online during working hours, and when exactly?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Политика_удалённой_работы.docx"
+      ],
+      "latency_ms": 36.77,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 37,
+      "category": "paraphrase",
+      "query": "How far in advance should I request my vacation?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 33.35,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 38,
+      "category": "paraphrase",
+      "query": "We are a non-profit organisation — do we get better pricing?",
+      "target_doc": "Pricing_and_Discounts.xlsx",
+      "rank": 1,
+      "top1_doc": "Pricing_and_Discounts.xlsx",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 38.8,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 39,
+      "category": "paraphrase",
+      "query": "Is there a limit on how big my upload can be?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 35.94,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 40,
+      "category": "cross-lingual",
+      "query": "Какая цена у тарифа Business?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "Тарифы_и_скидки.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 37.6,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 41,
+      "category": "cross-lingual",
+      "query": "Сколько стоит Enterprise и что в него входит?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": null,
+      "top1_doc": "Pricing_and_Discounts.xlsx",
+      "retrieved_docs": [
+        "Pricing_and_Discounts.xlsx",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf"
+      ],
+      "latency_ms": 27.9,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 42,
+      "category": "cross-lingual",
+      "query": "Как настроить two-factor authentication?",
+      "target_doc": "Руководство_пользователя.pdf",
+      "rank": 2,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Руководство_пользователя.pdf",
+        "User_Guide.pdf",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 34.35,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 43,
+      "category": "cross-lingual",
+      "query": "Что политика говорит про reimbursement интернета?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 1,
+      "top1_doc": "Политика_удалённой_работы.docx",
+      "retrieved_docs": [
+        "Политика_удалённой_работы.docx",
+        "Remote_Work_Policy.docx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Тарифы_и_скидки.xlsx"
+      ],
+      "latency_ms": 26.95,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 44,
+      "category": "cross-lingual",
+      "query": "According to the Russian pricing sheet, what does Старт cost?",
+      "target_doc": "Тарифы_и_скидки.xlsx",
+      "rank": 1,
+      "top1_doc": "Тарифы_и_скидки.xlsx",
+      "retrieved_docs": [
+        "Тарифы_и_скидки.xlsx",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Remote_Work_Policy.docx"
+      ],
+      "latency_ms": 36.34,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 45,
+      "category": "cross-lingual",
+      "query": "How many vacation days does Политика удалённой работы grant?",
+      "target_doc": "Политика_удалённой_работы.docx",
+      "rank": 2,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Руководство_пользователя.pdf",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx"
+      ],
+      "latency_ms": 42.89,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 46,
+      "category": "cross-lingual",
+      "query": "Какие требования к паролю в User Guide?",
+      "target_doc": "User_Guide.pdf",
+      "rank": 1,
+      "top1_doc": "User_Guide.pdf",
+      "retrieved_docs": [
+        "User_Guide.pdf",
+        "User_Guide.pdf",
+        "Руководство_пользователя.pdf",
+        "Политика_удалённой_работы.docx",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 32.67,
+      "error": null,
+      "strategy": "hybrid"
+    },
+    {
+      "id": 47,
+      "category": "cross-lingual",
+      "query": "Что Remote Work Policy говорит про рабочие часы?",
+      "target_doc": "Remote_Work_Policy.docx",
+      "rank": 1,
+      "top1_doc": "Remote_Work_Policy.docx",
+      "retrieved_docs": [
+        "Remote_Work_Policy.docx",
+        "Политика_удалённой_работы.docx",
+        "Тарифы_и_скидки.xlsx",
+        "Pricing_and_Discounts.xlsx",
+        "User_Guide.pdf"
+      ],
+      "latency_ms": 23.37,
+      "error": null,
+      "strategy": "hybrid"
+    }
+  ],
+  "env": {
+    "golden_set_sha256": {
+      "golden_answers.json": "6493f1d5d99639ef",
+      "golden_answers_v2.json": "cc208238b4147af6",
+      "golden_retrieval.json": "7db74f4beec9ddf9"
+    },
+    "dependencies": {
+      "python": "3.13.5",
+      "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+      "fastembed": "0.5.1",
+      "chromadb": "0.5.23",
+      "rank-bm25": "0.2.2",
+      "tiktoken": "0.8.0",
+      "openai": "1.59.6",
+      "anthropic": "0.42.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.10.4",
+      "fastapi": "0.115.6",
+      "psutil": "7.2.2"
+    }
+  }
+}

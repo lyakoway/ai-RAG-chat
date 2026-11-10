@@ -1,0 +1,14 @@
+{
+  "stage": "4C production migration — Chroma phase",
+  "timestamp": "2026-11-09T11:48:50+00:00",
+  "chroma_path": "backend/data/chroma",
+  "backup_path": "backups/prod_20261109T114847Z_d818d5/chroma_migration/chroma_20261109T114847Z_a8b834",
+  "total_chunks": 40,
+  "before_missing": 39,
+  "after_missing": 0,
+  "updated": 39,
+  "orphan_chunks_no_sql_doc": 0,
+  "phase": "converged",
+  "converged": true,
+  "note": "RECONSTRUCTED from Stage 4C console output: боевой прогон печатал отчёт в stdout, файл не писал; значения — фактические из зафиксированного вывода (см. docs/migration-plan.md §10.1)"
+}

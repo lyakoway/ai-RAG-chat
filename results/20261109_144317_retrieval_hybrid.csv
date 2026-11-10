@@ -1,0 +1,48 @@
+id,category,query,target_doc,rank,top1_doc,latency_ms,error,strategy
+1,fact,Сколько дней в неделю можно работать удалённо?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,37.5,,hybrid
+2,fact,Кто согласовывает полностью удалённый формат работы?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,45.43,,hybrid
+3,fact,Сколько стоит тариф Старт?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,30.04,,hybrid
+4,fact,Какой самый дорогой тариф и что в него входит?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,49.7,,hybrid
+5,fact,Какая поддержка предусмотрена для корпоративного тарифа?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,30.44,,hybrid
+6,fact,Какие форматы файлов поддерживает импорт данных?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,29.49,,hybrid
+7,fact,Где в интерфейсе запускается импорт данных?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,27.67,,hybrid
+8,fact,Как включить двухфакторную аутентификацию?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,33.42,,hybrid
+9,fact,Кому доступен экспорт данных?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,24.98,,hybrid
+10,fact,How many days per week can employees work remotely?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,32.65,,hybrid
+11,fact,Who approves a fully remote arrangement?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,89.89,,hybrid
+12,fact,How much does the Business plan cost per month?,Pricing_and_Discounts.xlsx,1,Pricing_and_Discounts.xlsx,26.24,,hybrid
+13,fact,Which plan includes no user limit?,Pricing_and_Discounts.xlsx,1,Pricing_and_Discounts.xlsx,34.88,,hybrid
+14,fact,What file formats does data import support?,User_Guide.pdf,1,User_Guide.pdf,32.53,,hybrid
+15,fact,Where are import errors shown?,User_Guide.pdf,1,User_Guide.pdf,27.98,,hybrid
+16,numeric,В какие часы сотрудник должен быть на связи онлайн?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,72.73,,hybrid
+17,numeric,Сколько часов длится рабочий день?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,35.38,,hybrid
+18,numeric,Какая компенсация за интернет положена удалённым сотрудникам?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,35.05,,hybrid
+19,numeric,До какого числа подаётся заявка на компенсацию интернета?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,45.15,,hybrid
+20,numeric,Сколько календарных дней длится ежегодный оплачиваемый отпуск?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,49.59,,hybrid
+21,numeric,За сколько дней до отпуска нужно подать заявление?,Политика_удалённой_работы.docx,2,Тарифы_и_скидки.xlsx,35.15,,hybrid
+22,numeric,Сколько пользователей включено в тариф Бизнес?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,34.01,,hybrid
+23,numeric,Какая скидка даётся при оплате за год?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,33.88,,hybrid
+24,numeric,Какой максимальный размер файла для импорта?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,33.09,,hybrid
+25,numeric,Через сколько минут простоя завершается сессия?,Руководство_пользователя.pdf,1,Руководство_пользователя.pdf,34.77,,hybrid
+26,numeric,What are the mandatory online availability hours?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,30.69,,hybrid
+27,numeric,How much does the company reimburse for internet?,Remote_Work_Policy.docx,2,User_Guide.pdf,53.49,,hybrid
+28,numeric,What is the annual paid leave entitlement?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,36.65,,hybrid
+29,numeric,How many users are included in the Start plan?,Pricing_and_Discounts.xlsx,1,Pricing_and_Discounts.xlsx,29.22,,hybrid
+30,numeric,After how many minutes of inactivity does the session end?,User_Guide.pdf,1,User_Guide.pdf,29.33,,hybrid
+31,paraphrase,"Могу ли я работать из дома всю неделю, если договорюсь с руководителем?",Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,73.67,,hybrid
+32,paraphrase,Что компания предоставляет для работы из дома?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,76.3,,hybrid
+33,paraphrase,Какие требования к паролю при регистрации?,Руководство_пользователя.pdf,2,User_Guide.pdf,55.6,,hybrid
+34,paraphrase,Планирую оплатить сразу за год — есть ли выгода?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,111.01,,hybrid
+35,paraphrase,Мы некоммерческая организация — есть ли для нас скидка?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,150.02,,hybrid
+36,paraphrase,"Do I need to stay online during working hours, and when exactly?",Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,66.1,,hybrid
+37,paraphrase,How far in advance should I request my vacation?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,36.96,,hybrid
+38,paraphrase,We are a non-profit organisation — do we get better pricing?,Pricing_and_Discounts.xlsx,1,Pricing_and_Discounts.xlsx,77.62,,hybrid
+39,paraphrase,Is there a limit on how big my upload can be?,User_Guide.pdf,1,User_Guide.pdf,55.48,,hybrid
+40,cross-lingual,Какая цена у тарифа Business?,Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,33.96,,hybrid
+41,cross-lingual,Сколько стоит Enterprise и что в него входит?,Тарифы_и_скидки.xlsx,,Pricing_and_Discounts.xlsx,51.81,,hybrid
+42,cross-lingual,Как настроить two-factor authentication?,Руководство_пользователя.pdf,2,User_Guide.pdf,57.2,,hybrid
+43,cross-lingual,Что политика говорит про reimbursement интернета?,Политика_удалённой_работы.docx,1,Политика_удалённой_работы.docx,187.52,,hybrid
+44,cross-lingual,"According to the Russian pricing sheet, what does Старт cost?",Тарифы_и_скидки.xlsx,1,Тарифы_и_скидки.xlsx,81.64,,hybrid
+45,cross-lingual,How many vacation days does Политика удалённой работы grant?,Политика_удалённой_работы.docx,2,Remote_Work_Policy.docx,157.04,,hybrid
+46,cross-lingual,Какие требования к паролю в User Guide?,User_Guide.pdf,1,User_Guide.pdf,176.38,,hybrid
+47,cross-lingual,Что Remote Work Policy говорит про рабочие часы?,Remote_Work_Policy.docx,1,Remote_Work_Policy.docx,200.46,,hybrid

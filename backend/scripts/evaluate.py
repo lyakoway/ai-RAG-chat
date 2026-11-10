@@ -175,7 +175,9 @@ async def judge_phase(
     rows: list[dict] = []
     for i, item in enumerate(items, 1):
         lang = item.get("lang", "ru")
-        hits = vectorstore.query(text=item["q"], top_k=top_k)
+        hits = vectorstore.query(
+            text=item["q"], workspace_id="default", top_k=top_k
+        )
         context = rag_mod.build_context(hits)
         system = rag_mod.build_system_prompt(hits, lang)
         print(f"[{i}/{len(items)}] {item['q'][:60]}", flush=True)
@@ -277,7 +279,9 @@ def evaluate(top_k: int = 5) -> None:
 
     for item in GOLDEN:
         started = time.perf_counter()
-        hits = vectorstore.query(text=item["q"], top_k=top_k)
+        hits = vectorstore.query(
+            text=item["q"], workspace_id="default", top_k=top_k
+        )
         latencies.append((time.perf_counter() - started) * 1000)
         names = [h["filename"] for h in hits]
         rank = next((i + 1 for i, n in enumerate(names) if n == item["doc"]), None)
